@@ -61,6 +61,33 @@ export class UserRoute {
         )
 
         this.router
+            .post(
+                '/users',
+                verifyAuth("employee"),
+                (req: Request, res: Response) => adminUserManagement.addUser(req, res)
+            )
+            .get(
+                "/users",
+                verifyAuth("employee"),
+                (req: Request, res: Response) => adminUserManagement.getUsers(req, res)
+            )
+            .get(
+                "/users/:employeeId",
+                verifyAuth("employee"),
+                (req: Request, res: Response) => adminUserManagement.getUserDetails(req, res)
+            )
+            .patch(
+                "/users/:employeeId",
+                verifyAuth("employee"),
+                (req: Request, res: Response) => adminUserManagement.updateprofile(req, res)
+            )
+            .delete(
+                "/users/:employeeId",
+                verifyAuth("employee"),
+                (req: Request, res: Response) => adminUserManagement.deleteUser(req, res)
+            );
+
+        this.router
             .get(
                 "/profile/:employeeId",
                 verifyAuth("employee"),
@@ -106,6 +133,18 @@ export class UserRoute {
                 "/leave/request/cancel/:leaveRequestId",
                 verifyAuth("employee"),
                 (req: Request, res: Response) => leaveRequestController.cancelLeaveRequest(req, res)
+            )
+
+            .get(
+                "/leave/requests",
+                verifyAuth("employee"),
+                (req: Request, res: Response) => leaveRequestController.getAllLeaveRequests(req, res)
+            )
+
+            .patch(
+                "/leave/requests/:leaveRequestId",
+                verifyAuth("employee"),
+                (req: Request, res: Response) => leaveRequestController.updateLeaveRequestStatus(req, res)
             )
 
         this.router
