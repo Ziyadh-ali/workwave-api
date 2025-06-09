@@ -41,7 +41,6 @@ export class AttendanceUseCase implements IAttendanceUseCase {
         if (now > checkInCutOff) {
             const isHalfDay = leave?.duration === "morning";
             if (!isHalfDay) {
-                console.log("hello afte 10")
                 await this.attendanceRepository.updateStatus(attendance._id?.toString() || "", "Absent");
                 throw new Error(MESSAGES.ERROR.ATTENDANCE.CUT_OFF_TIME);
             }
