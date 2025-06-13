@@ -100,6 +100,8 @@ export class AttendanceRepository implements IAttendanceRepository {
         if (data.checkInTime) updateData.checkInTime = data.checkInTime;
         if (data.checkOutTime) updateData.checkOutTime = data.checkOutTime;
 
+        console.log("UpdatedAttendnace",updateData)
+
         return await attendanceModel
             .findByIdAndUpdate(id, updateData, { new: true })
             .populate("employeeId", "fullName");
