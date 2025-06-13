@@ -25,8 +25,8 @@ export interface IAttendanceUseCase {
         id: string,
         data: {
             status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
-            checkInTime?: Date;
-            checkOutTime?: Date;
+            checkInTime?: string;
+            checkOutTime?: string;
         }
     ): Promise<Attendance | null>;
 }

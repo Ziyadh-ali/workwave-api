@@ -16,28 +16,28 @@ export class AttendanceUseCase implements IAttendanceUseCase {
     async checkIn(employeeId: string): Promise<void> {
         const now = new Date();
         const { startOfDay, endOfDay } = getDayRange(now);
-    
+
         const day = now.getDay();
         if (day === 0 || day === 6) {
             throw new Error(MESSAGES.ERROR.ATTENDANCE.ON_WEEKEND);
         }
-    
+
         const leave = await this.leaveRequestRepository.getLeaveRequestForDate(employeeId, now);
-        
+
         if (leave && leave.duration === "full" && leave.status === "Approved") {
             throw new Error(MESSAGES.ERROR.ATTENDANCE.ON_FULLDAY_LEAVE);
         }
-    
+
         const existingAttendance = await this.attendanceRepository.getAttendanceByDate(employeeId, now);
         if (existingAttendance?.checkInTime) {
             throw new Error(MESSAGES.ERROR.ATTENDANCE.ALREADY_CHECKED);
         }
-    
+
         const attendance = await this.attendanceRepository.createAttendance(employeeId, now);
-    
+
         const checkInCutOff = new Date(now);
         checkInCutOff.setHours(10, 0, 0, 0);
-    
+
         if (now > checkInCutOff) {
             const isHalfDay = leave?.duration === "morning";
             if (!isHalfDay) {
@@ -45,11 +45,11 @@ export class AttendanceUseCase implements IAttendanceUseCase {
                 throw new Error(MESSAGES.ERROR.ATTENDANCE.CUT_OFF_TIME);
             }
         }
-    
+
         await this.attendanceRepository.markCheckIn(employeeId, now, startOfDay, endOfDay);
         await this.attendanceRepository.updateStatus(attendance._id?.toString() || "", "Pending");
     }
-    
+
 
     async checkOut(employeeId: string): Promise<void> {
         const now = new Date();
@@ -81,7 +81,6 @@ export class AttendanceUseCase implements IAttendanceUseCase {
             await this.attendanceRepository.updateStatus(attendance._id?.toString() || "", "Present");
         }
 
-        // ✅ Duration Calculation (Optional but useful)
         const durationMs = now.getTime() - new Date(attendance.checkInTime).getTime();
         const durationHours = (durationMs / (1000 * 60 * 60)).toFixed(2);
         console.log(`✅ Work duration: ${durationHours} hours`);
@@ -102,24 +101,50 @@ export class AttendanceUseCase implements IAttendanceUseCase {
         return attendancesOfMonth;
     }
 
-    async getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: Attendance[]|[] , total: number }> {
+    async getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: Attendance[] | [], total: number }> {
         console.log(pageSize)
-        return await this.attendanceRepository.getAllAttendanceByDate(date , page , pageSize);
+        return await this.attendanceRepository.getAllAttendanceByDate(date, page, pageSize);
     }
 
     async updateStatus(id: string, status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending"): Promise<Attendance | null> {
-        return await this.attendanceRepository.updateStatus(id , status);
+        return await this.attendanceRepository.updateStatus(id, status);
     }
 
     async updateAttendance(
         id: string,
         data: {
             status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
-            checkInTime?: Date;
-            checkOutTime?: Date;
+            checkInTime?: string;
+            checkOutTime?: string;
         }
-    ): Promise<Attendance | null>{
-        return await this.attendanceRepository.updateAttendance(id , data);
+    ): Promise<Attendance | null> {
+        const updateData: any = {};
+
+        if (data.status) updateData.status = data.status;
+
+        if (data.checkInTime) {
+            if (typeof data.checkInTime === "string") {
+                const [hours, minutes] = data.checkInTime.split(":").map(Number);
+                const checkInDate = new Date();
+                checkInDate.setHours(hours, minutes, 0, 0);
+                updateData.checkInTime = checkInDate;
+            } else {
+                updateData.checkInTime = data.checkInTime;
+            }
+        }
+
+        if (data.checkOutTime) {
+            if (typeof data.checkOutTime === "string") {
+                const [hours, minutes] = data.checkOutTime.split(":").map(Number);
+                const checkOutDate = new Date();
+                checkOutDate.setHours(hours, minutes, 0, 0);
+                updateData.checkOutTime = checkOutDate;
+            } else {
+                updateData.checkOutTime = data.checkOutTime;
+            }
+        }
+
+        return await this.attendanceRepository.updateAttendance(id, updateData);
     }
 
     async getAllPendingRegularizationRequests(): Promise<Attendance[]> {
@@ -127,10 +152,10 @@ export class AttendanceUseCase implements IAttendanceUseCase {
     }
 
     async requestRegularization(attendanceId: string, requestedBy: string, reason: string): Promise<Attendance | null> {
-        return await this.attendanceRepository.requestRegularization(attendanceId , requestedBy,reason );
+        return await this.attendanceRepository.requestRegularization(attendanceId, requestedBy, reason);
     }
 
     async respondToRegularizationRequest(attendanceId: string, action: "Approved" | "Rejected", adminRemarks?: string): Promise<Attendance | null> {
-        return await this.attendanceRepository.respondToRegularizationRequest(attendanceId,action,adminRemarks);
+        return await this.attendanceRepository.respondToRegularizationRequest(attendanceId, action, adminRemarks);
     }
 }

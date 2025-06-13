@@ -106,8 +106,8 @@ export class AttendanceController {
             // const status = req.query.status as unknown as "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
             const data = req.body.data as {
                 status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending",
-                checkInTime?: Date,
-                checkOutTime?: Date,
+                checkInTime?: string,
+                checkOutTime?: string,
             }
 
             console.log("Attendance Data",data);
