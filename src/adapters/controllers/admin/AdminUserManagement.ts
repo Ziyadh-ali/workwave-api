@@ -108,7 +108,6 @@ export class AdminUserManagement {
 
 
         if (userData.email) {
-            console.log(userData)
             const isEmployee = await this.employeeRepository.findByEmail(userData.email);
             if (isEmployee) {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
