@@ -15,9 +15,8 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
     async updateEmployee(employeeId: string, data: Partial<Employee>): Promise<Employee | null> {
         try {
 
-            console.log("email is changing")
-
             if (data.email) {
+                console.log("email is changing")
                 let employee = await this.employeeRepository.findByEmail(data.email);
 
                 if (employee) {
@@ -32,6 +31,7 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
             }
             return updateEmployee;
         } catch (error) {
+            console.log(error);
             throw new Error(MESSAGES.ERROR.USER.USER_UPDATE_FAILED);
         }
     }
