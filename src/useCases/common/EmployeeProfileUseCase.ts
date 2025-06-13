@@ -16,7 +16,7 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
         try {
 
             if (data.email) {
-                console.log("email is changing")
+                console.log("email is changing in if")
                 let employee = await this.employeeRepository.findByEmail(data.email);
 
                 if (employee) {
