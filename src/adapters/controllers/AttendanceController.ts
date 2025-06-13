@@ -110,6 +110,8 @@ export class AttendanceController {
                 checkOutTime?: string,
             }
 
+            console.log("controller" , data);
+
             const updatedAttendance = await this.attendanceUseCase.updateAttendance(attendanceId , data)
 
             res.status(HTTP_STATUS_CODES.OK).json({
