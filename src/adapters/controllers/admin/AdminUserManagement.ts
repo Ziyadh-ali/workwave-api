@@ -3,12 +3,14 @@ import { injectable, inject } from "tsyringe";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { IEmployeeManagementUseCase } from "../../../entities/useCaseInterface/IEmployeeManagementUseCase";
+import { IEmployeeRepository } from "../../../entities/repositoryInterfaces/employee/employee.repository";
 
 @injectable()
 export class AdminUserManagement {
     constructor(
         @inject("IEmployeeManagementUseCase") private employeeManagementUseCase: IEmployeeManagementUseCase,
         @inject("IEmployeeProfileUseCase") private employeeProfileUseCase: IEmployeeProfileUseCase,
+        @inject("IEmployeeRepository") private employeeRepository: IEmployeeRepository,
     ) { }
 
     async addUser(req: Request, res: Response): Promise<void> {
@@ -103,7 +105,18 @@ export class AdminUserManagement {
     async updateprofile(req: Request, res: Response): Promise<void> {
         const { employeeId } = req.params;
         const userData = req.body;
-        console.log(userData)
+
+
+        if (userData.email) {
+            console.log(userData)
+            const isEmployee = await this.employeeRepository.findByEmail(userData.email);
+            if (isEmployee) {
+                res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
+                    success: false,
+                    message: "Employee exists with the same email",
+                })
+            }
+        }
         try {
             if (!employeeId) {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
@@ -143,7 +156,7 @@ export class AdminUserManagement {
         }
     }
 
-    async getEmployeesForChat (req : Request , res : Response) : Promise<void> {
+    async getEmployeesForChat(req: Request, res: Response): Promise<void> {
         try {
             const employees = await this.employeeManagementUseCase.getEmployeesForChat();
             res.status(HTTP_STATUS_CODES.OK).json({
@@ -157,7 +170,7 @@ export class AdminUserManagement {
         }
     }
 
-    async getDevelopers (req : Request , res : Response) : Promise<void> {
+    async getDevelopers(req: Request, res: Response): Promise<void> {
         try {
             const developers = await this.employeeManagementUseCase.getDevelopers();
             res.status(HTTP_STATUS_CODES.OK).json({
