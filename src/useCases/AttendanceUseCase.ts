@@ -126,7 +126,7 @@ export class AttendanceUseCase implements IAttendanceUseCase {
             if (typeof data.checkInTime === "string") {
                 const [hours, minutes] = data.checkInTime.split(":").map(Number);
                 const checkInDate = new Date();
-                checkInDate.setHours(hours, minutes, 0, 0);
+                checkInDate.setUTCHours(hours, minutes, 0, 0);
                 updateData.checkInTime = checkInDate;
             } else {
                 updateData.checkInTime = data.checkInTime;
@@ -137,7 +137,7 @@ export class AttendanceUseCase implements IAttendanceUseCase {
             if (typeof data.checkOutTime === "string") {
                 const [hours, minutes] = data.checkOutTime.split(":").map(Number);
                 const checkOutDate = new Date();
-                checkOutDate.setHours(hours, minutes, 0, 0);
+                checkOutDate.setUTCHours(hours, minutes, 0, 0);
                 updateData.checkOutTime = checkOutDate;
             } else {
                 updateData.checkOutTime = data.checkOutTime;
