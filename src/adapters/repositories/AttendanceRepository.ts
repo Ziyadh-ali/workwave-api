@@ -100,9 +100,9 @@ export class AttendanceRepository implements IAttendanceRepository {
         if (data.checkInTime) updateData.checkInTime = data.checkInTime;
         if (data.checkOutTime) updateData.checkOutTime = data.checkOutTime;
 
-        console.log("Updated one",updateData)
-
-        return await attendanceModel.findByIdAndUpdate(id, updateData, { new: true });
+        return await attendanceModel
+            .findByIdAndUpdate(id, updateData, { new: true })
+            .populate("employeeId", "fullName");
     }
 
     async getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: Attendance[] | [], total: number }> {

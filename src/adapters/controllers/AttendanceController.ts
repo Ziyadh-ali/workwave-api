@@ -103,14 +103,11 @@ export class AttendanceController {
     async updateAttendance(req: Request, res: Response): Promise<void> {
         try {
             const { attendanceId } = req.params;
-            // const status = req.query.status as unknown as "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
             const data = req.body.data as {
                 status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending",
                 checkInTime?: string,
                 checkOutTime?: string,
             }
-
-            console.log("controller" , data);
 
             const updatedAttendance = await this.attendanceUseCase.updateAttendance(attendanceId , data)
 
