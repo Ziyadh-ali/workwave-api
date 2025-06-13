@@ -11,3 +11,4 @@ const connectMongo = new MongoConnect();
 
 connectMongo.connect();
 server.start();
+console.log("Server is running from:", __dirname);
