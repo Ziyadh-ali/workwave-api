@@ -12,3 +12,4 @@ const connectMongo = new MongoConnect();
 connectMongo.connect();
 server.start();
 console.log("Server is running from:", __dirname);
+console.log("RUNNING BUILD VERSION: Employee Edit v5");
