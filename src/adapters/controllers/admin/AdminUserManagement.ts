@@ -141,7 +141,7 @@ export class AdminUserManagement {
             }
         } catch (error) {
             console.log(error);
-            if (error instanceof Error) {
+            if (error instanceof Error) {   
                 res.status(HTTP_STATUS_CODES.NOT_FOUND).json({
                     success: false,
                     message: error.message,

@@ -103,9 +103,16 @@ export class AttendanceController {
     async updateAttendance(req: Request, res: Response): Promise<void> {
         try {
             const { attendanceId } = req.params;
-            const status = req.query.status as unknown as "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
+            // const status = req.query.status as unknown as "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
+            const data = req.body.data as {
+                status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending",
+                checkInTime?: Date,
+                checkOutTime?: Date,
+            }
 
-            const updatedAttendance = await this.attendanceUseCase.updateStatus(attendanceId, status);
+            console.log("Attendance Data",data);
+
+            const updatedAttendance = await this.attendanceUseCase.updateAttendance(attendanceId , data)
 
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.ATTENDANCDE_UPDATED,
@@ -159,7 +166,7 @@ export class AttendanceController {
 
             await this.attendanceUseCase.respondToRegularizationRequest(attendanceId, action, remarks);
             res.status(HTTP_STATUS_CODES.OK).json({
-                message : `Regularization ${action}`,
+                message: `Regularization ${action}`,
             })
 
         } catch (error) {

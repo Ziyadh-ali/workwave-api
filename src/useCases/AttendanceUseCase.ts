@@ -111,6 +111,17 @@ export class AttendanceUseCase implements IAttendanceUseCase {
         return await this.attendanceRepository.updateStatus(id , status);
     }
 
+    async updateAttendance(
+        id: string,
+        data: {
+            status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
+            checkInTime?: Date;
+            checkOutTime?: Date;
+        }
+    ): Promise<Attendance | null>{
+        return await this.attendanceRepository.updateAttendance(id , data);
+    }
+
     async getAllPendingRegularizationRequests(): Promise<Attendance[]> {
         return await this.attendanceRepository.getAllPendingRegularizationRequests();
     }

@@ -4,7 +4,7 @@ import { Attendance } from "../../entities/models/Attendance.entities";
 import { attendanceModel } from "../../frameworks/database/models/AttendanceModel";
 
 @injectable()
-export class AttendanceRepository implements IAttendanceRepository  {
+export class AttendanceRepository implements IAttendanceRepository {
     async createAttendance(employeeId: string, date: Date): Promise<Attendance> {
         return await attendanceModel.create({
             employeeId,
@@ -86,6 +86,23 @@ export class AttendanceRepository implements IAttendanceRepository  {
         return await attendanceModel.findByIdAndUpdate(id, { status });
     }
 
+    async updateAttendance(
+        id: string,
+        data: {
+            status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
+            checkInTime?: Date;
+            checkOutTime?: Date;
+        }
+    ): Promise<Attendance | null> {
+        const updateData: any = {};
+
+        if (data.status) updateData.status = data.status;
+        if (data.checkInTime) updateData.checkInTime = data.checkInTime;
+        if (data.checkOutTime) updateData.checkOutTime = data.checkOutTime;
+
+        return await attendanceModel.findByIdAndUpdate(id, updateData, { new: true });
+    }
+
     async getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: Attendance[] | [], total: number }> {
         const query: any = {};
         if (date) {
@@ -95,7 +112,7 @@ export class AttendanceRepository implements IAttendanceRepository  {
             end.setHours(23, 59, 59, 999);
             query.date = { $gte: start, $lte: end };
         }
-        
+
         const skip = (page - 1) * pageSize;
 
         const [data, total] = await Promise.all([

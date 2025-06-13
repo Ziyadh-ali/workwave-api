@@ -20,4 +20,13 @@ export interface IAttendanceUseCase {
     ): Promise<Attendance | null>;
 
     getAllPendingRegularizationRequests(): Promise<Attendance[]>;
+
+    updateAttendance(
+        id: string,
+        data: {
+            status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
+            checkInTime?: Date;
+            checkOutTime?: Date;
+        }
+    ): Promise<Attendance | null>;
 }

@@ -16,7 +16,6 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
         try {
 
             if (data.email) {
-                console.log("email is changing in if")
                 let employee = await this.employeeRepository.findByEmail(data.email);
 
                 if (employee) {
@@ -31,7 +30,6 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
             }
             return updateEmployee;
         } catch (error) {
-            console.log(error);
             throw new Error(MESSAGES.ERROR.USER.USER_UPDATE_FAILED);
         }
     }
