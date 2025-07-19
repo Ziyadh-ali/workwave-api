@@ -19,6 +19,7 @@ import { MonthlySummaryController } from "../../adapters/controllers/MonthlySumm
 import { PayrollController } from "../../adapters/controllers/PayrollController";
 import { PayslipPDFService } from "../../adapters/service/PayslipPDFService";
 import { PayslipController } from "../../adapters/controllers/PDFHandlerController";
+import { CronService } from "../../adapters/service/cronService";
 
 export class ControllerRegistry {
     static registerControllers() : void {
@@ -99,6 +100,10 @@ export class ControllerRegistry {
 
         container.register("PayslipController",{
             useClass : PayslipController,
+        });
+
+        container.register("CronService",{
+            useClass : CronService,
         });
     }
 }

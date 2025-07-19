@@ -4,6 +4,8 @@ import { IMonthlyAttendanceSummary } from "../../entities/models/IMonthlyAttenda
 import { IPayrollModel, PayrollModel } from "../../frameworks/database/models/PayrollModel";
 import { EmployeeModel } from "../../frameworks/database/models/employee/EmployeeModel";
 import { IPayroll } from "../../entities/models/IPayroll";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class PayrollRepository implements IPayrollRepository {
@@ -66,7 +68,7 @@ export class PayrollRepository implements IPayrollRepository {
             summaries.map(async summary => {
                 const employee = await EmployeeModel.findById(summary.employeeId);
                 if (!employee) {
-                    throw new Error(`Employee not found for ID: ${summary.employeeId}`);
+                    throw new CustomError(`Employee not found for ID: ${summary.employeeId}` , HTTP_STATUS_CODES.BAD_REQUEST);
                 }
                 return this.generatePayroll(summary, employee.salary, taxPercentage);
             })
@@ -93,7 +95,7 @@ export class PayrollRepository implements IPayrollRepository {
         ).populate("employeeId", "fullName role");
 
         if (!payroll) {
-            throw new Error("Payroll not found");
+            throw new CustomError("Payroll not found" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         return payroll;

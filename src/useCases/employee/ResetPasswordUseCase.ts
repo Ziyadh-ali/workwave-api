@@ -1,9 +1,10 @@
 import { injectable , inject } from "tsyringe";
 import { IResetPasswordUseCase } from "../../entities/useCaseInterface/IResetPasswordUseCase";
-import { MESSAGES } from "../../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
 import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
 import { IJwtService } from "../../entities/services/jwt.interface";
+import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()
 export class ResetPasswordUseCase implements IResetPasswordUseCase {
@@ -15,12 +16,12 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
     async resetPassword(token: string, newPassword: string): Promise<void> {
         const payload = this.jwtService.verifyResetToken(token);
         if (!payload || !payload?.email) {
-            throw new Error(MESSAGES.ERROR.AUTH.INVALID_TOKEN);
+            throw new CustomError(MESSAGES.ERROR.AUTH.INVALID_TOKEN ,HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const employee = await this.employeeRepository.findByEmail(payload.email);
         if (!employee) {
-            throw new Error(MESSAGES.ERROR.USER.USER_NOT_FOUND);
+            throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const isSamePassword = await this.passwordBcrypt.compare(
@@ -28,7 +29,7 @@ export class ResetPasswordUseCase implements IResetPasswordUseCase {
             employee.password
         );
         if (isSamePassword) {
-            throw new Error("Same pasword");
+            throw new CustomError("Same pasword" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const hashedPassword = await this.passwordBcrypt.hash(newPassword);

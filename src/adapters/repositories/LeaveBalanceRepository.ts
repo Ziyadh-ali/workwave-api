@@ -2,6 +2,8 @@ import { injectable  } from "tsyringe";
 import { ILeaveBalanceRepository } from "../../entities/repositoryInterfaces/ILeaveBalance.repository";
 import { LeaveBalanceModel } from "../../frameworks/database/models/LeaveBalanceModel";
 import { LeaveBalance } from "../../entities/models/LeaveBalance.entity";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class LeaveBalanceRepository implements ILeaveBalanceRepository {
@@ -42,7 +44,7 @@ export class LeaveBalanceRepository implements ILeaveBalanceRepository {
         const leaveBalances = await LeaveBalanceModel.find({ employeeId });
 
         if (!leaveBalances || leaveBalances.length === 0) {
-            throw new Error("No leave balance records found for the user.");
+            throw new CustomError("No leave balance records found for the user." , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         for (const balance of leaveBalances) {

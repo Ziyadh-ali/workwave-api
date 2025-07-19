@@ -13,7 +13,6 @@ export class MeetingController {
     ) { }
 
     async createMeeting(req: Request, res: Response): Promise<void> {
-        try {
             const validatedBody = createMeetingSchema.parse(req.body);
 
             const { meeting , filter } = validatedBody;
@@ -32,32 +31,18 @@ export class MeetingController {
                 message: MESSAGES.SUCCESS.METING_SCHEDULED,
                 createdMeeting,
             });
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: (error instanceof Error) ? error.message : MESSAGES.ERROR.GENERIC,
-            });
-        }
     }
 
     async getMeetingByEmployeeId(req: Request, res: Response): Promise<void> {
-        try {
             const { employeeId } = req.params;
             const meetings = await this.meetingUseCase.getMeetingByEmployeeId(employeeId);
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.METING_SCHEDULED,
                 meetings,
             });
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: (error instanceof Error) ? error.message : MESSAGES.ERROR.GENERIC,
-            });
-        }
     }
 
     async updateMeetingStatusAnsLink(req: Request, res: Response): Promise<void> {
-        try {
             const { meetingId } = req.params;
             const { link, status } = req.body;
             const updateData: { link?: string, status?: "completed" | "upcoming" | "ongoing" } = {};
@@ -91,16 +76,9 @@ export class MeetingController {
                 message: successMessage,
                 meeting,
             });
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: (error instanceof Error) ? error.message : MESSAGES.ERROR.GENERIC,
-            });
-        }
     }
 
     async updateMeeting(req: Request, res: Response): Promise<void> {
-        try {
             const user = (req as CustomRequest).user;
             const { meeting, filter } = req.body;
             meeting.createdBy = user.id;
@@ -111,28 +89,15 @@ export class MeetingController {
                 message: MESSAGES.SUCCESS.MEETING_UPDATED,
                 updatedMeeting,
             });
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: error instanceof Error ? error.message : MESSAGES.ERROR.GENERIC,
-            });
-        }
     }
 
 
 
     async deleteMeeting(req: Request, res: Response): Promise<void> {
-        try {
             const { meetingId } = req.params;
             await this.meetingUseCase.deleteMeeting(meetingId);
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.MEETING_DELETED,
             });
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: (error instanceof Error) ? error.message : MESSAGES.ERROR.GENERIC,
-            });
-        }
     }
 }

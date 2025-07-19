@@ -3,10 +3,11 @@ import { IAdminRepository } from "../../entities/repositoryInterfaces/admin/admi
 import { Admin } from "../../entities/models/adminEntities/admin.enitity";
 import { AdminLoginResponse } from "../../entities/adminInterface/adminLogin.interface";
 import { IAdminAuthUseCase } from "../../entities/useCaseInterface/IAdaminAuthUseCase";
-import { MESSAGES } from "../../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { loginSchema } from "../../shared/validation/validator";
 import { IJwtService } from "../../entities/services/jwt.interface";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
+import { CustomError } from "../../shared/errors/CustomError";
 
 
 @injectable()
@@ -21,7 +22,7 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
         try {
             const existingAdmin = await this.adminRepository.findByEmail(email);
             if (existingAdmin) {
-                throw new Error("Admin already exists");
+                throw new CustomError("Admin already exists" , HTTP_STATUS_CODES.BAD_REQUEST);
             }
 
             const hashedPassword = await this.passwordBcrypt.hash(password);
@@ -34,24 +35,24 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
             await this.adminRepository.save(admin);
             return admin;
         } catch (error) {
-            throw new Error(`Failed to create admin`);
+            throw new CustomError(`Failed to create admin` , HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 
     async login(email: string, password: string): Promise<AdminLoginResponse | null> {
         // const validationResult = loginSchema.safeParse({ email, password });
         // if (!validationResult.success) {
-        //     throw new Error(JSON.stringify(validationResult.error.format()));
+        //     throw new error(JSON.stringify(validationResult.error.format()));
         // }
         const admin = await this.adminRepository.findByEmail(email);
         if (!admin) {
-            throw new Error("Admin not found");
+            throw new CustomError("Admin not found" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         if (password) {
             const isPasswordMatch = await this.passwordBcrypt.compare(password, admin.password);
             if (!isPasswordMatch) {
-                throw new Error(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
+                throw new CustomError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS , HTTP_STATUS_CODES.BAD_REQUEST);
             }
         }
 

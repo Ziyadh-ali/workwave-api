@@ -1,6 +1,8 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../service/cloudinary";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 const chatMediaStorage = new CloudinaryStorage({
     cloudinary,
@@ -50,7 +52,7 @@ export const chatMediaUpload = multer({
         if (allowedTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error("Invalid file type. Only images, videos, and PDFs are allowed."));
+            cb(new CustomError("Invalid file type. Only images, videos, and PDFs are allowed." , HTTP_STATUS_CODES.BAD_REQUEST));
         }
     }
 });

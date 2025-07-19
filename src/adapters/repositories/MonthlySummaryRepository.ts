@@ -8,6 +8,8 @@ import { attendanceModel } from "../../frameworks/database/models/AttendanceMode
 import { LeaveRequestModel } from "../../frameworks/database/models/LeaveRequestModel";
 import { Types } from "mongoose";
 import { LeaveTypeModel } from "../../frameworks/database/models/LeaveTypeModel";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class MonthlySummaryRepository implements IMonthlySummaryRepository {
@@ -23,7 +25,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
     ): Promise<IMonthlyAttendanceSummary | IMonthlyAttendanceSummary[]> {
 
         if (month < 1 || month > 12) {
-            throw new Error("Invalid month");
+            throw new CustomError("Invalid month" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         let generator
@@ -31,7 +33,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
         if (generatedBy.role == "employee") {
             generator = await EmployeeModel.findById(generatedBy.id);
             if (!generator) {
-                throw new Error("Invalid generator");
+                throw new CustomError("Invalid generator" , HTTP_STATUS_CODES.BAD_REQUEST);
             }
         }
 
@@ -41,7 +43,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
 
             const employee = await EmployeeModel.findById(employeeId);
             if (!employee) {
-                throw new Error("Employee not found");
+                throw new CustomError("Employee not found" , HTTP_STATUS_CODES.BAD_REQUEST);
             }
             employees = [employee];
         } else {
@@ -68,7 +70,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
         );
 
         if (employeesToProcess.length === 0) {
-            throw new Error("All requested employees already have summaries for this month");
+            throw new CustomError("All requested employees already have summaries for this month",HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const holidays = await fetchHolidayDates(year);
@@ -250,7 +252,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
 
         console.log(summary)
         if (!summary) {
-            throw new Error("Summary not found");
+            throw new CustomError("Summary not found" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         return summary;
@@ -261,7 +263,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
         reason: string
     ): Promise<IMonthlyAttendanceSummary> {
         if (!reason.trim()) {
-            throw new Error("Rejection reason is required");
+            throw new CustomError("Rejection reason is required" ,HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const summary = await MonthlySummaryModel.findByIdAndUpdate(
@@ -274,7 +276,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
         ).populate("employeeId", "fullName role");
 
         if (!summary) {
-            throw new Error("Summary not found");
+            throw new CustomError("Summary not found" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         return summary;
@@ -287,7 +289,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
         );
 
         if (updatedSummaries.modifiedCount === 0) {
-            throw new Error("No summaries were approved");
+            throw new CustomError("No summaries were approved" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         // Return the updated summaries

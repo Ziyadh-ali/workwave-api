@@ -3,9 +3,10 @@ import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employe
 import { Employee } from "../../entities/models/employeeEntities/employee.enitity";
 import { PasswordBcrypt } from "../../frameworks/security/password.bcrypt";
 import { IEmployeeManagementUseCase } from "../../entities/useCaseInterface/IEmployeeManagementUseCase";
-import { MESSAGES } from "../../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { eventHandler } from "../../shared/eventHandler";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
+import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()
 export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
@@ -18,7 +19,7 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
         const existingEmployee = await this.employeeRepository.findByEmail(data.email);
 
         if (existingEmployee) {
-            throw new Error(MESSAGES.ERROR.USER.USER_ALREADY_EXISTS);
+            throw new CustomError(MESSAGES.ERROR.USER.USER_ALREADY_EXISTS , 400);
         }
 
         const hashedPassword = await this.passwordBcrypt.hash(data.password);
@@ -43,7 +44,7 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
             eventHandler.emit("EMPLOYEE_DELETED",id); 
             await this.employeeRepository.findByIdAndDelete(id);
         } catch (error) {
-            throw new Error("Error in deleting user")
+            throw new CustomError("Error in deleting user" , HTTP_STATUS_CODES.BAD_REQUEST)
         }
     }
 
@@ -53,7 +54,7 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
             return managers;
         } catch (error) {
             console.log(error);
-            throw new Error("Error in finding managers");
+            throw new CustomError("Error in finding managers" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 

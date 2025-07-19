@@ -8,7 +8,7 @@ const tokenService = new JwtService();
 
 
 export interface CustomJwtPayload extends JwtPayload {
-    _id: string | ObjectId;
+    id: string | ObjectId;
     email: string;
     role: string;
     access_token: string;

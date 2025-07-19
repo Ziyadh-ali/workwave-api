@@ -2,6 +2,8 @@ import { injectable, inject } from "tsyringe";
 import { IMonthlySummaryRepository } from "../entities/repositoryInterfaces/IMonthlySummaryRepository";
 import { IMonthlySummaryUseCase } from "../entities/useCaseInterface/IMonthlySummaryUseCase";
 import { IMonthlyAttendanceSummary } from "../entities/models/IMonthlyAttendanceSummary";
+import { CustomError } from "../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../shared/constants";
 
 @injectable()
 export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
@@ -15,7 +17,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
     },
         employeeId?: string
     ): Promise<IMonthlyAttendanceSummary | IMonthlyAttendanceSummary[]> {
-        if (month < 1 || month > 12) throw new Error("Invalid month");
+        if (month < 1 || month > 12) throw new CustomError("Invalid month" , HTTP_STATUS_CODES.BAD_REQUEST);
 
         return await this.monthlySummaryRepo.generateSummary(month, year, generatedBy, employeeId);
     }
@@ -41,7 +43,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
 
     async bulkApproveSummaries(summaryIds: string[]): Promise<IMonthlyAttendanceSummary[]> {
         if (summaryIds.length === 0) {
-            throw new Error("No summary IDs provided");
+            throw new CustomError("No summary IDs provided" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
         return await this.monthlySummaryRepo.bulkApproveSummaries(summaryIds);
     }

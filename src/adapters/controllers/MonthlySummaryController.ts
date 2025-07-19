@@ -11,7 +11,6 @@ export class MonthlySummaryController {
     ) { }
 
     async generateSummary(req: Request, res: Response) {
-        try {
             const { month, year, employeeId } = req.body;
             const generatedBy = (req as CustomRequest).user;
 
@@ -19,23 +18,16 @@ export class MonthlySummaryController {
                 parseInt(month),
                 parseInt(year),
                 {
-                    id: generatedBy.id,
+                    id: generatedBy.id.toString(),
                     role: generatedBy.role as "admin" | "employee"
                 },
                 employeeId
             );
 
             res.status(HTTP_STATUS_CODES.OK).json(result);
-        } catch (error) {
-            console.log(error)
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                message: (error instanceof Error) ? error.message : "",
-            });
-        }
     }
 
     async regenerateSummary(req: Request, res: Response) {
-        try {
             const { month, year, employeeId } = req.body;
             const generatedBy = (req as CustomRequest).user;
 
@@ -43,66 +35,38 @@ export class MonthlySummaryController {
                 parseInt(month),
                 parseInt(year),
                 {
-                    id: generatedBy.id,
+                    id: generatedBy.id.toString(),
                     role: generatedBy.role as "admin" | "employee"
                 },
                 employeeId
             );
 
             res.status(HTTP_STATUS_CODES.OK).json(result);
-        } catch (error) {
-            console.log(error)
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                message: (error instanceof Error) ? error.message : "",
-            });
-        }
     }
 
     async getSummaries(req: Request, res: Response) {
-        try {
             const { month, year } = req.query;
             const result = await this.monthlySummaryUseCase.getExistingSummaries(
                 parseInt(month as string),
                 parseInt(year as string)
             );
             res.status(HTTP_STATUS_CODES.OK).json(result);
-        } catch (error) {
-            console.log(error)
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                message: (error instanceof Error) ? error.message : "",
-            });
-        }
     }
 
     async approveSummary(req: Request, res: Response) {
-        try {
             const { summaryId } = req.params;
             const result = await this.monthlySummaryUseCase.approveSummary(summaryId,);
             res.status(HTTP_STATUS_CODES.OK).json(result);
-        } catch (error) {
-            console.log(error)
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                message: (error instanceof Error) ? error.message : "",
-            });
-        }
     }
 
     async rejectSummary(req: Request, res: Response) {
-        try {
             const { summaryId } = req.params;
             const { rejectionReason } = req.body;
             const result = await this.monthlySummaryUseCase.rejectSummary(summaryId, rejectionReason);
             res.status(HTTP_STATUS_CODES.OK).json(result);
-        } catch (error) {
-            console.log(error)
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                message: (error instanceof Error) ? error.message : "",
-            });
-        }
     }
 
     async bulkApproveSummaries(req: Request, res: Response) {
-        try {
             const { summaryIds } = req.body;
             if (!Array.isArray(summaryIds)) {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
@@ -111,10 +75,5 @@ export class MonthlySummaryController {
             }
             const result = await this.monthlySummaryUseCase.bulkApproveSummaries(summaryIds);
             res.status(HTTP_STATUS_CODES.OK).json(result);
-        } catch (error) {
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                message: (error instanceof Error) ? error.message : "Failed to bulk approve summaries",
-            });
-        }
     }
 }

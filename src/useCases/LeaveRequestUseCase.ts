@@ -3,8 +3,9 @@ import { ILeaveRequestRepository } from "../entities/repositoryInterfaces/ILeave
 import { ILeaveRequestUseCase } from "../entities/useCaseInterface/ILeaveRequestUseCase";
 import { LeaveRequest, LeaveRequestFilter } from "../entities/models/LeaveRequest.entity";
 import { ILeaveBalanceRepository } from "../entities/repositoryInterfaces/ILeaveBalance.repository";
-import { MESSAGES } from "../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
 import { calculateWorkingDaysExcludingHolidays } from "../shared/utils/calculateWorkingDaysExcludingHolidays";
+import { CustomError } from "../shared/errors/CustomError";
 
 
 @injectable()
@@ -16,37 +17,39 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
 
     async createLeaveRequest(leaveRequest: LeaveRequest): Promise<LeaveRequest> {
         if (!leaveRequest || !leaveRequest.employeeId || !leaveRequest.leaveTypeId) {
-            throw new Error("Employee ID or Leave Type ID is missing");
+            throw new CustomError("Employee ID or Leave Type ID is missing" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         if (!leaveRequest.assignedManager && leaveRequest.userRole === "developer") {
-            throw new Error("No manager assigned");
+            throw new CustomError("No manager assigned" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const leaveBalance = await this.leaveBalanceRepository.getLeaveBalance(leaveRequest?.employeeId.toString(), leaveRequest.leaveTypeId.toString());
         if (!leaveBalance) {
-            throw new Error(MESSAGES.ERROR.LEAVE.NO_LEAVE_BALANCE);
+            throw new CustomError(MESSAGES.ERROR.LEAVE.NO_LEAVE_BALANCE , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
-        const existingLeaves = await this.leaveRequestRepository.getLeaveRequestByEmployee(leaveRequest?.employeeId.toString());
+        const existingLeaves = await this.leaveRequestRepository.getLeaveRequestsOfEmployee(leaveRequest?.employeeId.toString());
+        if (existingLeaves) {
+            for (const leave of existingLeaves) {
 
-        for (const leave of existingLeaves) {
+                if (leave.status === "Cancelled") continue;
+                if (leave.status === "Rejected") continue;
 
-            if (leave.status === "Cancelled") continue;
-            if (leave.status === "Rejected") continue;
+                const existingStart = new Date(leave.startDate);
+                const existingEnd = new Date(leave.endDate);
 
-            const existingStart = new Date(leave.startDate);
-            const existingEnd = new Date(leave.endDate);
+                const newStart = new Date(leaveRequest.startDate);
+                const newEnd = new Date(leaveRequest.endDate);
 
-            const newStart = new Date(leaveRequest.startDate);
-            const newEnd = new Date(leaveRequest.endDate);
+                const isOverlapping = newStart <= existingEnd && newEnd >= existingStart;
 
-            const isOverlapping = newStart <= existingEnd && newEnd >= existingStart;
-
-            if (isOverlapping) {
-                throw new Error("Leave request overlaps with an existing leave.");
+                if (isOverlapping) {
+                    throw new CustomError("Leave request overlaps with an existing leave." , HTTP_STATUS_CODES.BAD_REQUEST);
+                }
             }
         }
+
 
         const startDate = new Date(leaveRequest.startDate);
         const endDate = new Date(leaveRequest.endDate);
@@ -58,13 +61,19 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
         }
 
         if (requestedDays > leaveBalance.availableDays) {
-            throw new Error(MESSAGES.ERROR.LEAVE.INSUFFICIENT_BALANCE)
+            throw new CustomError(MESSAGES.ERROR.LEAVE.INSUFFICIENT_BALANCE , HTTP_STATUS_CODES.BAD_REQUEST)
         }
         return await this.leaveRequestRepository.createLeaveRequest(leaveRequest);
     }
 
-    async getLeaveRequestByEmployee(userId: string): Promise<LeaveRequest[]> {
-        return await this.leaveRequestRepository.getLeaveRequestByEmployee(userId);
+    async getLeaveRequestByEmployee(options: {
+        employeeId: string;
+        page: number;
+        limit: number;
+        search: string;
+        status: string;
+    }): Promise<{ leaveRequests: LeaveRequest[]; totalPages: number }> {
+        return await this.leaveRequestRepository.getLeaveRequestByEmployee(options);
     }
 
     // async getLeaveRequestForApproval(managerId: string): Promise<LeaveRequest[]> {
@@ -73,36 +82,36 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
 
     async cancelLeaveRequest(leaveRequestId: string): Promise<boolean> {
         const leaveRequest = await this.leaveRequestRepository.getLeaveRequestById(leaveRequestId);
-      
+
         if (!leaveRequest || leaveRequest.status !== "Approved") {
-          throw new Error("Only approved leave requests can be cancelled.");
+            throw new CustomError("Only approved leave requests can be cancelled." , HTTP_STATUS_CODES.BAD_REQUEST);
         }
-      
+
         const updated = await this.leaveRequestRepository.cancelLeaveRequest(leaveRequestId);
         if (!updated) return false;
-      
+
         const workingDays = await calculateWorkingDaysExcludingHolidays(
-          leaveRequest.startDate,
-          leaveRequest.endDate,
-          leaveRequest.duration? leaveRequest.duration : ""
+            leaveRequest.startDate,
+            leaveRequest.endDate,
+            leaveRequest.duration ? leaveRequest.duration : ""
         );
-      
+
         if (workingDays > 0) {
-          await this.leaveBalanceRepository.restoreLeave(
-            leaveRequest.employeeId.toString(),
-            leaveRequest.leaveTypeId.toString(),
-            workingDays
-          );
+            await this.leaveBalanceRepository.restoreLeave(
+                leaveRequest.employeeId.toString(),
+                leaveRequest.leaveTypeId.toString(),
+                workingDays
+            );
         }
-      
+
         return true;
-      }
+    }
 
     async updateLeaveRequestStatus(leaveRequestId: string, status: "Approved" | "Rejected",): Promise<boolean> {
         const leaveRequest = await this.leaveRequestRepository.getLeaveRequestById(leaveRequestId);
 
         if (!leaveRequest) {
-            throw new Error("Leave request not found");
+            throw new CustomError("Leave request not found" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         if (status === "Approved") {
@@ -118,7 +127,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
                 );
 
                 if (!success) {
-                    throw new Error("Failed to deduct leave balance. Possible insufficient balance.");
+                    throw new CustomError("Failed to deduct leave balance. Possible insufficient balance." , HTTP_STATUS_CODES.BAD_REQUEST);
                 }
             }
         }
@@ -130,8 +139,12 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     //     return await this.leaveRequestRepository.editLeaveRequest(leaveRequestId, updates);
     // }
 
-    async getAllLeaveRequests(): Promise<LeaveRequest[]> {
-        return await this.leaveRequestRepository.getAllLeaveRequests();
+    async getAllLeaveRequests(options: {
+        page: number;
+        limit: number;
+        status: string;
+    }): Promise<{ leaveRequests: LeaveRequest[]; totalPages: number }> {
+        return await this.leaveRequestRepository.getAllLeaveRequests(options);
     }
 
     async setRejectionReason(leaveRequestId: string, reason: string): Promise<void> {
@@ -139,5 +152,9 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     }
     async getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<LeaveRequest[]> {
         return await this.leaveRequestRepository.getFilteredLeaveRequests(filters);
+    }
+
+    async getLeaveRequestById(leaveRequestId: string): Promise<LeaveRequest | null> {
+        return await this.leaveRequestRepository.getLeaveRequestById(leaveRequestId);
     }
 }                                                                                 

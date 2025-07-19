@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { inject, injectable } from "tsyringe";
 import { IMessageUseCase } from "../../entities/useCaseInterface/IMessageUseCase";
+import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()
 export class MessageController {
@@ -10,7 +11,6 @@ export class MessageController {
     ) { }
 
     async getPrivateMessages(Req: Request, res: Response): Promise<void> {
-        try {
             const { user1, user2 } = Req.query;
             if (user1 && user2) {
                 const messages = await this.messageUseCase.getPrivateMessages(user1.toString(), user2.toString());
@@ -18,15 +18,8 @@ export class MessageController {
                     messages
                 })
             }
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: (error instanceof Error) ? error.message : "",
-            });
-        }
     }
     async getGroupMessages(Req: Request, res: Response): Promise<void> {
-        try {
             const { roomId } = Req.params;
             if (roomId) {
                 const messages = await this.messageUseCase.getGroupMessages(roomId.toString());
@@ -34,18 +27,11 @@ export class MessageController {
                     messages
                 })
             }
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: (error instanceof Error) ? error.message : "",
-            });
-        }
     }
 
     async uploadMedia(req: Request, res: Response): Promise<void> {
-        try {
             if (!req.file) {
-                throw new Error("No file provided");
+                throw new CustomError("No file provided" , HTTP_STATUS_CODES.BAD_REQUEST);
             }
 
             const cloudinaryResult = req.file as any;
@@ -70,13 +56,6 @@ export class MessageController {
                 }
             });
 
-        } catch (error) {
-            console.error("Media upload error:", error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                success: false,
-                message: error instanceof Error ? error.message : "Media upload failed"
-            });
-        }
     }
 
     // async deleteMedia(req: Request, res: Response): Promise<void> {

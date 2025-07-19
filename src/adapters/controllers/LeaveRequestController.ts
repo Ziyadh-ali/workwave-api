@@ -5,6 +5,7 @@ import { MESSAGES } from "../../shared/constants";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { leaveRequestSchema } from "../../shared/validation/validator";
+import { CustomError } from "../../shared/errors/CustomError";
 
 
 @injectable()
@@ -15,7 +16,6 @@ export class LeaveRequestController {
     ) { }
 
     async createLeaveRequest(req: Request, res: Response): Promise<void> {
-        try {
             const { data } = req.body;
 
             const validation = leaveRequestSchema.safeParse(data);
@@ -50,47 +50,43 @@ export class LeaveRequestController {
                 message: MESSAGES.SUCCESS.LEAVE_REQUEST_SUBMITTED,
                 leaveRequest
             });
-        } catch (error) {
-            console.error(error);
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: (error instanceof Error) ? error.message : MESSAGES.ERROR.GENERIC
-            });
-        }
     }
 
     async getLeaveRequestsByEmployee(req: Request, res: Response): Promise<void> {
-        try {
             const { employeeId } = req.params;
-            const leaveRequests = await this.leaveRequestUseCase.getLeaveRequestByEmployee(employeeId);
-            res.status(HTTP_STATUS_CODES.OK).json({ success: true, leaveRequests });
-        } catch (error) {
-            console.error(error);
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: MESSAGES.ERROR.GENERIC
+            const { page = "1", limit = "5", search = "", status = "" } = req.query;
+
+            const pageNum = parseInt(page as string, 10);
+            const limitNum = parseInt(limit as string, 10);
+
+            const result = await this.leaveRequestUseCase.getLeaveRequestByEmployee({
+                employeeId,
+                page: pageNum,
+                limit: limitNum,
+                search: search as string,
+                status: status as string
             });
-        }
+
+            res.status(200).json({ success: true, ...result });
+
     }
 
     async updateLeaveRequestStatus(req: Request, res: Response): Promise<void> {
-        try {
             const { leaveRequestId } = req.params;
-            const { status , reason } = req.body;
-
-            console.log(reason);
-            console.log(status);
+            const { status, reason } = req.body;
 
             if (!["Approved", "Rejected"].includes(status)) {
-                res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                    success: false,
-                    message: MESSAGES.ERROR.LEAVE.INVALID_STATUS,
-                });
-                return;
+                throw new CustomError(MESSAGES.ERROR.LEAVE.INVALID_STATUS , HTTP_STATUS_CODES.BAD_REQUEST);
             }
 
-            if(status === "Rejected"){
-                await this.leaveRequestUseCase.setRejectionReason(leaveRequestId , reason);
+            const leaveRequest = await this.leaveRequestUseCase.getLeaveRequestById(leaveRequestId);
+
+            if(leaveRequest?.status !== "Pending"){
+                throw new CustomError("Request already approved or rejected" , HTTP_STATUS_CODES.BAD_REQUEST)
+            }
+
+            if (status === "Rejected") {
+                await this.leaveRequestUseCase.setRejectionReason(leaveRequestId, reason);
             }
 
             const updated = await this.leaveRequestUseCase.updateLeaveRequestStatus(
@@ -103,13 +99,6 @@ export class LeaveRequestController {
                 message: MESSAGES.SUCCESS.OPERATION_SUCCESSFUL
             });
             return
-        } catch (error) {
-            console.error(error);
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: MESSAGES.ERROR.GENERIC
-            });
-        }
     }
 
 
@@ -140,7 +129,6 @@ export class LeaveRequestController {
     // }
 
     async cancelLeaveRequest(req: Request, res: Response): Promise<void> {
-        try {
             const { leaveRequestId } = req.params;
 
             const cancelled = await this.leaveRequestUseCase.cancelLeaveRequest(leaveRequestId);
@@ -155,29 +143,23 @@ export class LeaveRequestController {
                 success: true,
                 message: MESSAGES.SUCCESS.OPERATION_SUCCESSFUL
             });
-        } catch (error) {
-            console.error(error);
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: MESSAGES.ERROR.GENERIC
-            });
-        }
     }
 
     async getAllLeaveRequests(req: Request, res: Response): Promise<void> {
-        try {
-            const leaveRequests = await this.leaveRequestUseCase.getAllLeaveRequests();
+            const { page = "1", limit = "5", status = "" } = req.query;
+
+            const pageNum = parseInt(page as string, 10);
+            const limitNum = parseInt(limit as string, 10);
+
+            const result = await this.leaveRequestUseCase.getAllLeaveRequests({
+                page: pageNum,
+                limit: limitNum,
+                status: status as string
+            });
             res.status(HTTP_STATUS_CODES.OK).json({
                 success: true,
-                leaveRequests,
+                ...result,
             });
-        } catch (error) {
-            console.error("Error fetching leave requests for approval:", error);
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: MESSAGES.ERROR.GENERIC,
-            });
-        }
     }
 
     // async setRegectionStatus(req: Request, res: Response): Promise<void> {

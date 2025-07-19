@@ -97,7 +97,4 @@ export class PayslipPDFService {
             underline: true,
         });
     }
-    
-    
-
 }

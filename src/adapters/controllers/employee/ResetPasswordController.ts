@@ -10,7 +10,6 @@ export class ResetPasswordController {
     ) { }
 
     async execute(req: Request, res: Response): Promise<void> {
-        try {
             const { token, newPassword } = req.body;
 
             if (!token || !newPassword) {
@@ -26,11 +25,5 @@ export class ResetPasswordController {
                 success: true,
                 message: MESSAGES.SUCCESS.PASSWORD_CHANGED,
             });
-        } catch (error: any) {
-            res.status(400).json({
-                success: false,
-                message: error.message
-            });
-        }
     }
 }

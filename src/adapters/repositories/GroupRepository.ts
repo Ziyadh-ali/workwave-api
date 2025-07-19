@@ -3,6 +3,8 @@ import { IGroupRepository } from "../../entities/repositoryInterfaces/IGroup.rep
 import { IGroup } from "../../entities/models/IGroup.entities";
 import { GroupModel } from "../../frameworks/database/models/GroupModel";
 import { ObjectId } from "mongoose";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class GroupRepository implements IGroupRepository {
@@ -42,7 +44,7 @@ export class GroupRepository implements IGroupRepository {
             return result.modifiedCount === 1;
         } catch (error) {
             console.error('Error adding members:', error);
-            throw new Error('Failed to add members to group');
+            throw new CustomError('Failed to add members to group' , HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 

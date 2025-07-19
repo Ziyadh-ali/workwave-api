@@ -14,13 +14,39 @@ export class LeaveRequestRepository implements ILeaveRequestRepository {
         return await LeaveRequestModel.find({ assignedManager: managerId, status: "Pending" }).lean();
     }
 
-    async getLeaveRequestByEmployee(userId: string): Promise<LeaveRequest[]> {
-        return await LeaveRequestModel.find({ employeeId: userId })
-            .populate({
-                path: "leaveTypeId",
-                select: "name",
-            })
+    async getLeaveRequestByEmployee(options: {
+        employeeId: string;
+        page: number;
+        limit: number;
+        search: string;
+        status: string;
+    }): Promise<{ leaveRequests: LeaveRequest[]; totalPages: number }> {
+        const { employeeId, page, limit, search, status } = options;
+
+        const query: {
+            employeeId: string,
+            status?: string,
+        } = { employeeId };
+
+        if (status) {
+            query.status = status;
+        }
+
+        const totalCount = await LeaveRequestModel.countDocuments(query);
+
+        const leaveRequests = await LeaveRequestModel.find(query)
+            .populate({ path: "leaveTypeId", select: "name" })
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit)
             .lean();
+
+        const totalPages = Math.ceil(totalCount / limit);
+
+        return {
+            leaveRequests,
+            totalPages
+        }
     }
 
     async updateLeaveRequestStatus(leaveRequestId: string, status: "Approved" | "Rejected"): Promise<boolean> {
@@ -39,12 +65,27 @@ export class LeaveRequestRepository implements ILeaveRequestRepository {
     }
 
     async cancelLeaveRequest(leaveRequestId: string): Promise<boolean> {
-        await LeaveRequestModel.findByIdAndUpdate(leaveRequestId , {status : "Cancelled"});
+        await LeaveRequestModel.findByIdAndUpdate(leaveRequestId, { status: "Cancelled" });
         return true;
     }
 
-    async getAllLeaveRequests(): Promise<LeaveRequest[]> {
-        return await LeaveRequestModel.find({})
+    async getAllLeaveRequests(options: {
+        page: number;
+        limit: number;
+        status: string;
+    }): Promise<{ leaveRequests: LeaveRequest[]; totalPages: number }> {
+        const { page, limit, status } = options;
+
+        const query: {
+            status?: string,
+        } = {}
+
+        if(status){
+            query.status = status;
+        }
+
+        const totalCount = await LeaveRequestModel.countDocuments(query);
+        const leaveRequests =  await LeaveRequestModel.find(query)
             .populate({
                 path: "leaveTypeId",
                 select: "name",
@@ -53,6 +94,18 @@ export class LeaveRequestRepository implements ILeaveRequestRepository {
                 path: "employeeId",
                 select: "fullName role",
             })
+            .sort({createdAt: -1})
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .lean()
+
+        const totalPages = Math.ceil(totalCount / limit);
+
+        return {
+            leaveRequests,
+            totalPages
+        }
+
     }
 
     async getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<LeaveRequest[]> {
@@ -123,5 +176,9 @@ export class LeaveRequestRepository implements ILeaveRequestRepository {
             startDate: { $lte: endOfDay },
             endDate: { $gte: startOfDay }
         });
+    }
+
+    async getLeaveRequestsOfEmployee(employeeId: string): Promise<LeaveRequest[] | null> {
+        return await LeaveRequestModel.findById(employeeId);
     }
 }

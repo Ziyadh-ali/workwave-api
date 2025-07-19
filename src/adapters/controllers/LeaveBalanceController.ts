@@ -11,7 +11,6 @@ export class LeaveBalanceController {
 
     async getLeaveBalanceById (req : Request , res : Response) : Promise<void> {
         const {employeeId} = req.params;
-        try {
             if(!employeeId){
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
                     success : false,
@@ -23,13 +22,6 @@ export class LeaveBalanceController {
             res.status(HTTP_STATUS_CODES.OK).json({
                 success : true , 
                 leaveBalances,
-            })
-        } catch (error) {
-            console.log(error);
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                success : false,
-                message : MESSAGES.ERROR.GENERIC
             });
-        }
     }
 }

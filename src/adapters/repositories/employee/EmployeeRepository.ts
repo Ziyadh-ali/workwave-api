@@ -9,9 +9,22 @@ export class EmployeeRepository implements IEmployeeRepository {
         return await EmployeeModel.create(data);
     }
 
-    async find(filter: any, skip: number, limit: number): Promise<{ employees: Employee[] | []; total: number; active: number; inactive: number }> {
+    async find(filter: {
+        role?: string,
+        status?: string,
+        department?: string,
+        fullName?: string,
+    },
+        skip: number,
+        limit: number
+    ): Promise<{ employees: Employee[] | []; total: number; active: number; inactive: number }> {
 
-        const query: any = {};
+        const query: {
+            role?: string,
+            status?: string,
+            department?: string,
+            fullName?: string,
+        } = {};
 
         if (filter.role) query.role = filter.role;
         if (filter.status) query.status = filter.status;
@@ -71,4 +84,7 @@ export class EmployeeRepository implements IEmployeeRepository {
         return await EmployeeModel.find({ role: "developer" })
     }
 
+    async getAllEmployees(): Promise<Employee[] | null> {
+        return await EmployeeModel.find({status:"active"});
+    }
 }

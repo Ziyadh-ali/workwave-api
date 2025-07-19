@@ -1,7 +1,9 @@
-import { injectable, inject } from "tsyringe";
+import { injectable } from "tsyringe";
 import { IAttendanceRepository } from "../../entities/repositoryInterfaces/IAttendance.repository";
 import { Attendance } from "../../entities/models/Attendance.entities";
 import { attendanceModel } from "../../frameworks/database/models/AttendanceModel";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class AttendanceRepository implements IAttendanceRepository {
@@ -30,7 +32,7 @@ export class AttendanceRepository implements IAttendanceRepository {
         const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
 
         if (isNaN(startOfMonth.getTime()) || isNaN(endOfMonth.getTime())) {
-            throw new Error("Invalid start or end date");
+            throw new CustomError("Invalid start or end date", HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         return await attendanceModel.find({
@@ -74,7 +76,7 @@ export class AttendanceRepository implements IAttendanceRepository {
         });
 
         if (!attendance) {
-            throw new Error("Attendance not found");
+            throw new CustomError("Attendance not found", HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         attendance.checkOutTime = time;
@@ -94,13 +96,17 @@ export class AttendanceRepository implements IAttendanceRepository {
             checkOutTime?: Date;
         }
     ): Promise<Attendance | null> {
-        const updateData: any = {};
+        const updateData: {
+            status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
+            checkInTime?: Date;
+            checkOutTime?: Date;
+        } = {};
 
         if (data.status) updateData.status = data.status;
         if (data.checkInTime) updateData.checkInTime = data.checkInTime;
         if (data.checkOutTime) updateData.checkOutTime = data.checkOutTime;
 
-        console.log("UpdatedAttendnace",updateData)
+        console.log("UpdatedAttendnace", updateData)
 
         return await attendanceModel
             .findByIdAndUpdate(id, updateData, { new: true })
@@ -108,7 +114,7 @@ export class AttendanceRepository implements IAttendanceRepository {
     }
 
     async getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: Attendance[] | [], total: number }> {
-        const query: any = {};
+        const query: { date?: { $gte: Date, $lte: Date } } = {};
         if (date) {
             const start = new Date(date);
             start.setHours(0, 0, 0, 0);
@@ -125,6 +131,17 @@ export class AttendanceRepository implements IAttendanceRepository {
         ]);
 
         return { data, total };
+    }
+
+    async getEveryAttendanceByDate(date: Date): Promise<Attendance[] | null> {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(date);
+        end.setHours(23 , 59 , 59 , 999);
+
+        return await attendanceModel.find({date : {
+            $gte: start , $lte: end,
+        }});
     }
 
     async requestRegularization(
@@ -151,7 +168,7 @@ export class AttendanceRepository implements IAttendanceRepository {
         action: "Approved" | "Rejected",
         adminRemarks?: string
     ): Promise<Attendance | null> {
-        const update: any = {
+        const update = {
             "regularizationRequest.status": action,
             "regularizationRequest.adminRemarks": adminRemarks || "",
             isRegularized: true

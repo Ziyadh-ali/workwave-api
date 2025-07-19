@@ -10,6 +10,7 @@ import { UserRoute } from "../routes/employeeRoutes";
 import { Server as IOServer } from "socket.io";
 import { container } from "tsyringe";
 import { SocketManager } from "../../adapters/service/SocketService";
+import { errorHandler } from "../../adapters/middlewares/errorHandler";
 
 export class Server {
     private app: Application;
@@ -57,6 +58,8 @@ export class Server {
         const userRoute = new UserRoute();
         this.app.use("/", userRoute.getRoute());
         this.app.use("/admin", adminRoute.getRouter());
+
+        this.app.use(errorHandler)
     }
 
     private setupSocket(): void {

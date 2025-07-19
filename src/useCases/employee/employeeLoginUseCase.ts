@@ -4,10 +4,11 @@ import { EmployeeLoginResponse } from "../../entities/employeeInterface/employee
 import { IEmployeeLoginUseCase } from "../../entities/useCaseInterface/IEmployeeLoginUseCase";
 import { clearAuthCookies } from "../../shared/utils/cookieHelper";
 import { Response } from "express";
-import { MESSAGES } from "../../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { loginSchema } from "../../shared/validation/validator";
 import { IJwtService } from "../../entities/services/jwt.interface";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
+import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()
 export class EmployeeLoginUseCase implements IEmployeeLoginUseCase {
@@ -24,13 +25,13 @@ export class EmployeeLoginUseCase implements IEmployeeLoginUseCase {
         // }
         const employee = await this.userRepository.findByEmail(email);
         if (!employee) {
-            throw new Error(MESSAGES.ERROR.USER.USER_NOT_FOUND);
+            throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         if (password) {
             const isPasswordMatch = await this.passWordBcrypt.compare(password, employee.password);
             if (!isPasswordMatch) {
-                throw new Error(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS);
+                throw new CustomError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS , HTTP_STATUS_CODES.BAD_REQUEST);
             }
         }
 
@@ -65,7 +66,7 @@ export class EmployeeLoginUseCase implements IEmployeeLoginUseCase {
                 "refresh_token",
             );
         } catch (error) {
-            throw new Error("error in login");
+            throw new CustomError("error in login" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 }

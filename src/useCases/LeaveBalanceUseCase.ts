@@ -26,7 +26,7 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
         const leaveBalances = await this.leaveBalanceRepository.getLeaveBalanceByEmployeeId(employeeId);
         if (!leaveBalances) return null;
 
-        const leaveTypes = await this.leaveTypeRepository.getAllLeaveTypes();
+        const leaveTypes = await this.leaveTypeRepository.getEveryLeaveType();
 
         const leaveBalancesWithNames = leaveBalances.leaveBalances.map(lb => {
             const leaveType = leaveTypes.find(lt => lt._id?lt._id.toString() === lb.leaveTypeId : "");

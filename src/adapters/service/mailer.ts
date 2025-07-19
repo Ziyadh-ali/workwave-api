@@ -2,6 +2,8 @@ import nodemailer from "nodemailer";
 import { IEmailService } from "../../entities/services/IEmailService.interface";
 import { injectable } from "tsyringe";
 import { config } from "../../shared/config";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class EmailService implements IEmailService {
@@ -28,7 +30,7 @@ export class EmailService implements IEmailService {
                 from: "Work Wave",
                 to,
                 subject,
-                text,
+                text,   
                 html,
             };
 
@@ -36,7 +38,7 @@ export class EmailService implements IEmailService {
             console.log("Email sent: " + info.response);
         } catch (error) {
             console.error("Error sending email:", error);
-            throw new Error("Could not send email");
+            throw new CustomError("Could not send email" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 }

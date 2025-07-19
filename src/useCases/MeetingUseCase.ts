@@ -4,7 +4,8 @@ import { IMeeting } from "../entities/models/Meeting.entities";
 import { IMeetingRepository } from "../entities/repositoryInterfaces/IMeeting.repository";
 import { ObjectId } from "mongoose";
 import { IEmployeeRepository } from "../entities/repositoryInterfaces/employee/employee.repository";
-import { MESSAGES } from "../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
+import { CustomError } from "../shared/errors/CustomError";
 
 @injectable()
 export class MeetingUseCase implements IMeetingUseCase {
@@ -15,13 +16,13 @@ export class MeetingUseCase implements IMeetingUseCase {
 
     async createMeeting(meeting: IMeeting, filter: { role?: string; department?: string }): Promise<IMeeting> {
         if (!filter.role && !filter.department) {
-            throw new Error(MESSAGES.ERROR.MEETING.ROLE_REQUIRED);
+            throw new CustomError(MESSAGES.ERROR.MEETING.ROLE_REQUIRED  , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const participants = await this.employeeRepository.getParticipantsByFilter(filter);
 
         if (!participants || participants.length === 0) {
-            throw new Error(MESSAGES.ERROR.MEETING.EMPLOYEE_NOT_FOUND);
+            throw new CustomError(MESSAGES.ERROR.MEETING.EMPLOYEE_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const validParticipants = [];
@@ -56,7 +57,7 @@ export class MeetingUseCase implements IMeetingUseCase {
         });
 
         if (isHostOverlap) {
-            throw new Error(MESSAGES.ERROR.MEETING.ALREADY_HAVE_MEETING);
+            throw new CustomError(MESSAGES.ERROR.MEETING.ALREADY_HAVE_MEETING , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const allEmployeeMeetings = await Promise.all(
@@ -72,7 +73,7 @@ export class MeetingUseCase implements IMeetingUseCase {
         });
 
         if (isParticipantOverlap) {
-            throw new Error(MESSAGES.ERROR.MEETING.PARTICIPANTS_HAVE_MEETING);
+            throw new CustomError(MESSAGES.ERROR.MEETING.PARTICIPANTS_HAVE_MEETING , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         meeting.participants = filteredParticipants;
@@ -101,13 +102,13 @@ export class MeetingUseCase implements IMeetingUseCase {
 
     async editMeeting(meeting: IMeeting, filter: { role?: string; department?: string }): Promise<IMeeting |  null> {
         if (!filter.role && !filter.department) {
-            throw new Error(MESSAGES.ERROR.MEETING.ROLE_REQUIRED);
+            throw new CustomError(MESSAGES.ERROR.MEETING.ROLE_REQUIRED , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const participants = await this.employeeRepository.getParticipantsByFilter(filter);
 
         if (!participants || participants.length === 0) {
-            throw new Error(MESSAGES.ERROR.MEETING.EMPLOYEE_NOT_FOUND);
+            throw new CustomError(MESSAGES.ERROR.MEETING.EMPLOYEE_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const validParticipants = [];
@@ -143,7 +144,7 @@ export class MeetingUseCase implements IMeetingUseCase {
         });
 
         if (isHostOverlap) {
-            throw new Error(MESSAGES.ERROR.MEETING.ALREADY_HAVE_MEETING);
+            throw new CustomError(MESSAGES.ERROR.MEETING.ALREADY_HAVE_MEETING , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         // ✅ Participant overlap check (exclude the current meeting)
@@ -163,7 +164,7 @@ export class MeetingUseCase implements IMeetingUseCase {
         });
 
         if (isParticipantOverlap) {
-            throw new Error(MESSAGES.ERROR.MEETING.PARTICIPANTS_HAVE_MEETING);
+            throw new CustomError(MESSAGES.ERROR.MEETING.PARTICIPANTS_HAVE_MEETING , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         meeting.participants = filteredParticipants;

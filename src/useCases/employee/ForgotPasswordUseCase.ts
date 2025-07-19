@@ -1,11 +1,12 @@
 import { injectable, inject } from "tsyringe";
 import { IForgotPasswordUseCase } from "../../entities/useCaseInterface/IForgotPassword";
-import { MESSAGES } from "../../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { EmailService } from "../../adapters/service/mailer";
 import { IJwtService } from "../../entities/services/jwt.interface";
 import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
 import { config } from "../../shared/config";
 import { passwordResetTemplate , passwordResetText} from "../../shared/email-templates/password-reset"
+import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
@@ -17,7 +18,7 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
 
     async confirmEmailAndSendLink(email: string): Promise<void> {
         const employee = this.employeeRepository.findByEmail(email);
-        if (!employee) throw new Error(MESSAGES.ERROR.USER.USER_NOT_FOUND);
+        if (!employee) throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
 
         const token = await this.generateResetToken(email);
         const resetLink = `${config.cors.ALLOWED_ORIGIN}/reset-password?token=${token}`;

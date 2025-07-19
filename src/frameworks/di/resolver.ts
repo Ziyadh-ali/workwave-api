@@ -23,6 +23,7 @@ import { QuestionController } from "../../adapters/controllers/QuestionControlle
 import { MonthlySummaryController } from "../../adapters/controllers/MonthlySummaryController";
 import { PayrollController } from "../../adapters/controllers/PayrollController";
 import { PayslipController } from "../../adapters/controllers/PDFHandlerController";
+import { CronService } from "../../adapters/service/cronService";
 
 DependencyInjection.registerAll();
 
@@ -71,3 +72,5 @@ export const monthlySummaryController = container.resolve(MonthlySummaryControll
 export const payrollController = container.resolve(PayrollController);
 
 export const pdfController = container.resolve(PayslipController);
+
+export const cronService = container.resolve(CronService);

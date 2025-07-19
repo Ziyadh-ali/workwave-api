@@ -4,7 +4,12 @@ import { LeaveType } from "../models/LeaveType.entity";
 export interface ILeaveTypeUseCase {
     createLeaveType(data: LeaveTypeDTO): Promise<LeaveType>;
     getLeaveTypeById(id: string): Promise<LeaveType | null>;
-    getAllLeaveTypes(): Promise<LeaveType[]>;
+    getAllLeaveTypes(options: {
+        page: number;
+        limit: number;
+        isPaid?: boolean;
+    }): Promise<{ leaveTypes: LeaveType[]; totalPages: number }>
     updateLeaveType(id: string, data: Partial<LeaveTypeDTO>): Promise<LeaveType | null>;
     deleteLeaveType(id: string): Promise<boolean>;
+    getEveryLeaveType(): Promise<LeaveType[]>;
 }

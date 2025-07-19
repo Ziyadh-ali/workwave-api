@@ -3,6 +3,8 @@ import { IGroupUseCase } from "../entities/useCaseInterface/IGroupUseCase";
 import { IGroup } from "../entities/models/IGroup.entities";
 import { IGroupRepository } from "../entities/repositoryInterfaces/IGroup.repository";
 import { ObjectId } from "mongoose";
+import { CustomError } from "../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../shared/constants";
 // import { socketManager } from "../frameworks/di/resolver";
 
 
@@ -25,10 +27,10 @@ export class GroupUseCase implements IGroupUseCase {
 
   async addMembers(groupId: string, userIds: string[]) : Promise<{ members: string[]; createdBy: string }> {
     const success = await this.groupRepository.addMembers(groupId, userIds);
-    if (!success) throw new Error('Failed to add members');
+    if (!success) throw new CustomError('Failed to add members' , HTTP_STATUS_CODES.BAD_REQUEST);
 
     const group = await this.groupRepository.getGroupDetails(groupId);
-    if (!group) throw new Error('Group not found');
+    if (!group) throw new CustomError('Group not found' , HTTP_STATUS_CODES.BAD_REQUEST);
 
     // socketManager.emitMembersAdded(
     //   groupId,

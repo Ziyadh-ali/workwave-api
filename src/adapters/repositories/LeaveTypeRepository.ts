@@ -14,16 +14,44 @@ export class LeaveTypeRepository implements ILeaveTypeRepository {
         return await LeaveTypeModel.findById(id);
     }
 
-    async getAllLeaveTypes(): Promise<LeaveType[]> {
-        return await LeaveTypeModel.find();
+    async getAllLeaveTypes(options: {
+        page: number;
+        limit: number;
+        isPaid?: boolean;
+    }): Promise<{ leaveTypes: LeaveType[]; totalPages: number }> {
+        const { page, limit, isPaid } = options;
+
+        const query: any = {};
+        if (isPaid !== undefined) {
+            query.isPaid = isPaid;
+        }
+
+        const totalCount = await LeaveTypeModel.countDocuments(query);
+
+        const leaveTypes = await LeaveTypeModel.find(query)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const totalPages = Math.ceil(totalCount / limit);
+
+        return {
+            leaveTypes,
+            totalPages,
+        };
     }
 
     async updateLeaveType(id: string, data: Partial<LeaveTypeDTO>): Promise<LeaveType | null> {
-        return await LeaveTypeModel.findByIdAndUpdate(id , data , {new : true});
+        return await LeaveTypeModel.findByIdAndUpdate(id, data, { new: true });
     }
 
     async deleteLeaveType(id: string): Promise<boolean> {
         const deleted = await LeaveTypeModel.findByIdAndDelete(id);
         return !!deleted;
+    }
+
+    async getEveryLeaveType(): Promise<LeaveType[]> {
+        return await LeaveTypeModel.find({});
     }
 }

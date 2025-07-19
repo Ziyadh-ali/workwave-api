@@ -4,6 +4,8 @@ import { JwtService } from "../../adapters/service/jwt.service";
 import { updateCookieWithAccessToken } from "../../shared/utils/cookieHelper";
 import { Response } from "express";
 import { IJwtService, TJwtPayload } from "../../entities/services/jwt.interface";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 
 @injectable()

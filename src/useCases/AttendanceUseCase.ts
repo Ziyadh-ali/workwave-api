@@ -1,10 +1,11 @@
 import { injectable, inject } from "tsyringe";
 import { IAttendanceRepository } from "../entities/repositoryInterfaces/IAttendance.repository";
 import { IAttendanceUseCase } from "../entities/useCaseInterface/IAttendanceUseCase";
-import { MESSAGES } from "../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
 import { ILeaveRequestRepository } from "../entities/repositoryInterfaces/ILeaveRequest.repository";
 import { Attendance } from "../entities/models/Attendance.entities";
 import { getDayRange } from "../shared/utils/dateUtils";
+import { CustomError } from "../shared/errors/CustomError";
 
 @injectable()
 export class AttendanceUseCase implements IAttendanceUseCase {
@@ -19,18 +20,18 @@ export class AttendanceUseCase implements IAttendanceUseCase {
 
         const day = now.getDay();
         if (day === 0 || day === 6) {
-            throw new Error(MESSAGES.ERROR.ATTENDANCE.ON_WEEKEND);
+            throw new CustomError(MESSAGES.ERROR.ATTENDANCE.ON_WEEKEND , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const leave = await this.leaveRequestRepository.getLeaveRequestForDate(employeeId, now);
 
         if (leave && leave.duration === "full" && leave.status === "Approved") {
-            throw new Error(MESSAGES.ERROR.ATTENDANCE.ON_FULLDAY_LEAVE);
+            throw new CustomError(MESSAGES.ERROR.ATTENDANCE.ON_FULLDAY_LEAVE , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const existingAttendance = await this.attendanceRepository.getAttendanceByDate(employeeId, now);
         if (existingAttendance?.checkInTime) {
-            throw new Error(MESSAGES.ERROR.ATTENDANCE.ALREADY_CHECKED);
+            throw new CustomError(MESSAGES.ERROR.ATTENDANCE.ALREADY_CHECKED , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         const attendance = await this.attendanceRepository.createAttendance(employeeId, now);
@@ -42,7 +43,7 @@ export class AttendanceUseCase implements IAttendanceUseCase {
             const isHalfDay = leave?.duration === "morning";
             if (!isHalfDay) {
                 await this.attendanceRepository.updateStatus(attendance._id?.toString() || "", "Absent");
-                throw new Error(MESSAGES.ERROR.ATTENDANCE.CUT_OFF_TIME);
+                throw new CustomError(MESSAGES.ERROR.ATTENDANCE.CUT_OFF_TIME , HTTP_STATUS_CODES.BAD_REQUEST);
             }
         }
 
@@ -58,11 +59,11 @@ export class AttendanceUseCase implements IAttendanceUseCase {
         const attendance = await this.attendanceRepository.getAttendanceByDate(employeeId, now);
 
         if (!attendance) {
-            throw new Error("No attendance record found for today.");
+            throw new CustomError("No attendance record found for today." , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         if (attendance.checkOutTime) {
-            throw new Error("You have already checked out.");
+            throw new CustomError("You have already checked out." , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         await this.attendanceRepository.markCheckOut(employeeId, now, startOfDay, endOfDay);

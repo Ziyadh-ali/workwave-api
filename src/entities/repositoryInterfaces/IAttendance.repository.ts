@@ -34,4 +34,6 @@ export interface IAttendanceRepository {
       checkOutTime?: Date;
     }
   ): Promise<Attendance | null>;
+
+  getEveryAttendanceByDate(date: Date): Promise<Attendance[] | null>;
 }

@@ -6,6 +6,8 @@ import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employe
 import { IGroupRepository } from '../../entities/repositoryInterfaces/IGroup.repository';
 import { INotificationRepository } from '../../entities/repositoryInterfaces/INotification.repository';
 import { INotification } from '../../entities/models/INotification';
+import { CustomError } from '../../shared/errors/CustomError';
+import { HTTP_STATUS_CODES } from '../../shared/constants';
 
 interface UserSocketMap {
     [userId: string]: string;
@@ -34,7 +36,7 @@ export class SocketManager {
     }
 
     private setupSocketEvents(): void {
-        if (!this.io) throw new Error('Socket.IO server not initialized');
+        if (!this.io) throw new CustomError('Socket.IO server not initialized' , HTTP_STATUS_CODES.BAD_REQUEST);
 
         this.io.on('connection', (socket: Socket) => {
             console.log(`User connected: ${socket.id}`);

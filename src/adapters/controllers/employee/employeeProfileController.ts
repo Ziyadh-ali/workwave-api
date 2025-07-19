@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 import { IEmployeeProfile } from "../../../entities/controllerInterface/employeeController";
-import { CustomRequest } from "../../middlewares/authMiddleware";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../../entities/useCaseInterface/IEmployeeProfileUseCase";
+import { EmployeeDTO } from "../../../entities/dtos/employeeDto";
 
 @injectable()
 export class EmployeeProfile implements IEmployeeProfile {
@@ -12,7 +12,6 @@ export class EmployeeProfile implements IEmployeeProfile {
     ) { }
     async getProfileDetails(req: Request, res: Response): Promise<void> {
         const { employeeId } = req.params;
-        try {
             if (!employeeId) {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
                     success: false,
@@ -22,77 +21,66 @@ export class EmployeeProfile implements IEmployeeProfile {
 
             const details = await this.employeeProfileUseCase.getEmployeeDetails(employeeId);
 
-            res.status(HTTP_STATUS_CODES.OK).json({
-                success: true,
-                details,
-            })
+            if (details) {
+                const newEmployee = EmployeeDTO(details);
 
-        } catch (error) {
-            if (error instanceof Error) {
-                res.status(HTTP_STATUS_CODES.NOT_FOUND).json({
-                    success: false,
-                    message: error.message,
-                });
-            } else {
-                res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                    success: false,
-                    message: "Error in updating",
-                });
+                res.status(HTTP_STATUS_CODES.OK).json({
+                    success: true,
+                    details : newEmployee,
+                })
             }
-        }
     }
 
     async updateprofile(req: Request, res: Response): Promise<void> {
         const { employeeId } = req.params;
         const userData = req.body;
-        const { role } = (req as unknown as CustomRequest).user;
-        try {
+        const cloudinaryFile = req.file;
             if (!employeeId) {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
                     success: false,
-                    message: "User id not provided",
-                })
+                    message: "User ID not provided",
+                });
+                return;
             }
 
-            if (!userData) {
+            if (cloudinaryFile) {
+                const versionMatch = cloudinaryFile.path.match(/\/v(\d+)\//);
+                if (versionMatch && versionMatch[1]) {
+                    const version = versionMatch[1];
+                    userData.profilePic = version;
+                }
+            }
+
+            if (!userData || Object.keys(userData).length === 0) {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
                     success: false,
-                    message: "User data not provided",
+                    message: "No data provided for update",
                 });
-            }
-
-            if (req.file) {
-                userData.profilePic = req.file.path;
+                return;
             }
 
             const user = await this.employeeProfileUseCase.updateEmployee(employeeId, userData);
+
             if (user) {
                 res.status(HTTP_STATUS_CODES.OK).json({
                     success: true,
                     message: "User details updated",
                     newData: user,
                 });
+                return;
             }
-        } catch (error) {
-            console.log(error);
-            if (error instanceof Error) {
-                res.status(HTTP_STATUS_CODES.NOT_FOUND).json({
-                    success: false,
-                    message: error.message,
-                });
-            } else {
-                res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                    success: false,
-                    message: "Error in updating",
-                });
-            }
-        }
+
+            res.status(HTTP_STATUS_CODES.NOT_FOUND).json({
+                success: false,
+                message: "User not found or update failed",
+            });
+            return;
     }
+
 
     async changePassword(req: Request, res: Response): Promise<void> {
         const { employeeId } = req.params;
         const { currentPassword, newPassword } = req.body;
-        try {
             if (!employeeId) {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
                     success: false,
@@ -117,34 +105,5 @@ export class EmployeeProfile implements IEmployeeProfile {
                 success: true,
                 message: MESSAGES.SUCCESS.PASSWORD_CHANGED,
             })
-        } catch (error) {
-            if (error instanceof Error) {
-                if (error.message === MESSAGES.ERROR.USER.USER_NOT_FOUND) {
-                    res.status(HTTP_STATUS_CODES.NOT_FOUND).json({
-                        success: false,
-                        message: error.message,
-                    });
-                }
-
-                if (error.message === MESSAGES.ERROR.USER.INVALID_CURRENT_PASSWORD) {
-                    res.status(HTTP_STATUS_CODES.UNAUTHORIZED).json({
-                        success: false,
-                        message: error.message,
-                    });
-                }
-
-                if (error.message === MESSAGES.ERROR.USER.PASSWORD_UPDATE_FAILED) {
-                    res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                        success: false,
-                        message: error.message,
-                    });
-                }
-            }
-
-            res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: "Something went wrong. Please try again later.",
-            });
-        }
     }
 }

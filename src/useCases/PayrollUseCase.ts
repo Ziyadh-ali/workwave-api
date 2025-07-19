@@ -5,6 +5,8 @@ import { IPayrollModel } from "../frameworks/database/models/PayrollModel";
 import { IMonthlyAttendanceSummary } from "../entities/models/IMonthlyAttendanceSummary";
 import { EmployeeModel } from "../frameworks/database/models/employee/EmployeeModel";
 import { IPayroll } from "../entities/models/IPayroll";
+import { CustomError } from "../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../shared/constants";
 
 
 @injectable()
@@ -19,14 +21,14 @@ export class PayrollUseCase implements IPayrollUseCase {
         taxPercentage: number,
     ): Promise<IPayrollModel> {
         if (summary.status !== "Approved") {
-            throw new Error("Cannot generate payroll for unapproved summary");
+            throw new CustomError("Cannot generate payroll for unapproved summary" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
         if (employeeSalary <= 0) {
-            throw new Error("Employee salary must be positive");
+            throw new CustomError("Employee salary must be positive" ,HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         if (summary.presentDays > summary.workingDays) {
-            throw new Error("Present days cannot exceed working days");
+            throw new CustomError("Present days cannot exceed working days" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         return this.payrollRepository.generatePayroll(summary, employeeSalary, taxPercentage);
@@ -36,14 +38,14 @@ export class PayrollUseCase implements IPayrollUseCase {
         const approvedSummaries = summaries.filter(s => s.status === "Approved");
 
         if (approvedSummaries.length === 0) {
-            throw new Error("No approved summaries provided");
+            throw new CustomError("No approved summaries provided" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         return Promise.all(
             approvedSummaries.map(async summary => {
                 const employee = await EmployeeModel.findById(summary.employeeId);
                 if (!employee) {
-                    throw new Error(`Employee not found for ID: ${summary.employeeId}`);
+                    throw new CustomError(`Employee not found for ID: ${summary.employeeId}` , HTTP_STATUS_CODES.BAD_REQUEST);
                 }
                 return this.generatePayroll(summary, employee.salary, taxPercentage);
             })
@@ -62,7 +64,7 @@ export class PayrollUseCase implements IPayrollUseCase {
 
     async updatePayrollStatus(payrollId: string, status: "Paid"): Promise<IPayrollModel> {
         if (status !== "Paid") {
-            throw new Error("Can only update status to 'Paid'");
+            throw new CustomError("Can only update status to 'Paid'" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         return this.payrollRepository.updatePayrollStatus(payrollId, status);

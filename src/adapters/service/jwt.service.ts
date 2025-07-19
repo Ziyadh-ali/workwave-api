@@ -3,6 +3,8 @@ import { TJwtPayload ,IJwtService} from "../../entities/services/jwt.interface";
 import  jwt ,{JwtPayload,Secret } from "jsonwebtoken";
 import { config } from "../../shared/config";
 import ms from "ms";
+import { CustomError } from "../../shared/errors/CustomError";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class JwtService implements IJwtService {
@@ -35,7 +37,7 @@ export class JwtService implements IJwtService {
         try {
             return jwt.verify(token, this.accessSecret) as TJwtPayload
         } catch (error) {
-            throw new Error("Invalid or Expired Access Token");
+            throw new CustomError("Invalid or Expired Access Token" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 
@@ -43,7 +45,7 @@ export class JwtService implements IJwtService {
         try {
             return jwt.verify(token, this.refreshSecret) as JwtPayload;
         } catch (error) {
-            throw new Error("Invalid or Expired Refresh Token");
+            throw new CustomError("Invalid or Expired Refresh Token" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 
