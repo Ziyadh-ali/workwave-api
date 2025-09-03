@@ -1,4 +1,4 @@
-import { IHoliday } from "../../models/adminEntities/Holiday.entitiy";
+import { IHoliday } from "../../models/adminEntities/HolidayEntitiy";
 
 export interface IHolidayRepository {
     createHoliday(holiday: IHoliday): Promise<IHoliday>;

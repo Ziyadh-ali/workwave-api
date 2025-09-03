@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { IGroupUseCase } from "../../entities/useCaseInterface/IGroupUseCase";
 import { injectable, inject } from "tsyringe";
-import { CustomRequest } from "../middlewares/authMiddleware";
+import { CustomRequest } from "../middlewares/AuthMiddleware";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()

@@ -1,9 +1,9 @@
 import { inject, injectable } from "tsyringe";
 import { IRefreshTokenUseCase } from "../../entities/useCaseInterface/IRefreshTokenUseCase";
-import { JwtService } from "../../adapters/service/jwt.service";
+import { JwtService } from "../../adapters/service/JwtService";
 import { updateCookieWithAccessToken } from "../../shared/utils/cookieHelper";
 import { Response } from "express";
-import { IJwtService, TJwtPayload } from "../../entities/services/jwt.interface";
+import { IJwtService, TJwtPayload } from "../../entities/services/JwtInterface";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 

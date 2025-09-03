@@ -8,8 +8,8 @@ import { AttendanceRepository } from "../../adapters/repositories/AttendanceRepo
 import { MeetingRepository } from "../../adapters/repositories/MeetingRepository";
 import { FaqRepository } from "../../adapters/repositories/FaqRepository";
 import { MessageRepository } from "../../adapters/repositories/MessageRepository";
-import { IAdminRepository } from "../../entities/repositoryInterfaces/admin/admin.repository";
-import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
+import { IAdminRepository } from "../../entities/repositoryInterfaces/admin/AdminRepository";
+import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/EmployeeRepository";
 import { ILeaveTypeRepository } from "../../entities/repositoryInterfaces/ILeaveType.repository";
 import { ILeaveBalanceRepository } from "../../entities/repositoryInterfaces/ILeaveBalance.repository";
 import { ILeaveRequestRepository } from "../../entities/repositoryInterfaces/ILeaveRequest.repository";

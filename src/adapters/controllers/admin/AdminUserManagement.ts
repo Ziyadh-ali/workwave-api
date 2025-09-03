@@ -3,11 +3,10 @@ import { injectable, inject } from "tsyringe";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { IEmployeeManagementUseCase } from "../../../entities/useCaseInterface/IEmployeeManagementUseCase";
-import { IEmployeeRepository } from "../../../entities/repositoryInterfaces/employee/employee.repository";
 import {
   EmployeeFilter,
   toStringOrUndefined,
-} from "../../../entities/models/employeeEntities/employee.enitity";
+} from "../../../entities/models/employeeEntities/EmployeeEnitity";
 import { ParsedQs } from "qs";
 
 @injectable()
@@ -17,8 +16,6 @@ export class AdminUserManagement {
     private employeeManagementUseCase: IEmployeeManagementUseCase,
     @inject("IEmployeeProfileUseCase")
     private employeeProfileUseCase: IEmployeeProfileUseCase,
-    @inject("IEmployeeRepository")
-    private employeeRepository: IEmployeeRepository
   ) {}
 
   async addUser(req: Request, res: Response): Promise<void> {

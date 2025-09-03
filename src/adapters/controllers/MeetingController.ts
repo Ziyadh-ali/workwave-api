@@ -3,7 +3,7 @@ import { IMeetingUseCase } from "../../entities/useCaseInterface/IMeetingUseCase
 import { injectable, inject } from "tsyringe";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IMeeting } from "../../entities/models/Meeting.entities";
-import { CustomRequest } from "../middlewares/authMiddleware";
+import { CustomRequest } from "../middlewares/AuthMiddleware";
 import { createMeetingSchema } from "../../shared/validation/validator";
 
 @injectable()

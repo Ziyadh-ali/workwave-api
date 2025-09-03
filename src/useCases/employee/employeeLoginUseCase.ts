@@ -1,12 +1,12 @@
 import { injectable, inject } from "tsyringe";
-import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
-import { EmployeeLoginResponse } from "../../entities/employeeInterface/employeeLogin.interface";
+import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/EmployeeRepository";
+import { EmployeeLoginResponse } from "../../entities/employeeInterface/EmployeeLoginInterface";
 import { IEmployeeLoginUseCase } from "../../entities/useCaseInterface/IEmployeeLoginUseCase";
 import { clearAuthCookies } from "../../shared/utils/cookieHelper";
 import { Response } from "express";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { loginSchema } from "../../shared/validation/validator";
-import { IJwtService } from "../../entities/services/jwt.interface";
+import { IJwtService } from "../../entities/services/JwtInterface";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
 

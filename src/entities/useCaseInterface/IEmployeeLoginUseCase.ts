@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { EmployeeLoginResponse } from "../employeeInterface/employeeLogin.interface";
+import { EmployeeLoginResponse } from "../employeeInterface/EmployeeLoginInterface";
 
 
 export interface IEmployeeLoginUseCase {

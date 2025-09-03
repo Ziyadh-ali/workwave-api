@@ -2,7 +2,7 @@ import { Server as IOServer, Socket } from 'socket.io';
 import { inject, injectable } from 'tsyringe';
 import { IMessage } from '../../entities/models/IMessage.enities';
 import { IMessageRepository } from '../../entities/repositoryInterfaces/IMessage.respository';
-import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employee/employee.repository';
+import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employee/EmployeeRepository';
 import { IGroupRepository } from '../../entities/repositoryInterfaces/IGroup.repository';
 import { INotificationRepository } from '../../entities/repositoryInterfaces/INotification.repository';
 import { INotification } from '../../entities/models/INotification';

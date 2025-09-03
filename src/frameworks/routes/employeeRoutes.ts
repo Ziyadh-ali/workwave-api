@@ -20,10 +20,10 @@ import {
     payrollController,
     pdfController
 } from "../di/resolver";
-import { verifyAuth } from "../../adapters/middlewares/authMiddleware";
-import upload from "../../adapters/service/multer";
-import { chatMediaUpload } from "../../adapters/service/chatUploadMulter";
-import { uploadEmployeeProfile } from "../../adapters/service/deletePrevious";
+import { verifyAuth } from "../../adapters/middlewares/AuthMiddleware";
+import upload from "../../adapters/service/Multer";
+import { chatMediaUpload } from "../../adapters/service/ChatUploadMulter";
+import { uploadEmployeeProfile } from "../../adapters/service/DeletePreviousTmp";
 import asyncHandler from "express-async-handler"
 
 

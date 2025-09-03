@@ -3,7 +3,7 @@ import { IMeetingUseCase } from "../entities/useCaseInterface/IMeetingUseCase";
 import { IMeeting } from "../entities/models/Meeting.entities";
 import { IMeetingRepository } from "../entities/repositoryInterfaces/IMeeting.repository";
 import { ObjectId } from "mongoose";
-import { IEmployeeRepository } from "../entities/repositoryInterfaces/employee/employee.repository";
+import { IEmployeeRepository } from "../entities/repositoryInterfaces/employee/EmployeeRepository";
 import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
 import { CustomError } from "../shared/errors/CustomError";
 

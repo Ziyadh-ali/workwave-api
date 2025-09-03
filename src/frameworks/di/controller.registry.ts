@@ -1,9 +1,9 @@
 import { container } from "tsyringe";
-import { AdminController } from "../../adapters/controllers/admin/adminController";
-import { RefreshController } from "../../adapters/controllers/refreshController";
+import { AdminController } from "../../adapters/controllers/admin/AdminController";
+import { RefreshController } from "../../adapters/controllers/RefreshController";
 import { AdminUserManagement } from "../../adapters/controllers/admin/AdminUserManagement";
-import { EmployeeController } from "../../adapters/controllers/employee/employeeController";
-import { EmployeeProfile } from "../../adapters/controllers/employee/employeeProfileController";
+import { EmployeeController } from "../../adapters/controllers/employee/EmployeeController";
+import { EmployeeProfile } from "../../adapters/controllers/employee/EmployeeProfileController";
 import { LeaveTypeController } from "../../adapters/controllers/LeaveTypeController";
 import { LeaveBalanceController } from "../../adapters/controllers/LeaveBalanceController";
 import { LeaveRequestController } from "../../adapters/controllers/LeaveRequestController";
@@ -19,7 +19,7 @@ import { MonthlySummaryController } from "../../adapters/controllers/MonthlySumm
 import { PayrollController } from "../../adapters/controllers/PayrollController";
 import { PayslipPDFService } from "../../adapters/service/PayslipPDFService";
 import { PayslipController } from "../../adapters/controllers/PDFHandlerController";
-import { CronService } from "../../adapters/service/cronService";
+import { CronService } from "../../adapters/service/CronService";
 
 export class ControllerRegistry {
     static registerControllers() : void {

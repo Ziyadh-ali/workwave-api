@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { JwtService } from "../service/jwt.service";
+import { JwtService } from "../service/JwtService";
 import { JwtPayload } from "jsonwebtoken";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { ObjectId } from "mongoose";

@@ -1,11 +1,11 @@
 import { injectable, inject } from "tsyringe";
-import { IAdminRepository } from "../../entities/repositoryInterfaces/admin/admin.repository";
-import { Admin } from "../../entities/models/adminEntities/admin.enitity";
-import { AdminLoginResponse } from "../../entities/adminInterface/adminLogin.interface";
+import { IAdminRepository } from "../../entities/repositoryInterfaces/admin/AdminRepository";
+import { Admin } from "../../entities/models/adminEntities/AdminEnitity";
+import { AdminLoginResponse } from "../../entities/adminInterface/AdminLoginInterface";
 import { IAdminAuthUseCase } from "../../entities/useCaseInterface/IAdaminAuthUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { loginSchema } from "../../shared/validation/validator";
-import { IJwtService } from "../../entities/services/jwt.interface";
+import { IJwtService } from "../../entities/services/JwtInterface";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
 

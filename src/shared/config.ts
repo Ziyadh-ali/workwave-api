@@ -20,8 +20,8 @@ export const config = {
 
     cors : {
         ALLOWED_ORIGIN: isProduction
-      ? process.env.ALLOWED_ORIGIN_PROD || ""
-      : process.env.ALLOWED_ORIGIN_DEV || "http://localhost:5172",
+      ? process.env.ALLOWED_ORIGIN_PROD || "https://workwave.ziyadhali.tech"
+      : process.env.ALLOWED_ORIGIN_DEV || "http://localhost:5173",
     },
 
     cloudinary : {

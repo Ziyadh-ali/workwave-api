@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
-import { IEmployeeProfile } from "../../../entities/controllerInterface/employeeController";
+import { IEmployeeProfile } from "../../../entities/controllerInterface/EmployeeController";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../../entities/useCaseInterface/IEmployeeProfileUseCase";
-import { EmployeeDTO } from "../../../entities/dtos/employeeDto";
+import { EmployeeDTO } from "../../../entities/dtos/EmployeeDtoTmp";
 
 @injectable()
 export class EmployeeProfile implements IEmployeeProfile {

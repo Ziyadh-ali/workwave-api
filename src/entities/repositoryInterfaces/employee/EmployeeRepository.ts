@@ -1,4 +1,4 @@
-import { Employee, EmployeeFilter } from "../../models/employeeEntities/employee.enitity";
+import { Employee, EmployeeFilter } from "../../models/employeeEntities/EmployeeEnitity";
 export interface IEmployeeRepository {
     save(data: Partial<Employee>): Promise<Employee>
     findByEmail(email: string): Promise<Employee | null>;

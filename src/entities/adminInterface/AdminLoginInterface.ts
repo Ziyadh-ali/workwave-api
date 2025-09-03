@@ -1,4 +1,4 @@
-import { Admin } from "./admin.interface";
+import { Admin } from "./AdminInterface";
 
 export interface AdminLoginInterface {
     email : string;

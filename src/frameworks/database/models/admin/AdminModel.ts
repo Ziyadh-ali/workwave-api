@@ -1,5 +1,5 @@
 import { Document , model , ObjectId } from "mongoose";
-import { Admin } from "../../../../entities/models/adminEntities/admin.enitity";
+import { Admin } from "../../../../entities/models/adminEntities/AdminEnitity";
 import { AdminSchema } from "../../schemas/admin/AdminSchema";
 
 

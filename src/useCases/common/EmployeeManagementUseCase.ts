@@ -1,9 +1,9 @@
 import { inject, injectable } from "tsyringe";
-import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
+import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/EmployeeRepository";
 import {
   Employee,
   EmployeeFilter,
-} from "../../entities/models/employeeEntities/employee.enitity";
+} from "../../entities/models/employeeEntities/EmployeeEnitity";
 import { IEmployeeManagementUseCase } from "../../entities/useCaseInterface/IEmployeeManagementUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { eventHandler } from "../../shared/eventHandler";

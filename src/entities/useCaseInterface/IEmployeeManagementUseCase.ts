@@ -1,4 +1,4 @@
-import { Employee, EmployeeFilter } from "../models/employeeEntities/employee.enitity";
+import { Employee, EmployeeFilter } from "../models/employeeEntities/EmployeeEnitity";
 
 
 export interface IEmployeeManagementUseCase {

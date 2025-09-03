@@ -1,4 +1,4 @@
-import { Employee } from "../models/employeeEntities/employee.enitity";
+import { Employee } from "../models/employeeEntities/EmployeeEnitity";
 
 export interface EmployeeLoginInterface {
     email : string , 

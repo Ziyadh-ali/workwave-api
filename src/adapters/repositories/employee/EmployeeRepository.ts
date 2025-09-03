@@ -1,6 +1,6 @@
-import { IEmployeeRepository } from "../../../entities/repositoryInterfaces/employee/employee.repository";
+import { IEmployeeRepository } from "../../../entities/repositoryInterfaces/employee/EmployeeRepository";
 import { injectable } from "tsyringe";
-import { Employee, EmployeeFilter } from "../../../entities/models/employeeEntities/employee.enitity";
+import { Employee, EmployeeFilter } from "../../../entities/models/employeeEntities/EmployeeEnitity";
 import { EmployeeModel } from "../../../frameworks/database/models/employee/EmployeeModel";
 
 @injectable()

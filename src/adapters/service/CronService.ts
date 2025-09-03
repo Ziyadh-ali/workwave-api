@@ -1,4 +1,4 @@
-import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employee/employee.repository';
+import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employee/EmployeeRepository';
 import { IAttendanceRepository } from '../../entities/repositoryInterfaces/IAttendance.repository';
 import cron from "node-cron";
 import { inject, injectable } from "tsyringe";

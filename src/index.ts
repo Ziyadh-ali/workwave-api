@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import "./shared/events";
-import "./adapters/service/cronService"
+import "./adapters/service/CronService"
 import { config  } from "./shared/config";
 import { Server } from "./frameworks/http/server";
 import { MongoConnect } from "./frameworks/database/mongodb/mongoConnect";

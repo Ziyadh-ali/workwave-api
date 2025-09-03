@@ -2,8 +2,6 @@ import { inject, injectable } from "tsyringe";
 import { IMeetingRepository } from "../../entities/repositoryInterfaces/IMeeting.repository";
 import { IMeeting } from "../../entities/models/Meeting.entities";
 import { meetingModel } from "../../frameworks/database/models/MeetingModel";
-import { BaseRepository } from "./BaseRepository";
-import { Document } from "mongoose";
 
 @injectable()
 export class MeetingRepository implements IMeetingRepository {

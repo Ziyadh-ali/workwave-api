@@ -1,10 +1,10 @@
 import { container } from "tsyringe";
-import { AdminController } from "../../adapters/controllers/admin/adminController";
-import { RefreshController } from "../../adapters/controllers/refreshController";
+import { AdminController } from "../../adapters/controllers/admin/AdminController";
+import { RefreshController } from "../../adapters/controllers/RefreshController";
 import { DependencyInjection } from "./index";
 import { AdminUserManagement } from "../../adapters/controllers/admin/AdminUserManagement";
-import { EmployeeController } from "../../adapters/controllers/employee/employeeController";
-import { EmployeeProfile } from "../../adapters/controllers/employee/employeeProfileController";
+import { EmployeeController } from "../../adapters/controllers/employee/EmployeeController";
+import { EmployeeProfile } from "../../adapters/controllers/employee/EmployeeProfileController";
 import { LeaveTypeController } from "../../adapters/controllers/LeaveTypeController";
 import { LeaveBalanceUseCase } from "../../useCases/LeaveBalanceUseCase";
 import { LeaveTypeRepository } from "../../adapters/repositories/LeaveTypeRepository";
@@ -15,7 +15,6 @@ import { ResetPasswordController } from "../../adapters/controllers/employee/Res
 import { AttendanceController } from "../../adapters/controllers/AttendanceController";
 import { MeetingController } from "../../adapters/controllers/MeetingController";
 import { FaqController } from "../../adapters/controllers/FaqController";
-// import { SocketManager } from "../../shared/socket/socketManager";
 import { MessageController } from "../../adapters/controllers/MessageController";
 import { ProjectController } from "../../adapters/controllers/ProjectController";
 import { GroupController } from "../../adapters/controllers/GroupController";
@@ -23,7 +22,7 @@ import { QuestionController } from "../../adapters/controllers/QuestionControlle
 import { MonthlySummaryController } from "../../adapters/controllers/MonthlySummaryController";
 import { PayrollController } from "../../adapters/controllers/PayrollController";
 import { PayslipController } from "../../adapters/controllers/PDFHandlerController";
-import { CronService } from "../../adapters/service/cronService";
+import { CronService } from "../../adapters/service/CronService";
 
 DependencyInjection.registerAll();
 

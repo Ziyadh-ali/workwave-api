@@ -1,9 +1,9 @@
 import { injectable, inject } from "tsyringe";
 import { IForgotPasswordUseCase } from "../../entities/useCaseInterface/IForgotPassword";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
-import { EmailService } from "../../adapters/service/mailer";
-import { IJwtService } from "../../entities/services/jwt.interface";
-import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
+import { EmailService } from "../../adapters/service/MailerTmp";
+import { IJwtService } from "../../entities/services/JwtInterface";
+import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/EmployeeRepository";
 import { config } from "../../shared/config";
 import { passwordResetTemplate , passwordResetText} from "../../shared/email-templates/password-reset"
 import { CustomError } from "../../shared/errors/CustomError";

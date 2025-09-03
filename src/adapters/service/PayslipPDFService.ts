@@ -4,7 +4,7 @@ import { inject, injectable } from "tsyringe";
 import { IPayrollUseCase } from "../../entities/useCaseInterface/IPayrollUseCase";
 import { IPayroll } from "../../entities/models/IPayroll";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
-import { Employee } from "../../entities/models/employeeEntities/employee.enitity";
+import { Employee } from "../../entities/models/employeeEntities/EmployeeEnitity";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()

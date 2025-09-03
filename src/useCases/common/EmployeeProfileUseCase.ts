@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
-import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
-import { Employee } from "../../entities/models/employeeEntities/employee.enitity";
+import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/EmployeeRepository";
+import { Employee } from "../../entities/models/employeeEntities/EmployeeEnitity";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";

@@ -3,7 +3,6 @@ import { inject, injectable } from "tsyringe";
 import { setAuthCookies, clearAuthCookies } from "../../../shared/utils/cookieHelper";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 import { IAdminAuthUseCase } from "../../../entities/useCaseInterface/IAdaminAuthUseCase";
-import { CustomError } from "../../../shared/errors/CustomError";
 
 @injectable()
 export class AdminController {

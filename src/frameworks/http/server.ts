@@ -10,7 +10,7 @@ import { UserRoute } from "../routes/employeeRoutes";
 import { Server as IOServer } from "socket.io";
 import { container } from "tsyringe";
 import { SocketManager } from "../../adapters/service/SocketService";
-import { errorHandler } from "../../adapters/middlewares/errorHandler";
+import { errorHandler } from "../../adapters/middlewares/ErrorHandler";
 import { errorLogger, requestLogger } from "../../adapters/middlewares/Logger";
 
 export class Server {
