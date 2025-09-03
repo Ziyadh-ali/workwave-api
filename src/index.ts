@@ -9,7 +9,6 @@ import { MongoConnect } from "./frameworks/database/mongodb/mongoConnect";
 const server = new Server(config.PORT);
 const connectMongo = new MongoConnect();
 
-
 connectMongo.connect();
 server.start();
 console.log("RUNNING BUILD VERSION: Employee Edit v5");

@@ -11,6 +11,7 @@ import { Server as IOServer } from "socket.io";
 import { container } from "tsyringe";
 import { SocketManager } from "../../adapters/service/SocketService";
 import { errorHandler } from "../../adapters/middlewares/errorHandler";
+import { errorLogger, requestLogger } from "../../adapters/middlewares/Logger";
 
 export class Server {
     private app: Application;
@@ -38,7 +39,7 @@ export class Server {
     }
 
     private setupMiddlewares(): void {
-        this.app.use(morgan("dev"));
+        this.app.use(requestLogger);
         this.app.use(
             cors({
                 origin: config.cors.ALLOWED_ORIGIN,
@@ -60,6 +61,7 @@ export class Server {
         this.app.use("/admin", adminRoute.getRouter());
 
         this.app.use(errorHandler)
+        this.app.use(errorLogger)
     }
 
     private setupSocket(): void {
