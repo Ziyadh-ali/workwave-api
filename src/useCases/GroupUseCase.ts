@@ -5,7 +5,6 @@ import { IGroupRepository } from "../entities/repositoryInterfaces/IGroup.reposi
 import { ObjectId } from "mongoose";
 import { CustomError } from "../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../shared/constants";
-// import { socketManager } from "../frameworks/di/resolver";
 
 
 @injectable()
@@ -17,7 +16,6 @@ export class GroupUseCase implements IGroupUseCase {
 
   async createGroup(data: IGroup): Promise<IGroup> {
     const group = await this.groupRepository.createGroup(data);
-    // socketManager.emitGroupCreated(group);
     return group;
   }
 
@@ -31,12 +29,6 @@ export class GroupUseCase implements IGroupUseCase {
 
     const group = await this.groupRepository.getGroupDetails(groupId);
     if (!group) throw new CustomError('Group not found' , HTTP_STATUS_CODES.BAD_REQUEST);
-
-    // socketManager.emitMembersAdded(
-    //   groupId,
-    //   userIds,
-    //   group.members
-    // );
 
     return group;
   }

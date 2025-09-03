@@ -17,7 +17,7 @@ export class GroupController {
         console.log(members)
 
         if (!name || !members || members.length === 0) {
-            res.status(400).json({ message: "Group name and members are required." });
+            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: "Group name and members are required." });
             return;
         }
 

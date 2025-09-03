@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { injectable, inject } from 'tsyringe';
 import { PayslipPDFService } from '../service/PayslipPDFService';
+import { HTTP_STATUS_CODES } from '../../shared/constants';
 
 @injectable()
 export class PayslipController {
@@ -11,7 +12,7 @@ export class PayslipController {
   async downloadPayslip(req: Request, res: Response) {
     const { employeeId, month, year } = req.query;
     if (!employeeId || !month || !year) {
-        res.status(400).json({ message: 'Missing required query params' });
+        res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: 'Missing required query params' });
     }
 
     await this.payslipPDFService.generateAndSendPDF(

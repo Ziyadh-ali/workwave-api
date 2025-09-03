@@ -1,7 +1,9 @@
 import { inject, injectable } from "tsyringe";
 import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
-import { Employee, EmployeeFilter } from "../../entities/models/employeeEntities/employee.enitity";
-import { PasswordBcrypt } from "../../frameworks/security/password.bcrypt";
+import {
+  Employee,
+  EmployeeFilter,
+} from "../../entities/models/employeeEntities/employee.enitity";
 import { IEmployeeManagementUseCase } from "../../entities/useCaseInterface/IEmployeeManagementUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { eventHandler } from "../../shared/eventHandler";
@@ -10,59 +12,65 @@ import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()
 export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
-    constructor(
-        @inject("IEmployeeRepository") private employeeRepository: IEmployeeRepository,
-        @inject("IBcrypt") private passwordBcrypt: IBcrypt,
-    ) { }
+  constructor(
+    @inject("IEmployeeRepository")
+    private employeeRepository: IEmployeeRepository,
+    @inject("IBcrypt") private passwordBcrypt: IBcrypt
+  ) {}
 
-    async addEmployee(data: Employee): Promise<Employee> {
-        const existingEmployee = await this.employeeRepository.findByEmail(data.email);
+  async addEmployee(data: Employee): Promise<Employee> {
+    const existingEmployee = await this.employeeRepository.findByEmail(
+      data.email
+    );
 
-        if (existingEmployee) {
-            throw new CustomError(MESSAGES.ERROR.USER.USER_ALREADY_EXISTS , 400);
-        }
-
-        const hashedPassword = await this.passwordBcrypt.hash(data.password);
-        const newEmployee: Employee = { ...data, password: hashedPassword };
-
-        const createEmployee = await this.employeeRepository.save(newEmployee);
-
-        console.log(createEmployee);
-        eventHandler.emit("EMPLOYEE_CREATED", createEmployee._id?.toString());
-
-        return createEmployee;
+    if (existingEmployee) {
+      throw new CustomError(
+        MESSAGES.ERROR.USER.USER_ALREADY_EXISTS,
+        HTTP_STATUS_CODES.CONFLICT
+      );
     }
 
-    async getEmployees(filter: EmployeeFilter, page: number, pageSize: number): Promise<{ employees: Employee[] | []; total: number, active: number, inactive: number }> {
-        const skip = (page - 1) * pageSize;
-        const limit = pageSize;
-        return await this.employeeRepository.find(filter, skip, limit);
-    }
+    const hashedPassword = await this.passwordBcrypt.hash(data.password);
+    const newEmployee: Employee = { ...data, password: hashedPassword };
 
-    async deleteEmployee(id: string): Promise<void> {
-        try {
-            eventHandler.emit("EMPLOYEE_DELETED",id); 
-            await this.employeeRepository.findByIdAndDelete(id);
-        } catch (error) {
-            throw new CustomError("Error in deleting user" , HTTP_STATUS_CODES.BAD_REQUEST)
-        }
-    }
+    const createEmployee = await this.employeeRepository.save(newEmployee);
 
-    async getManagers(): Promise<Employee[] | []> {
-        try {
-            const managers = await this.employeeRepository.findManagers();
-            return managers;
-        } catch (error) {
-            console.log(error);
-            throw new CustomError("Error in finding managers" , HTTP_STATUS_CODES.BAD_REQUEST);
-        }
-    }
+    console.log(createEmployee);
+    eventHandler.emit("EMPLOYEE_CREATED", createEmployee._id?.toString());
 
-    async getEmployeesForChat(): Promise<Partial<Employee[]>> {
-        return await this.employeeRepository.getEmployeesForChat();
-    }
+    return createEmployee;
+  }
 
-    async getDevelopers(): Promise<Employee[]> {
-        return await this.employeeRepository.getDevelopers();
-    }
-} 
+  async getEmployees(
+    filter: EmployeeFilter,
+    page: number,
+    pageSize: number
+  ): Promise<{
+    employees: Employee[] | [];
+    total: number;
+    active: number;
+    inactive: number;
+  }> {
+    const skip = (page - 1) * pageSize;
+    const limit = pageSize;
+    return await this.employeeRepository.find(filter, skip, limit);
+  }
+
+  async deleteEmployee(id: string): Promise<void> {
+    eventHandler.emit("EMPLOYEE_DELETED", id);
+    await this.employeeRepository.findByIdAndDelete(id);
+  }
+
+  async getManagers(): Promise<Employee[] | []> {
+    const managers = await this.employeeRepository.findManagers();
+    return managers;
+  }
+
+  async getEmployeesForChat(): Promise<Partial<Employee[]>> {
+    return await this.employeeRepository.getEmployeesForChat();
+  }
+
+  async getDevelopers(): Promise<Employee[]> {
+    return await this.employeeRepository.getDevelopers();
+  }
+}

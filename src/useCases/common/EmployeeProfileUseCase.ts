@@ -8,64 +8,88 @@ import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()
 export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
-    constructor(
-        @inject("IEmployeeRepository") private employeeRepository: IEmployeeRepository,
-        @inject("IBcrypt") private passwordBcrypt: IBcrypt,
-    ) { }
+  constructor(
+    @inject("IEmployeeRepository")
+    private employeeRepository: IEmployeeRepository,
+    @inject("IBcrypt") private passwordBcrypt: IBcrypt
+  ) {}
 
-    async updateEmployee(employeeId: string, data: Partial<Employee>): Promise<Employee | null> {
-        try {
+  async updateEmployee(
+    employeeId: string,
+    data: Partial<Employee>
+  ): Promise<Employee | null> {
+    console.log(data);
+    if (data.email) {
+      let employee = await this.employeeRepository.findByEmail(data.email);
 
-            console.log(data)
-            if (data.email) {
-                let employee = await this.employeeRepository.findByEmail(data.email);
-
-                if (employee) {
-                    throw new CustomError("Eployee with the same email exists" , HTTP_STATUS_CODES.BAD_REQUEST);
-                }
-            }
-
-
-            const updateEmployee = await this.employeeRepository.updateEmployeeById(employeeId, data);
-            if (!updateEmployee) {
-                throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
-            }
-            return updateEmployee;
-        } catch (error) {
-            throw new CustomError(MESSAGES.ERROR.USER.USER_UPDATE_FAILED , HTTP_STATUS_CODES.BAD_REQUEST);
-        }
+      if (employee) {
+        throw new CustomError(
+          "Eployee with the same email exists",
+          HTTP_STATUS_CODES.BAD_REQUEST
+        );
+      }
     }
 
-    async getEmployeeDetails(id: string): Promise<Employee | null> {
-        return await this.employeeRepository.findById(id)
+    const updateEmployee = await this.employeeRepository.updateEmployeeById(
+      employeeId,
+      data
+    );
+    if (!updateEmployee) {
+      throw new CustomError(
+        MESSAGES.ERROR.USER.USER_NOT_FOUND,
+        HTTP_STATUS_CODES.BAD_REQUEST
+      );
+    }
+    return updateEmployee;
+  }
+
+  async getEmployeeDetails(id: string): Promise<Employee | null> {
+    return await this.employeeRepository.findById(id);
+  }
+
+  async changePassword(
+    employeeId: string,
+    data: { currentPassword: string; newPassword: string }
+  ): Promise<void> {
+    const employee = await this.employeeRepository.findById(employeeId);
+    if (!employee) {
+      throw new CustomError(
+        MESSAGES.ERROR.USER.USER_NOT_FOUND,
+        HTTP_STATUS_CODES.BAD_REQUEST
+      );
     }
 
-    async changePassword(employeeId: string, data: { currentPassword: string; newPassword: string; }): Promise<void> {
-        try {
-            const employee = await this.employeeRepository.findById(employeeId);
-            if (!employee) {
-                throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
-            }
-
-            if (!data?.currentPassword || !data?.newPassword) {
-                throw new CustomError(MESSAGES.ERROR.USER.PASSWORD_REQUIRED , HTTP_STATUS_CODES.BAD_REQUEST);
-            }
-
-            const isPasswordValid = await this.passwordBcrypt.compare(data.currentPassword, employee.password);
-            if (!isPasswordValid) {
-                throw new CustomError(MESSAGES.ERROR.USER.INVALID_CURRENT_PASSWORD , HTTP_STATUS_CODES.BAD_REQUEST);
-            }
-
-            const hashedPassword = await this.passwordBcrypt.hash(data.newPassword);
-            const passwordChange = await this.employeeRepository.updateEmployeeById(employeeId, { password: hashedPassword });
-
-            if (!passwordChange) {
-                throw new CustomError(MESSAGES.ERROR.USER.PASSWORD_UPDATE_FAILED , HTTP_STATUS_CODES.BAD_REQUEST);
-            }
-
-            return;
-        } catch (error) {
-            throw error
-        }
+    if (!data?.currentPassword || !data?.newPassword) {
+      throw new CustomError(
+        MESSAGES.ERROR.USER.PASSWORD_REQUIRED,
+        HTTP_STATUS_CODES.BAD_REQUEST
+      );
     }
+
+    const isPasswordValid = await this.passwordBcrypt.compare(
+      data.currentPassword,
+      employee.password
+    );
+    if (!isPasswordValid) {
+      throw new CustomError(
+        MESSAGES.ERROR.USER.INVALID_CURRENT_PASSWORD,
+        HTTP_STATUS_CODES.BAD_REQUEST
+      );
+    }
+
+    const hashedPassword = await this.passwordBcrypt.hash(data.newPassword);
+    const passwordChange = await this.employeeRepository.updateEmployeeById(
+      employeeId,
+      { password: hashedPassword }
+    );
+
+    if (!passwordChange) {
+      throw new CustomError(
+        MESSAGES.ERROR.USER.PASSWORD_UPDATE_FAILED,
+        HTTP_STATUS_CODES.BAD_REQUEST
+      );
+    }
+
+    return;
+  }
 }

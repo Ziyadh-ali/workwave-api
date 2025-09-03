@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { injectable, inject } from "tsyringe";
 import { IResetPasswordUseCase } from "../../../entities/useCaseInterface/IResetPasswordUseCase";
-import { MESSAGES } from "../../../shared/constants";
+import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 
 @injectable()
 export class ResetPasswordController {
@@ -13,7 +13,7 @@ export class ResetPasswordController {
             const { token, newPassword } = req.body;
 
             if (!token || !newPassword) {
-                res.status(400).json({
+                res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
                     success: false,
                     message: "Token Required"
                 });

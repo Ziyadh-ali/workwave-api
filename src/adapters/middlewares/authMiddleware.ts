@@ -39,7 +39,7 @@ export const verifyAuth = (
             if (!token) {
                 console.log("no token");
                 res
-                    .status(401)
+                    .status(HTTP_STATUS_CODES.UNAUTHORIZED)
                     .json({ message: "Unauthorized access." });
                 return;
             }
@@ -55,7 +55,7 @@ export const verifyAuth = (
 
             if (!user || !user.id) {
                 res
-                    .status(401)
+                    .status(HTTP_STATUS_CODES.UNAUTHORIZED)
                     .json({ message: "Unauthorized access." });
                 return;
             }

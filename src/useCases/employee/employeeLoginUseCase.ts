@@ -19,10 +19,6 @@ export class EmployeeLoginUseCase implements IEmployeeLoginUseCase {
     ) { }
 
     async login(email: string, password: string): Promise<EmployeeLoginResponse | null> {
-        // const validationResult = loginSchema.safeParse({ email, password });
-        // if (!validationResult.success) {
-        //     throw new Error(JSON.stringify(validationResult.error.format()));
-        // }
         const employee = await this.userRepository.findByEmail(email);
         if (!employee) {
             throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
@@ -59,14 +55,10 @@ export class EmployeeLoginUseCase implements IEmployeeLoginUseCase {
     }
 
     async logout(res: Response): Promise<void> {
-        try {
             clearAuthCookies(
                 res,
                 "access_token",
                 "refresh_token",
-            );
-        } catch (error) {
-            throw new CustomError("error in login" , HTTP_STATUS_CODES.BAD_REQUEST);
-        }
+            )
     }
 }

@@ -5,6 +5,7 @@ import { IPayrollUseCase } from "../../entities/useCaseInterface/IPayrollUseCase
 import { IPayroll } from "../../entities/models/IPayroll";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { Employee } from "../../entities/models/employeeEntities/employee.enitity";
+import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class PayslipPDFService {
@@ -24,7 +25,7 @@ export class PayslipPDFService {
 
 
         if (!payroll || !employee) {
-            res.status(404).json({ message: 'Data not found' });
+            res.status(HTTP_STATUS_CODES.NOT_FOUND).json({ message: 'Data not found' });
             return;
         }
 
