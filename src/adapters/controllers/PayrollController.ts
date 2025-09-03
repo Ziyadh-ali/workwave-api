@@ -85,10 +85,16 @@ export class PayrollController {
     async getPayrollRecords(req: Request, res: Response) {
         const { month, year, status } = req.query;
 
-        const filter: any = {};
+        const filter: {
+            month?: number;
+            year?: number;
+            status?: "Pending" | "Paid";
+        } = {};
         if (month) filter.month = parseInt(month.toString());
         if (year) filter.year = parseInt(year.toString());
-        if (status) filter.status = status.toString();
+        if (status ) {
+            filter.status = status as "Pending" | "Paid";
+        }
 
         const payrolls = await this.payrollUseCase.getPayrollRecords(filter);
 

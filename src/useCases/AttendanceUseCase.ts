@@ -119,7 +119,11 @@ export class AttendanceUseCase implements IAttendanceUseCase {
             checkOutTime?: string;
         }
     ): Promise<Attendance | null> {
-        const updateData: any = {};
+        const updateData: {
+            status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
+            checkInTime?: Date;
+            checkOutTime?: Date;
+        } = {};
 
         if (data.status) updateData.status = data.status;
 

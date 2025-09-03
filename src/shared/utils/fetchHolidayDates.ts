@@ -11,9 +11,9 @@ export  async function fetchHolidayDates(year: number): Promise<string[]> {
         },
       });
   
-      const holidays = res.data.response.holidays;
+      const holidays: { date: { iso: string } }[] = res.data.response.holidays;
   
-      return holidays.map((holiday: any) => holiday.date.iso);
+      return holidays.map((holiday) => holiday.date.iso);
     } catch (error) {
       console.error("Error fetching holidays:", error);
       return [];

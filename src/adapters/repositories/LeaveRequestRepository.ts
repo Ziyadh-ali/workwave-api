@@ -1,5 +1,5 @@
 import { inject, injectable } from "tsyringe";
-import { LeaveRequest, LeaveRequestFilter } from "../../entities/models/LeaveRequest.entity";
+import { LeaveRequest, LeaveRequestFilter, LeaveRequestQuery ,  } from "../../entities/models/LeaveRequest.entity";
 import { ILeaveRequestRepository } from "../../entities/repositoryInterfaces/ILeaveRequest.repository";
 import { LeaveRequestModel } from "../../frameworks/database/models/LeaveRequestModel";
 import { EmployeeModel } from "../../frameworks/database/models/employee/EmployeeModel";
@@ -109,7 +109,7 @@ export class LeaveRequestRepository implements ILeaveRequestRepository {
     }
 
     async getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<LeaveRequest[]> {
-        const query: any = {};
+        const query: LeaveRequestQuery = {};
 
         if (filters.status) query.status = filters.status;
         if (filters.userRole) query.userRole = filters.userRole;

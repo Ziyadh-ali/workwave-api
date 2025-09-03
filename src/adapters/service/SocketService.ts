@@ -8,6 +8,7 @@ import { INotificationRepository } from '../../entities/repositoryInterfaces/INo
 import { INotification } from '../../entities/models/INotification';
 import { CustomError } from '../../shared/errors/CustomError';
 import { HTTP_STATUS_CODES } from '../../shared/constants';
+import { IGroup } from '../../entities/models/IGroup.entities';
 
 interface UserSocketMap {
     [userId: string]: string;
@@ -156,7 +157,7 @@ export class SocketManager {
                 this.io!.to(roomId).emit('userTypingRoom', senderId, roomId);
             });
 
-            socket.on('createGroup', async (groupData: { name: string; members: string[]; createdBy: string }, callback: (response: { success: boolean; group?: any; error?: string }) => void) => {
+            socket.on('createGroup', async (groupData: { name: string; members: string[]; createdBy: string }, callback: (response: { success: boolean; group?: IGroup; error?: string }) => void) => {
                 try {
                     const newGroup = await this.groupRepository.createGroup(groupData);
                     const members = [...groupData.members, groupData.createdBy];

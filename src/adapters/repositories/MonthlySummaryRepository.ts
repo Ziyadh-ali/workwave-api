@@ -101,7 +101,11 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
         },
         employeeId?: string
     ): Promise<IMonthlyAttendanceSummary | IMonthlyAttendanceSummary[]> {
-        const deleteFilter: any = { month, year };
+        const deleteFilter: {
+            month: number;
+            year: number;
+            employeeId?: string;
+        } = { month, year };
         if (employeeId) {
             deleteFilter.employeeId = employeeId;
         }

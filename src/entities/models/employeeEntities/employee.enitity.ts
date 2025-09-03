@@ -18,3 +18,17 @@ export interface Employee {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface EmployeeFilter {
+  role?: string;
+  status?: "active" | "inactive";
+  department?: string;
+  fullName?: { $regex: string; $options: string };
+}
+
+import { ParsedQs } from "qs";
+
+export function toStringOrUndefined(value: string | ParsedQs | string[] | ParsedQs[] | undefined): string | undefined {
+  if (typeof value === "string") return value;
+  return undefined;
+}

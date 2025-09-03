@@ -1,14 +1,9 @@
-import { Employee } from "../../models/employeeEntities/employee.enitity";
+import { Employee, EmployeeFilter } from "../../models/employeeEntities/employee.enitity";
 export interface IEmployeeRepository {
     save(data: Partial<Employee>): Promise<Employee>
     findByEmail(email: string): Promise<Employee | null>;
     find(
-        filter: {
-            role?: string,
-            status?: string,
-            department?: string,
-            fullName?: string,
-        },
+        filter: EmployeeFilter,
         skip: number,
         limit: number,
     ): Promise<{ employees: Employee[] | []; total: number, active: number; inactive: number }>;

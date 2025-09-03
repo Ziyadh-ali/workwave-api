@@ -1,11 +1,11 @@
-import { Employee } from "../models/employeeEntities/employee.enitity";
+import { Employee, EmployeeFilter } from "../models/employeeEntities/employee.enitity";
 
 
 export interface IEmployeeManagementUseCase {
     addEmployee(data: Employee): Promise<Employee>;
 
     getEmployees(
-        filter: any,
+        filter: EmployeeFilter,
         page: number,
         pageSize: number
     ): Promise<{

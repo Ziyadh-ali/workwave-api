@@ -21,3 +21,11 @@ export interface LeaveRequestFilter {
     endDate?: Date;
     search?: string;
 }
+
+export type LeaveRequestQuery = {
+  status?: "Pending" | "Approved" | "Rejected";
+  userRole?: string;
+  startDate?: { $gte: Date };
+  endDate?: { $lte: Date };
+  employeeId?: { $in: ObjectId[] };
+};

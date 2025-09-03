@@ -1,6 +1,6 @@
 import { IEmployeeRepository } from "../../../entities/repositoryInterfaces/employee/employee.repository";
 import { injectable } from "tsyringe";
-import { Employee } from "../../../entities/models/employeeEntities/employee.enitity";
+import { Employee, EmployeeFilter } from "../../../entities/models/employeeEntities/employee.enitity";
 import { EmployeeModel } from "../../../frameworks/database/models/employee/EmployeeModel";
 
 @injectable()
@@ -9,22 +9,12 @@ export class EmployeeRepository implements IEmployeeRepository {
         return await EmployeeModel.create(data);
     }
 
-    async find(filter: {
-        role?: string,
-        status?: string,
-        department?: string,
-        fullName?: string,
-    },
+    async find(filter: EmployeeFilter,
         skip: number,
         limit: number
     ): Promise<{ employees: Employee[] | []; total: number; active: number; inactive: number }> {
 
-        const query: {
-            role?: string,
-            status?: string,
-            department?: string,
-            fullName?: string,
-        } = {};
+        const query: EmployeeFilter = {};
 
         if (filter.role) query.role = filter.role;
         if (filter.status) query.status = filter.status;

@@ -1,6 +1,6 @@
 import { inject, injectable } from "tsyringe";
 import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/employee.repository";
-import { Employee } from "../../entities/models/employeeEntities/employee.enitity";
+import { Employee, EmployeeFilter } from "../../entities/models/employeeEntities/employee.enitity";
 import { PasswordBcrypt } from "../../frameworks/security/password.bcrypt";
 import { IEmployeeManagementUseCase } from "../../entities/useCaseInterface/IEmployeeManagementUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
@@ -33,7 +33,7 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
         return createEmployee;
     }
 
-    async getEmployees(filter: any, page: number, pageSize: number): Promise<{ employees: Employee[] | []; total: number, active: number, inactive: number }> {
+    async getEmployees(filter: EmployeeFilter, page: number, pageSize: number): Promise<{ employees: Employee[] | []; total: number, active: number, inactive: number }> {
         const skip = (page - 1) * pageSize;
         const limit = pageSize;
         return await this.employeeRepository.find(filter, skip, limit);

@@ -21,7 +21,9 @@ export class LeaveTypeRepository implements ILeaveTypeRepository {
     }): Promise<{ leaveTypes: LeaveType[]; totalPages: number }> {
         const { page, limit, isPaid } = options;
 
-        const query: any = {};
+        const query: {
+            isPaid?: boolean;
+        } = {};
         if (isPaid !== undefined) {
             query.isPaid = isPaid;
         }

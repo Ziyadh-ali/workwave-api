@@ -57,7 +57,7 @@ export class GroupRepository implements IGroupRepository {
           if (!group) return null;
         
           return {
-            members: group.members.map((m: any) => m.toString()),
+            members: group.members.map((m) => m.toString()),
             createdBy: group.createdBy.toString(),
             name : group.name
           };

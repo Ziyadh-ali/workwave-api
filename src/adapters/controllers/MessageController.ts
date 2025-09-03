@@ -3,6 +3,7 @@ import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { inject, injectable } from "tsyringe";
 import { IMessageUseCase } from "../../entities/useCaseInterface/IMessageUseCase";
 import { CustomError } from "../../shared/errors/CustomError";
+type MulterFile = Express.Multer.File;
 
 @injectable()
 export class MessageController {
@@ -34,7 +35,7 @@ export class MessageController {
                 throw new CustomError("No file provided" , HTTP_STATUS_CODES.BAD_REQUEST);
             }
 
-            const cloudinaryResult = req.file as any;
+            const cloudinaryResult = req.file as MulterFile;
             let mediaType: 'image' | 'video' | 'document' = 'document';
 
             if (cloudinaryResult.mimetype.startsWith('image/')) {
@@ -44,8 +45,6 @@ export class MessageController {
             } else if (cloudinaryResult.mimetype === 'application/pdf') {
                 mediaType = 'document';
             }
-
-            console.log(cloudinaryResult)
 
             res.status(HTTP_STATUS_CODES.OK).json({
                 success: true,
