@@ -39,6 +39,7 @@ export class Server {
     }
 
     private setupMiddlewares(): void {
+        this.app.use(morgan("dev"));
         this.app.use(requestLogger);
         this.app.use(
             cors({
