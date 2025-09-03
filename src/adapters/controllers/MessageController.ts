@@ -57,20 +57,4 @@ export class MessageController {
 
     }
 
-    // async deleteMedia(req: Request, res: Response): Promise<void> {
-    //     try {
-    //         const { public_id } = req.params;
-    //         await this.mediaUseCase.deleteMedia(public_id);
-
-    //         res.status(HTTP_STATUS_CODES.OK).json({
-    //             success: true,
-    //             message: "Media deleted successfully"
-    //         });
-    //     } catch (error) {
-    //         res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-    //             success: false,
-    //             message: error instanceof Error ? error.message : "Media deletion failed"
-    //         });
-    //     }
-    // }
 }

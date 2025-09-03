@@ -36,16 +36,11 @@ export class GroupRepository implements IGroupRepository {
     }
 
     async addMembers(groupId: string, userIds: string[]): Promise<boolean> {
-        try {
             const result = await GroupModel.updateOne(
                 { _id: groupId },
                 { $addToSet: { members: { $each: userIds } } }
             );
             return result.modifiedCount === 1;
-        } catch (error) {
-            console.error('Error adding members:', error);
-            throw new CustomError('Failed to add members to group' , HTTP_STATUS_CODES.BAD_REQUEST);
-        }
     }
 
     async getGroupDetails(groupId: string): Promise<{  name : string , members: string[], createdBy: string } | null> {

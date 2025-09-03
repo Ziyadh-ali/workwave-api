@@ -101,33 +101,6 @@ export class LeaveRequestController {
             return
     }
 
-
-    // async editLeaveRequest(req: Request, res: Response): Promise<void> {
-    //     try {
-    //         const { leaveRequestId } = req.params;
-    //         const updates = req.body;
-
-    //         const updated = await this.leaveRequestUseCase.editLeaveRequest(leaveRequestId, updates);
-    //         if (!updated) {
-    //             res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-    //                 success: false,
-    //                 message: MESSAGES.ERROR.LEAVE.EDIT_FAILED
-    //             });
-    //         }
-
-    //         res.status(HTTP_STATUS_CODES.OK).json({
-    //             success: true,
-    //             message: MESSAGES.SUCCESS.OPERATION_SUCCESSFUL
-    //         });
-    //     } catch (error) {
-    //         console.error(error);
-    //         res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-    //             success: false,
-    //             message: MESSAGES.ERROR.GENERIC
-    //         });
-    //     }
-    // }
-
     async cancelLeaveRequest(req: Request, res: Response): Promise<void> {
             const { leaveRequestId } = req.params;
 
@@ -162,23 +135,4 @@ export class LeaveRequestController {
             });
     }
 
-    // async setRegectionStatus(req: Request, res: Response): Promise<void> {
-    //     try {
-    //         const { leaveRequestId } = req.params;
-    //         const { reason } = req.body;
-
-    //         await this.leaveRequestUseCase.setRejectionReason(leaveRequestId, reason);
-
-    //         await this.leaveRequestUseCase.updateLeaveRequestStatus(leaveRequestId , "Rejected");
-
-    //         res.status(HTTP_STATUS_CODES.OK).json({
-    //             message : MESSAGES.SUCCESS.LEAVE_REQUEST_REJECTED,
-    //         })
-    //     } catch (error) {
-    //         res.status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-    //             success: false,
-    //             message: MESSAGES.ERROR.GENERIC,
-    //         });
-    //     }
-    // }
 }

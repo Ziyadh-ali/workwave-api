@@ -3,7 +3,7 @@ import { leaveBalanceUseCase, leaveTypeRepository } from "../frameworks/di/resol
 
 eventHandler.on("EMPLOYEE_CREATED", async (employeeId: string) => {
     try {
-        const leaveTypes = await leaveTypeRepository.getAllLeaveTypes();
+        const leaveTypes = await leaveTypeRepository.getEveryLeaveType();
 
         console.log(employeeId)
 
