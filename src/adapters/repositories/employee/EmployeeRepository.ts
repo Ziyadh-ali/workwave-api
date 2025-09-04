@@ -2,10 +2,11 @@ import { IEmployeeRepository } from "../../../entities/repositoryInterfaces/empl
 import { injectable } from "tsyringe";
 import { Employee, EmployeeFilter } from "../../../entities/models/employeeEntities/EmployeeEnitity";
 import { EmployeeModel } from "../../../frameworks/database/models/employee/EmployeeModel";
+import { CreateEmployeeRequestDTO, UpdateEmployeeRequestDTO } from "../../../entities/dtos/RequestDTOs";
 
 @injectable()
 export class EmployeeRepository implements IEmployeeRepository {
-    async save(data: Partial<Employee>): Promise<Employee> {
+    async save(data: CreateEmployeeRequestDTO): Promise<Employee> {
         return await EmployeeModel.create(data);
     }
 
@@ -42,7 +43,7 @@ export class EmployeeRepository implements IEmployeeRepository {
         await EmployeeModel.findByIdAndDelete(id);
     }
 
-    async updateEmployeeById(id: string, data: Partial<Employee>): Promise<Employee | null> {
+    async updateEmployeeById(id: string, data: UpdateEmployeeRequestDTO): Promise<Employee | null> {
         return await EmployeeModel.findByIdAndUpdate(id, data);
     }
 

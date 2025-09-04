@@ -5,6 +5,9 @@ import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmploy
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
+import { UpdateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs";
+import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs";
+import { EmployeeMapper } from "../../entities/mapping/EmployeeMapper";
 
 @injectable()
 export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
@@ -16,8 +19,8 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
 
   async updateEmployee(
     employeeId: string,
-    data: Partial<Employee>
-  ): Promise<Employee | null> {
+    data: UpdateEmployeeRequestDTO
+  ): Promise<EmployeeResponseDTO | null> {
     console.log(data);
     if (data.email) {
       let employee = await this.employeeRepository.findByEmail(data.email);
@@ -40,11 +43,18 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
         HTTP_STATUS_CODES.BAD_REQUEST
       );
     }
-    return updateEmployee;
+    return EmployeeMapper.toResponseDTO(updateEmployee);
   }
 
-  async getEmployeeDetails(id: string): Promise<Employee | null> {
-    return await this.employeeRepository.findById(id);
+  async getEmployeeDetails(id: string): Promise<EmployeeResponseDTO | null> {
+    const employee = await this.employeeRepository.findById(id);
+    if (!employee) {
+      throw new CustomError(
+        MESSAGES.ERROR.USER.USER_NOT_FOUND,
+        HTTP_STATUS_CODES.BAD_REQUEST
+      );
+    }
+    return EmployeeMapper.toResponseDTO(employee);
   }
 
   async changePassword(

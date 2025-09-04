@@ -1,15 +1,17 @@
+import { CreateEmployeeRequestDTO } from "../dtos/RequestDTOs";
+import { EmployeeResponseDTO } from "../dtos/ResponseDTOs";
 import { Employee, EmployeeFilter } from "../models/employeeEntities/EmployeeEnitity";
 
 
 export interface IEmployeeManagementUseCase {
-    addEmployee(data: Employee): Promise<Employee>;
+    addEmployee(data: CreateEmployeeRequestDTO): Promise<EmployeeResponseDTO>;
 
     getEmployees(
         filter: EmployeeFilter,
         page: number,
         pageSize: number
     ): Promise<{
-        employees: Employee[] | [];
+        employees: EmployeeResponseDTO[] | [];
         total: number;
         active: number;
         inactive: number,
@@ -17,8 +19,8 @@ export interface IEmployeeManagementUseCase {
 
     deleteEmployee(employeeId : string) : Promise<void>;
 
-    getManagers() : Promise<Employee[]>;
+    getManagers() : Promise<EmployeeResponseDTO[]>;
 
-    getEmployeesForChat () : Promise<Partial<Employee[]>>;
-    getDevelopers () : Promise<Employee[]>;
+    getEmployeesForChat () : Promise<Partial<EmployeeResponseDTO[]>>;
+    getDevelopers () : Promise<EmployeeResponseDTO[]>;
 }

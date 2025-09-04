@@ -9,6 +9,9 @@ import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { eventHandler } from "../../shared/eventHandler";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
+import { CreateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs";
+import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs";
+import { EmployeeMapper } from "../../entities/mapping/EmployeeMapper";
 
 @injectable()
 export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
@@ -18,7 +21,9 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
     @inject("IBcrypt") private passwordBcrypt: IBcrypt
   ) {}
 
-  async addEmployee(data: Employee): Promise<Employee> {
+  async addEmployee(
+    data: CreateEmployeeRequestDTO
+  ): Promise<EmployeeResponseDTO> {
     const existingEmployee = await this.employeeRepository.findByEmail(
       data.email
     );
@@ -31,14 +36,16 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
     }
 
     const hashedPassword = await this.passwordBcrypt.hash(data.password);
-    const newEmployee: Employee = { ...data, password: hashedPassword };
+    const newEmployee: CreateEmployeeRequestDTO = {
+      ...data,
+      password: hashedPassword,
+    };
 
     const createEmployee = await this.employeeRepository.save(newEmployee);
 
-    console.log(createEmployee);
     eventHandler.emit("EMPLOYEE_CREATED", createEmployee._id?.toString());
 
-    return createEmployee;
+    return EmployeeMapper.toResponseDTO(createEmployee);
   }
 
   async getEmployees(
@@ -46,14 +53,22 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
     page: number,
     pageSize: number
   ): Promise<{
-    employees: Employee[] | [];
+    employees: EmployeeResponseDTO[] | [];
     total: number;
     active: number;
     inactive: number;
   }> {
     const skip = (page - 1) * pageSize;
     const limit = pageSize;
-    return await this.employeeRepository.find(filter, skip, limit);
+    const employees = await this.employeeRepository.find(filter, skip, limit);
+    return {
+      employees: EmployeeMapper.toResponseDTOs(
+        employees.employees as Employee[]
+      ),
+      total: employees.total,
+      active: employees.active,
+      inactive: employees.inactive,
+    };
   }
 
   async deleteEmployee(id: string): Promise<void> {
@@ -61,16 +76,18 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
     await this.employeeRepository.findByIdAndDelete(id);
   }
 
-  async getManagers(): Promise<Employee[] | []> {
+  async getManagers(): Promise<EmployeeResponseDTO[] | []> {
     const managers = await this.employeeRepository.findManagers();
-    return managers;
+    return EmployeeMapper.toResponseDTOs(managers as Employee[]);
   }
 
-  async getEmployeesForChat(): Promise<Partial<Employee[]>> {
-    return await this.employeeRepository.getEmployeesForChat();
+  async getEmployeesForChat(): Promise<Partial<EmployeeResponseDTO[]>> {
+    const employees = await this.employeeRepository.getEmployeesForChat();
+    return EmployeeMapper.toResponseDTOs(employees as Employee[]);
   }
 
-  async getDevelopers(): Promise<Employee[]> {
-    return await this.employeeRepository.getDevelopers();
+  async getDevelopers(): Promise<EmployeeResponseDTO[]> {
+    const developers = await this.employeeRepository.getDevelopers();
+    return EmployeeMapper.toResponseDTOs(developers as Employee[]);
   }
 }

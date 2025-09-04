@@ -3,7 +3,6 @@ import { inject, injectable } from "tsyringe";
 import { IEmployeeProfile } from "../../../entities/controllerInterface/EmployeeController";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../../entities/useCaseInterface/IEmployeeProfileUseCase";
-import { EmployeeDTO } from "../../../entities/dtos/EmployeeDtoTmp";
 
 @injectable()
 export class EmployeeProfile implements IEmployeeProfile {
@@ -22,12 +21,11 @@ export class EmployeeProfile implements IEmployeeProfile {
             const details = await this.employeeProfileUseCase.getEmployeeDetails(employeeId);
 
             if (details) {
-                const newEmployee = EmployeeDTO(details);
 
                 res.status(HTTP_STATUS_CODES.OK).json({
                     success: true,
-                    details : newEmployee,
-                })
+                    details,
+                });
             }
     }
 
