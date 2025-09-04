@@ -1,5 +1,5 @@
-import { CreateEmployeeRequestDTO } from "../dtos/RequestDTOs";
-import { EmployeeResponseDTO } from "../dtos/ResponseDTOs";
+import { CreateEmployeeRequestDTO } from "../dtos/RequestDTOs/EmployeeDTO";
+import { EmployeeResponseDTO } from "../dtos/ResponseDTOs/EmployeeDTO";
 import { Employee, EmployeeFilter } from "../models/employeeEntities/EmployeeEnitity";
 
 

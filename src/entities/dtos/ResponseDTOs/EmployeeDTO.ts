@@ -16,3 +16,4 @@ export interface EmployeeResponseDTO {
   salaryType: "hourly" | "monthly";
   createdAt?: string;
 }
+

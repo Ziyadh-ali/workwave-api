@@ -1,7 +1,6 @@
-import { CreateEmployeeRequestDTO, UpdateEmployeeRequestDTO } from "../../dtos/RequestDTOs";
 import { Employee, EmployeeFilter } from "../../models/employeeEntities/EmployeeEnitity";
 export interface IEmployeeRepository {
-    save(data: CreateEmployeeRequestDTO): Promise<Employee>
+    save(data: Employee): Promise<Employee>
     findByEmail(email: string): Promise<Employee | null>;
     find(
         filter: EmployeeFilter,
@@ -11,7 +10,7 @@ export interface IEmployeeRepository {
     findByIdAndDelete(id: string): Promise<void>;
     updateEmployeeById(
         id: string,
-        data: UpdateEmployeeRequestDTO,
+        data: Partial<Employee>,
     ): Promise<Employee | null>;
     findById(id: string): Promise<Employee | null>;
     findManagers(): Promise<Employee[] | []>;

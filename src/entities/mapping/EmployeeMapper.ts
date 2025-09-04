@@ -1,6 +1,6 @@
 import { Employee } from "../models/employeeEntities/EmployeeEnitity";
-import { EmployeeResponseDTO } from "../dtos/ResponseDTOs";
-import { CreateEmployeeRequestDTO } from "../dtos/RequestDTOs";
+import { EmployeeResponseDTO } from "../dtos/ResponseDTOs/EmployeeDTO";
+import { CreateEmployeeRequestDTO, UpdateEmployeeRequestDTO } from "../dtos/RequestDTOs/EmployeeDTO";
 
 export class EmployeeMapper {
   static toResponseDTO(employee: Employee): EmployeeResponseDTO {
@@ -42,5 +42,23 @@ export class EmployeeMapper {
       password: dto.password,
       status: "active",
     };
+  }
+
+  static toUpdateEntity(dto: UpdateEmployeeRequestDTO): Partial<Employee> {
+    const entity: Partial<Employee> = {};
+
+    if (dto.fullName) entity.fullName = dto.fullName;
+    if (dto.email) entity.email = dto.email;
+    if (dto.department) entity.department = dto.department;
+    if (dto.role) entity.role = dto.role;
+    if (dto.phone) entity.phone = dto.phone;
+    if (dto.address) entity.address = dto.address;
+    if (dto.manager) entity.manager = dto.manager;
+    if (dto.profilePic) entity.profilePic = dto.profilePic;
+    if (dto.salary !== undefined) entity.salary = dto.salary;
+    if (dto.salaryType) entity.salaryType = dto.salaryType;
+    if (dto.status) entity.status = dto.status;
+
+    return entity;
   }
 }

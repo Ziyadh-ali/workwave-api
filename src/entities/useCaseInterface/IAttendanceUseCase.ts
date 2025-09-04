@@ -1,32 +1,29 @@
+import { RegularizationRequestDTO, UpdateAttendanceRequestDTO } from "../dtos/RequestDTOs/AttendanceDTO";
+import { AttendanceResponseDTO } from "../dtos/ResponseDTOs/AttendanceDTO";
 import { Attendance } from "../models/Attendance.entities";
 
 export interface IAttendanceUseCase {
     checkIn(employeeId: string): Promise<void>;
     checkOut(employeeId: string): Promise<void>;
-    getTodayAttendance(employeeId: string): Promise<Attendance | null>;
-    getAttendanceByMonth(employeeId: string, year: number, month: number): Promise<Attendance[] | []>;
-    getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: Attendance[] | [], total: number }>;
-    updateStatus(id: string, status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late"): Promise<Attendance | null>;
+    getTodayAttendance(employeeId: string): Promise<AttendanceResponseDTO | null>;
+    getAttendanceByMonth(employeeId: string, year: number, month: number): Promise<AttendanceResponseDTO[] | []>;
+    getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: AttendanceResponseDTO[] | [], total: number }>;
+    updateStatus(id: string, status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late"): Promise<AttendanceResponseDTO | null>;
     requestRegularization(
         attendanceId: string,
-        requestedBy: string,
-        reason: string,
-    ): Promise<Attendance | null>;
+        request: Omit<RegularizationRequestDTO, "status"> 
+    ): Promise<AttendanceResponseDTO | null>;
 
     respondToRegularizationRequest(
         attendanceId: string,
         action: "Approved" | "Rejected",
         adminRemarks?: string
-    ): Promise<Attendance | null>;
+    ): Promise<AttendanceResponseDTO | null>;
 
-    getAllPendingRegularizationRequests(): Promise<Attendance[]>;
+    getAllPendingRegularizationRequests(): Promise<AttendanceResponseDTO[]>;
 
     updateAttendance(
         id: string,
-        data: {
-            status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
-            checkInTime?: string;
-            checkOutTime?: string;
-        }
-    ): Promise<Attendance | null>;
+        data: UpdateAttendanceRequestDTO
+    ): Promise<AttendanceResponseDTO | null>;
 }

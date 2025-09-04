@@ -3,9 +3,11 @@ import { IAttendanceRepository } from "../entities/repositoryInterfaces/IAttenda
 import { IAttendanceUseCase } from "../entities/useCaseInterface/IAttendanceUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
 import { ILeaveRequestRepository } from "../entities/repositoryInterfaces/ILeaveRequest.repository";
-import { Attendance } from "../entities/models/Attendance.entities";
 import { getDayRange } from "../shared/utils/dateUtils";
 import { CustomError } from "../shared/errors/CustomError";
+import { AttendanceResponseDTO } from "../entities/dtos/ResponseDTOs/AttendanceDTO";
+import { AttendanceMapper } from "../entities/mapping/AttendanceMapper";
+import { RegularizationRequestDTO } from "../entities/dtos/RequestDTOs/AttendanceDTO";
 
 @injectable()
 export class AttendanceUseCase implements IAttendanceUseCase {
@@ -87,28 +89,32 @@ export class AttendanceUseCase implements IAttendanceUseCase {
         console.log(`✅ Work duration: ${durationHours} hours`);
     }
 
-    async getTodayAttendance(employeeId: string): Promise<Attendance | null> {
-        const attendace = await this.attendanceRepository.getAttendanceByDate(employeeId, new Date());
-        return attendace
+    async getTodayAttendance(employeeId: string): Promise<AttendanceResponseDTO | null> {
+        const attendance = await this.attendanceRepository.getAttendanceByDate(employeeId, new Date());
+        return attendance ? AttendanceMapper.toResponseDTO(attendance) : null;
     }
 
-    async getAttendanceByMonth(employeeId: string, year: number, month: number): Promise<Attendance[] | []> {
+    async getAttendanceByMonth(employeeId: string, year: number, month: number): Promise<AttendanceResponseDTO[] | []> {
         const attendancesOfMonth = await this.attendanceRepository.getAttendanceByMonth(
             employeeId,
             year,
             month
         );
 
-        return attendancesOfMonth;
+        return attendancesOfMonth ? AttendanceMapper.toResponseDTOs(attendancesOfMonth) : [];
     }
 
-    async getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: Attendance[] | [], total: number }> {
-        console.log(pageSize)
-        return await this.attendanceRepository.getAllAttendanceByDate(date, page, pageSize);
+    async getAllAttendanceByDate(date: Date | null, page: number, pageSize: number): Promise<{ data: AttendanceResponseDTO[] | [], total: number }> {
+        const attendances =  await this.attendanceRepository.getAllAttendanceByDate(date, page, pageSize);
+        return {
+            data: AttendanceMapper.toResponseDTOs(attendances.data),
+            total: attendances.total
+        };
     }
 
-    async updateStatus(id: string, status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending"): Promise<Attendance | null> {
-        return await this.attendanceRepository.updateStatus(id, status);
+    async updateStatus(id: string, status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending"): Promise<AttendanceResponseDTO | null> {
+        const attendance =  await this.attendanceRepository.updateStatus(id, status);
+        return attendance ? AttendanceMapper.toResponseDTO(attendance) : null;
     }
 
     async updateAttendance(
@@ -118,7 +124,7 @@ export class AttendanceUseCase implements IAttendanceUseCase {
             checkInTime?: string;
             checkOutTime?: string;
         }
-    ): Promise<Attendance | null> {
+    ): Promise<AttendanceResponseDTO | null> {
         const updateData: {
             status?: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";
             checkInTime?: Date;
@@ -149,18 +155,22 @@ export class AttendanceUseCase implements IAttendanceUseCase {
             }
         }
 
-        return await this.attendanceRepository.updateAttendance(id, updateData);
+        const attendance =  await this.attendanceRepository.updateAttendance(id, updateData);
+        return attendance ? AttendanceMapper.toResponseDTO(attendance) : null;
     }
 
-    async getAllPendingRegularizationRequests(): Promise<Attendance[]> {
-        return await this.attendanceRepository.getAllPendingRegularizationRequests();
+    async getAllPendingRegularizationRequests(): Promise<AttendanceResponseDTO[]> {
+        const attendances =  await this.attendanceRepository.getAllPendingRegularizationRequests();
+        return AttendanceMapper.toResponseDTOs(attendances);
     }
 
-    async requestRegularization(attendanceId: string, requestedBy: string, reason: string): Promise<Attendance | null> {
-        return await this.attendanceRepository.requestRegularization(attendanceId, requestedBy, reason);
+    async requestRegularization(attendanceId: string, request: Omit<RegularizationRequestDTO, "status">): Promise<AttendanceResponseDTO | null> {
+        const regularizationRequest =  await this.attendanceRepository.requestRegularization(attendanceId, request.requestedBy, request.reason);
+        return regularizationRequest ? AttendanceMapper.toResponseDTO(regularizationRequest) : null;
     }
 
-    async respondToRegularizationRequest(attendanceId: string, action: "Approved" | "Rejected", adminRemarks?: string): Promise<Attendance | null> {
-        return await this.attendanceRepository.respondToRegularizationRequest(attendanceId, action, adminRemarks);
+    async respondToRegularizationRequest(attendanceId: string, action: "Approved" | "Rejected", adminRemarks?: string): Promise<AttendanceResponseDTO | null> {
+        const regularizationRequest =  await this.attendanceRepository.respondToRegularizationRequest(attendanceId, action, adminRemarks);
+        return regularizationRequest ? AttendanceMapper.toResponseDTO(regularizationRequest) : null;
     }
 }

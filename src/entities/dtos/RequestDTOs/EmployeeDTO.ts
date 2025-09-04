@@ -27,3 +27,5 @@ export interface UpdateEmployeeRequestDTO {
   salaryType?: "hourly" | "monthly";
   status?: "active" | "inactive";
 }
+
+

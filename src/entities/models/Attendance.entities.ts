@@ -15,5 +15,5 @@ export interface Attendance {
       requestedStatus: "Present" | "Absent" | "Late" | "Leave";
       status: "Pending" | "Approved" | "Rejected";
       adminRemarks?: string;
-    };
+    };  
 }

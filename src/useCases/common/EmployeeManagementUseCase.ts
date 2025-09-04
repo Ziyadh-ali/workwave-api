@@ -9,8 +9,8 @@ import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { eventHandler } from "../../shared/eventHandler";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
-import { CreateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs";
-import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs";
+import { CreateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs/EmployeeDTO";
+import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs/EmployeeDTO";
 import { EmployeeMapper } from "../../entities/mapping/EmployeeMapper";
 
 @injectable()
@@ -41,7 +41,9 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
       password: hashedPassword,
     };
 
-    const createEmployee = await this.employeeRepository.save(newEmployee);
+    const employee = EmployeeMapper.toEntity(newEmployee);
+
+    const createEmployee = await this.employeeRepository.save(employee);
 
     eventHandler.emit("EMPLOYEE_CREATED", createEmployee._id?.toString());
 

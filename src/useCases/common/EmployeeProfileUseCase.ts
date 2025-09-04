@@ -5,8 +5,8 @@ import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmploy
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
-import { UpdateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs";
-import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs";
+import { UpdateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs/EmployeeDTO";
+import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs/EmployeeDTO";
 import { EmployeeMapper } from "../../entities/mapping/EmployeeMapper";
 
 @injectable()
@@ -21,7 +21,6 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
     employeeId: string,
     data: UpdateEmployeeRequestDTO
   ): Promise<EmployeeResponseDTO | null> {
-    console.log(data);
     if (data.email) {
       let employee = await this.employeeRepository.findByEmail(data.email);
 
@@ -33,9 +32,11 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
       }
     }
 
+    const employee = EmployeeMapper.toUpdateEntity(data);
+
     const updateEmployee = await this.employeeRepository.updateEmployeeById(
       employeeId,
-      data
+      employee
     );
     if (!updateEmployee) {
       throw new CustomError(
