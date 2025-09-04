@@ -1,3 +1,5 @@
+import { ObjectId } from "mongoose";
+
 export interface CreateAttendanceRequestDTO {
   employeeId: string;
   date: string;
@@ -14,9 +16,9 @@ export interface UpdateAttendanceRequestDTO {
   isRegularizable?: boolean;
 }
 export interface RegularizationRequestDTO {
-  requestedBy: string;
+  requestedBy: string | ObjectId;
   reason: string;
-  requestedStatus: "Present" | "Absent" | "Late" | "Leave";
-  status: "Pending" | "Approved" | "Rejected";
+  requestedStatus?: "Present" | "Absent" | "Late" | "Leave";
+  status?: "Pending" | "Approved" | "Rejected";
   adminRemarks?: string;
 }

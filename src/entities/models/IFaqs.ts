@@ -1,4 +1,5 @@
 export interface IFaqs {
+    _id?: string;
     topic: string;
     description: string;
     questions: {

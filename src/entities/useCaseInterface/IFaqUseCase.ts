@@ -1,14 +1,15 @@
 import { ObjectId } from "mongoose";
-import { IFaqs } from "../models/IFaqs";
+import { CreateFaqRequestDTO, UpdateFaqRequestDTO } from "../dtos/RequestDTOs/FaqDTO";
+import { FaqResponseDTO } from "../dtos/ResponseDTOs/FaqDTO";
 
 export interface IFaqUseCase {
-    createFaq(data: IFaqs): Promise<IFaqs>;
-    updateFaq(faqId: string | ObjectId, updatedData: Partial<IFaqs>): Promise<IFaqs | null>;
+    createFaq(data: CreateFaqRequestDTO): Promise<FaqResponseDTO>;
+    updateFaq(faqId: string | ObjectId, updatedData: UpdateFaqRequestDTO): Promise<FaqResponseDTO | null>;
     find(
         search: string,
         page: number,
         pageSize: number,
-    ): Promise<IFaqs[] | []>;
-    findById(faqId: string | ObjectId): Promise<IFaqs | null>;
+    ): Promise<FaqResponseDTO[] | []>;
+    findById(faqId: string | ObjectId): Promise<FaqResponseDTO | null>;
     deleteFaq(faqId: string | ObjectId): Promise<void>;
 }

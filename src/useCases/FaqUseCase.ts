@@ -4,6 +4,9 @@ import { IFaqRepository } from "../entities/repositoryInterfaces/IFaq.respositor
 import { FaqRepository } from "../adapters/repositories/FaqRepository";
 import { IFaqs } from "../entities/models/IFaqs";
 import { ObjectId } from "mongoose";
+import { FaqResponseDTO } from "../entities/dtos/ResponseDTOs/FaqDTO";
+import { CreateFaqRequestDTO, UpdateFaqRequestDTO } from "../entities/dtos/RequestDTOs/FaqDTO";
+import { FaqMapper } from "../entities/mapping/FaqMapper";
 
 @injectable()
 export class FaqUseCase implements IFaqUseCase {
@@ -11,26 +14,31 @@ export class FaqUseCase implements IFaqUseCase {
         @inject("IFaqRepository") private faqRepository : FaqRepository,
     ){}
 
-    async createFaq(data: IFaqs): Promise<IFaqs> {
-        return await this.faqRepository.createFaq(data);
+    async createFaq(data: CreateFaqRequestDTO): Promise<FaqResponseDTO> {
+        const updatedData = FaqMapper.toEntity(data);
+        const createdFaq = await this.faqRepository.createFaq(updatedData);
+        return FaqMapper.toResponseDTO(createdFaq);
     }
 
     async deleteFaq(faqId: string | ObjectId): Promise<void> {
         await this.faqRepository.deleteFaq(faqId);
     }
 
-    async find(search: string, page: number, pageSize: number): Promise<IFaqs[] | []> {
+    async find(search: string, page: number, pageSize: number): Promise<FaqResponseDTO[] | []> {
         const limit = pageSize;
         const skip = (page -1) * pageSize;
 
-        return await this.faqRepository.find(search , skip , limit);
+        const faqs =  await this.faqRepository.find(search , skip , limit);
+        return faqs.map(FaqMapper.toResponseDTO);
     }
 
-    async findById(faqId: string | ObjectId): Promise<IFaqs | null> {
-        return await this.faqRepository.findFaqById(faqId);
+    async findById(faqId: string | ObjectId): Promise<FaqResponseDTO | null> {
+        const faq =  await this.faqRepository.findFaqById(faqId);
+        return faq ? FaqMapper.toResponseDTO(faq) : null;
     }
 
-    async updateFaq(faqId: string | ObjectId, updatedData: Partial<IFaqs>): Promise<IFaqs | null> {
-        return await this.faqRepository.updateFaq(faqId , updatedData);
+    async updateFaq(faqId: string | ObjectId, updatedData: UpdateFaqRequestDTO): Promise<FaqResponseDTO | null> {
+        const faq =  await this.faqRepository.updateFaq(faqId , updatedData);
+        return faq ? FaqMapper.toResponseDTO(faq) : null;
     }
 }
