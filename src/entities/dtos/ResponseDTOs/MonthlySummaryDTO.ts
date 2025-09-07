@@ -1,8 +1,8 @@
-import { ObjectId, Types } from "mongoose";
+import { ObjectId } from "mongoose";
 
-export interface IMonthlyAttendanceSummary {
-  _id?: string | ObjectId;
-  employeeId: Types.ObjectId;
+export interface MonthlyAttendanceSummaryResponseDTO {
+  _id: string | ObjectId;
+  employeeId: string | ObjectId;
   month: number;
   year: number;
   workingDays: number;
@@ -12,12 +12,12 @@ export interface IMonthlyAttendanceSummary {
   status?: "Pending" | "Approved" | "Rejected";
   remarks?: string;
   rejectionReason?: string;
-  generatedAt?: Date;
+  generatedAt?: string;
   generatedBy: string | ObjectId;
 }
 
-export interface IMonthlyAttendanceSummaryRes {
-  _id?: string | ObjectId;
+export interface MonthlyAttendanceSummaryWithEmployeeResponseDTO {
+  _id: string | ObjectId;
   employeeId: {
     _id: string | ObjectId;
     fullName: string;
@@ -32,6 +32,6 @@ export interface IMonthlyAttendanceSummaryRes {
   status?: "Pending" | "Approved" | "Rejected";
   remarks?: string;
   rejectionReason?: string;
-  generatedAt?: Date;
+  generatedAt?: string;
   generatedBy: string | ObjectId;
 }

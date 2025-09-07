@@ -1,50 +1,128 @@
 import { injectable, inject } from "tsyringe";
 import { IMonthlySummaryRepository } from "../entities/repositoryInterfaces/IMonthlySummaryRepository";
 import { IMonthlySummaryUseCase } from "../entities/useCaseInterface/IMonthlySummaryUseCase";
-import { IMonthlyAttendanceSummary } from "../entities/models/IMonthlyAttendanceSummary";
 import { CustomError } from "../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../shared/constants";
+import {
+  MonthlyAttendanceSummaryResponseDTO,
+  MonthlyAttendanceSummaryWithEmployeeResponseDTO,
+} from "../entities/dtos/ResponseDTOs/MonthlySummaryDTO";
+import { MonthlyAttendanceSummaryMapper } from "../entities/mapping/MonthlySummaryMapper";
 
 @injectable()
 export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
-    constructor(
-        @inject("IMonthlySummaryRepository") private monthlySummaryRepo: IMonthlySummaryRepository,
-    ) { }
+  constructor(
+    @inject("IMonthlySummaryRepository")
+    private monthlySummaryRepo: IMonthlySummaryRepository
+  ) {}
 
-    async generateSummary(month: number, year: number, generatedBy: {
-        id: string,
-        role: "admin" | "employee",
+  async generateSummary(
+    month: number,
+    year: number,
+    generatedBy: {
+      id: string;
+      role: "admin" | "employee";
     },
-        employeeId?: string
-    ): Promise<IMonthlyAttendanceSummary | IMonthlyAttendanceSummary[]> {
-        if (month < 1 || month > 12) throw new CustomError("Invalid month" , HTTP_STATUS_CODES.BAD_REQUEST);
+    employeeId?: string
+  ): Promise<
+    MonthlyAttendanceSummaryResponseDTO | MonthlyAttendanceSummaryResponseDTO[]
+  > {
+    if (month < 1 || month > 12)
+      throw new CustomError("Invalid month", HTTP_STATUS_CODES.BAD_REQUEST);
 
-        return await this.monthlySummaryRepo.generateSummary(month, year, generatedBy, employeeId);
+    const summaries = await this.monthlySummaryRepo.generateSummary(
+      month,
+      year,
+      generatedBy,
+      employeeId
+    );
+    if (Array.isArray(summaries)) {
+      return summaries.map(MonthlyAttendanceSummaryMapper.toResponseDTO);
     }
 
-    async getExistingSummaries(month: number, year: number): Promise<IMonthlyAttendanceSummary[]> {
-        return await this.monthlySummaryRepo.getExistingSummaries(month, year);
+    return MonthlyAttendanceSummaryMapper.toResponseDTO(summaries);
+  }
+
+  async getExistingSummaries(
+    month: number,
+    year: number
+  ): Promise<MonthlyAttendanceSummaryWithEmployeeResponseDTO[]> {
+    const summaries = await this.monthlySummaryRepo.getExistingSummaries(
+      month,
+      year
+    );
+    return summaries.map(
+      MonthlyAttendanceSummaryMapper.toWithEmployeeResponseDTO
+    );
+  }
+
+  async regenerateSummary(
+    month: number,
+    year: number,
+    generatedBy: {
+      id: string;
+      role: "admin" | "employee";
+    },
+    employeeId?: string
+  ): Promise<
+    MonthlyAttendanceSummaryResponseDTO | MonthlyAttendanceSummaryResponseDTO[]
+  > {
+    const summaries = await this.monthlySummaryRepo.regenerateSummary(
+      month,
+      year,
+      generatedBy,
+      employeeId
+    );
+
+    if (Array.isArray(summaries)) {
+      return summaries.map(MonthlyAttendanceSummaryMapper.toResponseDTO);
     }
 
-    async regenerateSummary(month: number, year: number, generatedBy: {
-        id: string,
-        role: "admin" | "employee",
-    }, employeeId?: string): Promise<IMonthlyAttendanceSummary | IMonthlyAttendanceSummary[]> {
-        return await this.monthlySummaryRepo.regenerateSummary(month, year, generatedBy, employeeId);
+    return MonthlyAttendanceSummaryMapper.toResponseDTO(summaries);
+  }
+
+  async approveSummary(
+    summaryId: string
+  ): Promise<MonthlyAttendanceSummaryResponseDTO> {
+    const summary = await this.monthlySummaryRepo.approveSummary(summaryId);
+
+    if (!summary) {
+      throw new CustomError("Summary not found", HTTP_STATUS_CODES.NOT_FOUND);
     }
 
-    async approveSummary(summaryId: string): Promise<IMonthlyAttendanceSummary> {
-        return await this.monthlySummaryRepo.approveSummary(summaryId);
+    return MonthlyAttendanceSummaryMapper.toResponseDTO(summary);
+  }
+
+  async rejectSummary(
+    summaryId: string,
+    reason: string
+  ): Promise<MonthlyAttendanceSummaryResponseDTO> {
+    const summary = await this.monthlySummaryRepo.rejectSummary(
+      summaryId,
+      reason
+    );
+
+    if (!summary) {
+      throw new CustomError("Summary not found", HTTP_STATUS_CODES.NOT_FOUND);
     }
 
-    async rejectSummary(summaryId: string, reason: string): Promise<IMonthlyAttendanceSummary> {
-        return await this.monthlySummaryRepo.rejectSummary(summaryId, reason);
+    return MonthlyAttendanceSummaryMapper.toResponseDTO(summary);
+  }
+
+  async bulkApproveSummaries(
+    summaryIds: string[]
+  ): Promise<MonthlyAttendanceSummaryResponseDTO[]> {
+    if (summaryIds.length === 0) {
+      throw new CustomError(
+        "No summary IDs provided",
+        HTTP_STATUS_CODES.BAD_REQUEST
+      );
     }
 
-    async bulkApproveSummaries(summaryIds: string[]): Promise<IMonthlyAttendanceSummary[]> {
-        if (summaryIds.length === 0) {
-            throw new CustomError("No summary IDs provided" , HTTP_STATUS_CODES.BAD_REQUEST);
-        }
-        return await this.monthlySummaryRepo.bulkApproveSummaries(summaryIds);
-    }
+    const summaries = await this.monthlySummaryRepo.bulkApproveSummaries(
+      summaryIds
+    );
+
+    return summaries.map(MonthlyAttendanceSummaryMapper.toResponseDTO);
+  }
 }

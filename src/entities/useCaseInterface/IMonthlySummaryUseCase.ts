@@ -1,3 +1,4 @@
+import { MonthlyAttendanceSummaryResponseDTO, MonthlyAttendanceSummaryWithEmployeeResponseDTO } from "../dtos/ResponseDTOs/MonthlySummaryDTO";
 import { IMonthlyAttendanceSummary } from "../models/IMonthlyAttendanceSummary";
 
 export interface IMonthlySummaryUseCase {
@@ -9,7 +10,7 @@ export interface IMonthlySummaryUseCase {
             role: "admin" | "employee",
         },
         employeeId?: string
-    ): Promise<IMonthlyAttendanceSummary | IMonthlyAttendanceSummary[]>;
+    ): Promise<MonthlyAttendanceSummaryResponseDTO | MonthlyAttendanceSummaryResponseDTO[]>;
 
     regenerateSummary(
         month: number,
@@ -19,17 +20,17 @@ export interface IMonthlySummaryUseCase {
             role: "admin" | "employee",
         },
         employeeId?: string
-    ): Promise<IMonthlyAttendanceSummary | IMonthlyAttendanceSummary[]>;
+    ): Promise<MonthlyAttendanceSummaryResponseDTO | MonthlyAttendanceSummaryResponseDTO[]>;
 
     getExistingSummaries(
         month: number,
         year: number
-    ): Promise<IMonthlyAttendanceSummary[]>;
+    ): Promise<MonthlyAttendanceSummaryWithEmployeeResponseDTO[]>;
 
-    approveSummary(summaryId: string): Promise<IMonthlyAttendanceSummary>;
+    approveSummary(summaryId: string): Promise<MonthlyAttendanceSummaryResponseDTO>;
     rejectSummary(
         summaryId: string,
         reason: string
-    ): Promise<IMonthlyAttendanceSummary>;
-    bulkApproveSummaries(summaryIds: string[]): Promise<IMonthlyAttendanceSummary[]>
+    ): Promise<MonthlyAttendanceSummaryResponseDTO>;
+    bulkApproveSummaries(summaryIds: string[]): Promise<MonthlyAttendanceSummaryResponseDTO[]>
 }
