@@ -1,12 +1,12 @@
 import { injectable, inject } from "tsyringe";
 import { IPayrollUseCase } from "../entities/useCaseInterface/IPayrollUseCase";
 import { IPayrollRepository } from "../entities/repositoryInterfaces/IPayrollRepository";
-import { IPayrollModel } from "../frameworks/database/models/PayrollModel";
 import { IMonthlyAttendanceSummary } from "../entities/models/IMonthlyAttendanceSummary";
 import { EmployeeModel } from "../frameworks/database/models/employee/EmployeeModel";
-import { IPayroll } from "../entities/models/IPayroll";
 import { CustomError } from "../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../shared/constants";
+import { PayrollResponseDTO, PayrollResponseWithEmployeeDTO } from "../entities/dtos/ResponseDTOs/PayrollDTO";
+import { PayrollMapper } from "../entities/mapping/PayrollMapper";
 
 
 @injectable()
@@ -19,7 +19,7 @@ export class PayrollUseCase implements IPayrollUseCase {
         summary: IMonthlyAttendanceSummary,
         employeeSalary: number,
         taxPercentage: number,
-    ): Promise<IPayrollModel> {
+    ): Promise<PayrollResponseDTO> {
         if (summary.status !== "Approved") {
             throw new CustomError("Cannot generate payroll for unapproved summary" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
@@ -31,10 +31,11 @@ export class PayrollUseCase implements IPayrollUseCase {
             throw new CustomError("Present days cannot exceed working days" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
-        return this.payrollRepository.generatePayroll(summary, employeeSalary, taxPercentage);
+        const payroll = await this.payrollRepository.generatePayroll(summary, employeeSalary, taxPercentage);
+        return PayrollMapper.toResponseDTO(payroll);
     }
 
-    async generateBulkPayroll(summaries: IMonthlyAttendanceSummary[], taxPercentage: number): Promise<IPayrollModel[]> {
+    async generateBulkPayroll(summaries: IMonthlyAttendanceSummary[], taxPercentage: number): Promise<PayrollResponseDTO[]> {
         const approvedSummaries = summaries.filter(s => s.status === "Approved");
 
         if (approvedSummaries.length === 0) {
@@ -57,27 +58,32 @@ export class PayrollUseCase implements IPayrollUseCase {
         month?: number;
         year?: number;
         status?: "Pending" | "Paid";
-    }): Promise<IPayrollModel[]> {
+    }): Promise<PayrollResponseWithEmployeeDTO[]> {
         
-        return this.payrollRepository.getPayrollRecords(filter);
+        const payrolls = await this.payrollRepository.getPayrollRecords(filter);
+        return payrolls.map(PayrollMapper.toResponseWithEmployeeDTO);
     }
 
-    async updatePayrollStatus(payrollId: string, status: "Paid"): Promise<IPayrollModel> {
+    async updatePayrollStatus(payrollId: string, status: "Paid"): Promise<PayrollResponseDTO> {
         if (status !== "Paid") {
             throw new CustomError("Can only update status to 'Paid'" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
-        return this.payrollRepository.updatePayrollStatus(payrollId, status);
+        const payroll = await this.payrollRepository.updatePayrollStatus(payrollId, status);
+        return PayrollMapper.toResponseDTO(payroll);
     }
-    async getPayrollByEmployeeId(employeeId: string): Promise<IPayrollModel[] | []> {
-        return await this.payrollRepository.getPayrollByEmployeeId(employeeId)
-    }
-
-    async getPayrollByMonthAndEmployeeId(employeeId: string, month: number, year: number): Promise<IPayrollModel | null> {
-        return await this.payrollRepository.getPayrollByMonthAndEmployeeId(employeeId , month , year);
+    async getPayrollByEmployeeId(employeeId: string): Promise<PayrollResponseWithEmployeeDTO[] | []> {
+        const payrolls =  await this.payrollRepository.getPayrollByEmployeeId(employeeId);
+        return payrolls.map(PayrollMapper.toResponseWithEmployeeDTO);
     }
 
-    async getAllPayroll(): Promise<IPayroll[] | []> {
-        return await this.payrollRepository.getAllPayroll();
+    async getPayrollByMonthAndEmployeeId(employeeId: string, month: number, year: number): Promise<PayrollResponseDTO | null> {
+        const payroll =  await this.payrollRepository.getPayrollByMonthAndEmployeeId(employeeId , month , year);
+        return payroll ? PayrollMapper.toResponseDTO(payroll) : null;
+    }
+
+    async getAllPayroll(): Promise<PayrollResponseDTO[] | []> {
+        const payrolls =  await this.payrollRepository.getAllPayroll();
+        return PayrollMapper.toResponseList(payrolls);
     }
 }
