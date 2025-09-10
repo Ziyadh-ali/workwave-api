@@ -1,6 +1,7 @@
 import { ObjectId } from "mongoose";
 
 export interface IQuestion {
+    _id : string;
     employeeId: string | ObjectId;
     question: string;
     answer?: string;

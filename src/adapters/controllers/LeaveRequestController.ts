@@ -6,6 +6,7 @@ import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { leaveRequestSchema } from "../../shared/validation/validator";
 import { CustomError } from "../../shared/errors/CustomError";
+import { LeaveRequestMapper } from "../../entities/mapping/LeaveRequestMapper";
 
 
 @injectable()

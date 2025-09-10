@@ -1,7 +1,9 @@
+import { CreateLeaveRequestDTO } from "../dtos/RequestDTOs/LeaveRequestDTO";
+import { LeaveRequestResponseDTO } from "../dtos/ResponseDTOs/LeaveRequestDTO";
 import { LeaveRequest, LeaveRequestFilter } from "../models/LeaveRequest.entity";
 
 export interface ILeaveRequestUseCase {
-    createLeaveRequest(leaveRequest: LeaveRequest): Promise<LeaveRequest>;
+    createLeaveRequest(leaveRequest: CreateLeaveRequestDTO): Promise<LeaveRequest>;
     // getLeaveRequestForApproval(managerId: string): Promise<LeaveRequest[]>;
     getLeaveRequestByEmployee(oprions: {
         employeeId: string;
@@ -9,7 +11,7 @@ export interface ILeaveRequestUseCase {
         limit: number;
         search: string;
         status: string;
-    }): Promise<{ leaveRequests: LeaveRequest[]; totalPages: number }>;
+    }): Promise<{ leaveRequests: LeaveRequestResponseDTO[]; totalPages: number }>;
     updateLeaveRequestStatus(leaveRequestId: string, status: "Approved" | "Rejected", rejectionReason?: string): Promise<boolean>;
     // editLeaveRequest(leaveRequestId: string, updates: Partial<LeaveRequest>): Promise<boolean>;
     cancelLeaveRequest(leaveRequestId: string): Promise<boolean>;
@@ -17,8 +19,8 @@ export interface ILeaveRequestUseCase {
         page: number;
         limit: number;
         status: string;
-    }): Promise<{ leaveRequests: LeaveRequest[]; totalPages: number }>;
+    }): Promise<{ leaveRequests: LeaveRequestResponseDTO[]; totalPages: number }>;
     setRejectionReason(leaveRequestId: string, reason: string): Promise<void>;
-    getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<LeaveRequest[]>
-    getLeaveRequestById(leaveRequestId: string): Promise<LeaveRequest | null>;
+    getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<LeaveRequestResponseDTO[]>;
+    getLeaveRequestById(leaveRequestId: string): Promise<LeaveRequestResponseDTO | null>;
 }

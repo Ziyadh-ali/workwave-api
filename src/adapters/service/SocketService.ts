@@ -42,7 +42,6 @@ export class SocketManager {
         this.io.on('connection', (socket: Socket) => {
             console.log(`User connected: ${socket.id}`);
 
-            // User joins with their userId
             socket.on('register', (userId: string) => {
                 this.userSocketMap[userId] = socket.id;
                 console.log(`User ${userId} registered with socket ${socket.id}`);

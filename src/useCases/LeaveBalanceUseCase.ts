@@ -1,8 +1,8 @@
 import { injectable, inject } from "tsyringe";
 import { ILeaveBalanceRepository } from "../entities/repositoryInterfaces/ILeaveBalance.repository";
-import { LeaveBalance } from "../entities/models/LeaveBalance.entity";
 import { ILeaveBalanceUseCase } from "../entities/useCaseInterface/ILeaveBalanceUseCase";
 import { ILeaveTypeRepository } from "../entities/repositoryInterfaces/ILeaveType.repository";
+import { LeaveBalanceResponseDTO, } from "../entities/dtos/ResponseDTOs/LeaveBalanceDTO";
 
 @injectable()
 export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
@@ -22,7 +22,7 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
         await this.leaveBalanceRepository.initializeLeaveBalance(employeeId, leaveBalances);
     }
 
-    async getLeaveBalanceByEmployeeId(employeeId: string): Promise<LeaveBalance | null> {
+    async getLeaveBalanceByEmployeeId(employeeId: string): Promise<LeaveBalanceResponseDTO | null> {
         const leaveBalances = await this.leaveBalanceRepository.getLeaveBalanceByEmployeeId(employeeId);
         if (!leaveBalances) return null;
 
@@ -39,7 +39,10 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
             };
         });
 
-        return { employeeId: leaveBalances.employeeId, leaveBalances: leaveBalancesWithNames };   
+        return { 
+            _id : leaveBalances._id?.toString()!,
+            employeeId: leaveBalances.employeeId,
+            leaveBalances: leaveBalancesWithNames };   
     }
 
     async deductLeave(employeeId: string, leaveTypeId: string, usedDays: number): Promise<boolean> {
