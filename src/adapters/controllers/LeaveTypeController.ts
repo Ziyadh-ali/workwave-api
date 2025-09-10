@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 import { ILeaveTypeUseCase } from "../../entities/useCaseInterface/ILeaveTypeUseCase";
-import { LeaveTypeDTO } from "../../entities/dtos/LeaveTypeDTO";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { ILeaveTypeController } from "../../entities/controllerInterface/ILeaveTypeController";
+import { LeaveTypeMapper } from "../../entities/mapping/LeaveTypeMapper";
 
 @injectable()
 export class LeaveTypeController implements ILeaveTypeController {
@@ -12,8 +12,8 @@ export class LeaveTypeController implements ILeaveTypeController {
     ) { }
 
     async createLeaveType(req: Request, res: Response): Promise<void> {
-        const leaveTypeData: LeaveTypeDTO = req.body;
-        const leaveType = await this.leaveTypeUseCase.createLeaveType(leaveTypeData);
+        const leaveTypeData = req.body;
+        const leaveType = await this.leaveTypeUseCase.createLeaveType(LeaveTypeMapper.toEntity(leaveTypeData));
         res.status(HTTP_STATUS_CODES.CREATED).json({
             success: true,
             message: MESSAGES.SUCCESS.LEAVE_TYPE_CREATED,
@@ -51,8 +51,8 @@ export class LeaveTypeController implements ILeaveTypeController {
 
     async updateLeaveType(req: Request, res: Response): Promise<void> {
         const { id } = req.params;
-        const updateData: Partial<LeaveTypeDTO> = req.body;
-        const updatedLeaveType = await this.leaveTypeUseCase.updateLeaveType(id, updateData);
+        const updateData = req.body;
+        const updatedLeaveType = await this.leaveTypeUseCase.updateLeaveType(id, LeaveTypeMapper.toEntity(updateData));
         res.status(HTTP_STATUS_CODES.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.LEAVE_TYPE_UPDATED,

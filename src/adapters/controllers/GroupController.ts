@@ -14,7 +14,6 @@ export class GroupController {
         const { name, members } = req.body.data;
         const createdBy = (req as CustomRequest).user.id;
         members.push(createdBy)
-        console.log(members)
 
         if (!name || !members || members.length === 0) {
             res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: "Group name and members are required." });

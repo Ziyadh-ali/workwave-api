@@ -1,11 +1,11 @@
 import { CreateLeaveRequestDTO } from "../dtos/RequestDTOs/LeaveRequestDTO";
-import { LeaveRequestResponseDTO } from "../dtos/ResponseDTOs/LeaveRequestDTO";
+import { LeaveRequestAdminResponseDTO, LeaveRequestResponseDTO } from "../dtos/ResponseDTOs/LeaveRequestDTO";
 import { LeaveRequest, LeaveRequestFilter } from "../models/LeaveRequest.entity";
 
 export interface ILeaveRequestUseCase {
     createLeaveRequest(leaveRequest: CreateLeaveRequestDTO): Promise<LeaveRequest>;
     // getLeaveRequestForApproval(managerId: string): Promise<LeaveRequest[]>;
-    getLeaveRequestByEmployee(oprions: {
+    getLeaveRequestByEmployee(options: {
         employeeId: string;
         page: number;
         limit: number;
@@ -19,8 +19,8 @@ export interface ILeaveRequestUseCase {
         page: number;
         limit: number;
         status: string;
-    }): Promise<{ leaveRequests: LeaveRequestResponseDTO[]; totalPages: number }>;
+    }): Promise<{ leaveRequests: LeaveRequestAdminResponseDTO[]; totalPages: number }>;
     setRejectionReason(leaveRequestId: string, reason: string): Promise<void>;
-    getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<LeaveRequestResponseDTO[]>;
+    getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<LeaveRequestAdminResponseDTO[]>;
     getLeaveRequestById(leaveRequestId: string): Promise<LeaveRequestResponseDTO | null>;
 }

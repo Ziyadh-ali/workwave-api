@@ -37,7 +37,6 @@ export const verifyAuth = (
             const token = extractToken(req,role);
 
             if (!token) {
-                console.log("no token");
                 res
                     .status(HTTP_STATUS_CODES.UNAUTHORIZED)
                     .json({ message: "Unauthorized access." });

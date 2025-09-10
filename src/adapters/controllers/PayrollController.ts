@@ -4,139 +4,169 @@ import { injectable, inject } from "tsyringe";
 import { IMonthlySummaryUseCase } from "../../entities/useCaseInterface/IMonthlySummaryUseCase";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { EmployeeModel } from "../../frameworks/database/models/employee/EmployeeModel";
+import { IMonthlyAttendanceSummary } from "../../entities/models/IMonthlyAttendanceSummary";
 
 @injectable()
 export class PayrollController {
-    constructor(
-        @inject("IMonthlySummaryUseCase") private monthlySummaryUseCase: IMonthlySummaryUseCase,
-        @inject("IPayrollUseCase") private payrollUseCase: IPayrollUseCase,
-    ) { }
+  constructor(
+    @inject("IMonthlySummaryUseCase")
+    private monthlySummaryUseCase: IMonthlySummaryUseCase,
+    @inject("IPayrollUseCase") private payrollUseCase: IPayrollUseCase
+  ) {}
 
-    async generatePayroll(req: Request, res: Response) {
-        const { month, year, employeeId, taxPercentage } = req.body;
+  async generatePayroll(req: Request, res: Response) {
+    const { month, year, employeeId, taxPercentage } = req.body;
 
-        if (!month || !year || !employeeId) {
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: "Month, year, and employeeId are required",
-            });
-            return
-        }
-
-        const summaries = await this.monthlySummaryUseCase.getExistingSummaries(month, year);
-        const summary = summaries.find(s =>
-            s.employeeId._id.toString() === employeeId &&
-            s.status === "Approved"
-        );
-
-        if (!summary) {
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: "Approved monthly summary not found for this employee",
-            });
-            return
-        }
-
-        const employee = await EmployeeModel.findById(employeeId);
-        if (!employee) {
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: "Employee not found",
-            });
-            return
-        }
-        console.log(employee.salary)
-
-        const payroll = await this.payrollUseCase.generatePayroll(summary, employee.salary, taxPercentage);
-
-        res.status(HTTP_STATUS_CODES.OK).json({
-            success: true,
-            data: payroll
-        });
+    if (!month || !year || !employeeId) {
+      res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
+        message: "Month, year, and employeeId are required",
+      });
+      return;
     }
 
-    async generateBulkPayroll(req: Request, res: Response) {
-        const { month, year, taxPercentage } = req.body;
+    const summaries = await this.monthlySummaryUseCase.getExistingSummaries(
+      month,
+      year
+    );
+    const summary = summaries.find(
+      (s) =>
+        s.employeeId._id.toString() === employeeId && s.status === "Approved"
+    );
 
-        if (!month || !year) {
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: "Month and year are required",
-            });
-            return
-        }
-        console.log(month, year, taxPercentage)
-
-        const summaries = await this.monthlySummaryUseCase.getExistingSummaries(month, year);
-        const approvedSummaries = summaries.filter(s => s.status === "Approved");
-
-        if (approvedSummaries.length === 0) {
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: "No approved monthly summaries found for this period",
-            });
-            return
-        }
-
-        const payrolls = await this.payrollUseCase.generateBulkPayroll(approvedSummaries, taxPercentage);
-
-        res.status(HTTP_STATUS_CODES.OK).json({
-            success: true,
-            data: payrolls,
-            count: payrolls.length
-        });
+    if (!summary) {
+      res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
+        message: "Approved monthly summary not found for this employee",
+      });
+      return;
     }
 
-    async getPayrollRecords(req: Request, res: Response) {
-        const { month, year, status } = req.query;
-
-        const filter: {
-            month?: number;
-            year?: number;
-            status?: "Pending" | "Paid";
-        } = {};
-        if (month) filter.month = parseInt(month.toString());
-        if (year) filter.year = parseInt(year.toString());
-        if (status ) {
-            filter.status = status as "Pending" | "Paid";
-        }
-
-        const payrolls = await this.payrollUseCase.getPayrollRecords(filter);
-
-        res.status(HTTP_STATUS_CODES.OK).json({
-            success: true,
-            data: payrolls,
-            count: payrolls.length
-        });
+    const employee = await EmployeeModel.findById(employeeId);
+    if (!employee) {
+      res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
+        message: "Employee not found",
+      });
+      return;
     }
 
-    async updatePayrollStatus(req: Request, res: Response) {
-        const { payrollId } = req.params;
-        console.log(payrollId)
+    const payroll = await this.payrollUseCase.generatePayroll(
+      {
+        ...summary,
+        employeeId: summary.employeeId._id,
+        generatedAt: summary.generatedAt
+          ? new Date(summary.generatedAt)
+          : undefined,
+      },
+      employee.salary,
+      taxPercentage
+    );
 
-        if (!payrollId) {
-            res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-                message: "Payroll ID is required",
-            });
-            return;
-        }
+    res.status(HTTP_STATUS_CODES.OK).json({
+      success: true,
+      data: payroll,
+    });
+  }
 
-        const updatedPayroll = await this.payrollUseCase.updatePayrollStatus(payrollId, "Paid");
+  async generateBulkPayroll(req: Request, res: Response) {
+    const { month, year, taxPercentage } = req.body;
 
-        res.status(HTTP_STATUS_CODES.OK).json({
-            success: true,
-            data: updatedPayroll
-        });
+    if (!month || !year) {
+      res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
+        message: "Month and year are required",
+      });
+      return;
     }
 
-    async getPayslipByEmployeeId(req: Request, res: Response): Promise<void> {
-        const { employeeId } = req.params;
-        const payslip = await this.payrollUseCase.getPayrollByEmployeeId(employeeId);
-        res.status(HTTP_STATUS_CODES.OK).json({
-            payslip
-        });
+    const summaries = await this.monthlySummaryUseCase.getExistingSummaries(
+      month,
+      year
+    );
+    const approvedSummaries = summaries.filter((s) => s.status === "Approved");
+
+    if (approvedSummaries.length === 0) {
+      res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
+        message: "No approved monthly summaries found for this period",
+      });
+      return;
     }
 
-    async getAllPayroll(req: Request, res: Response): Promise<void> {
-        const payrolls = await this.payrollUseCase.getAllPayroll();
+    const domainSummaries: IMonthlyAttendanceSummary[] = approvedSummaries.map(
+      (s) => ({
+        ...s,
+        employeeId: s.employeeId._id,
+        generatedAt: s.generatedAt ? new Date(s.generatedAt) : undefined,
+      })
+    );
+    const payrolls = await this.payrollUseCase.generateBulkPayroll(
+      domainSummaries,
+      taxPercentage
+    );
 
-        res.status(HTTP_STATUS_CODES.OK).json({
-            payrolls
-        });
+    res.status(HTTP_STATUS_CODES.OK).json({
+      success: true,
+      data: payrolls,
+      count: payrolls.length,
+    });
+  }
+
+  async getPayrollRecords(req: Request, res: Response) {
+    const { month, year, status } = req.query;
+
+    const filter: {
+      month?: number;
+      year?: number;
+      status?: "Pending" | "Paid";
+    } = {};
+    if (month) filter.month = parseInt(month.toString());
+    if (year) filter.year = parseInt(year.toString());
+    if (status) {
+      filter.status = status as "Pending" | "Paid";
     }
+
+    const payrolls = await this.payrollUseCase.getPayrollRecords(filter);
+
+    res.status(HTTP_STATUS_CODES.OK).json({
+      success: true,
+      data: payrolls,
+      count: payrolls.length,
+    });
+  }
+
+  async updatePayrollStatus(req: Request, res: Response) {
+    const { payrollId } = req.params;
+
+    if (!payrollId) {
+      res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
+        message: "Payroll ID is required",
+      });
+      return;
+    }
+
+    const updatedPayroll = await this.payrollUseCase.updatePayrollStatus(
+      payrollId,
+      "Paid"
+    );
+
+    res.status(HTTP_STATUS_CODES.OK).json({
+      success: true,
+      data: updatedPayroll,
+    });
+  }
+
+  async getPayslipByEmployeeId(req: Request, res: Response): Promise<void> {
+    const { employeeId } = req.params;
+    const payslip = await this.payrollUseCase.getPayrollByEmployeeId(
+      employeeId
+    );
+    res.status(HTTP_STATUS_CODES.OK).json({
+      payslip,
+    });
+  }
+
+  async getAllPayroll(req: Request, res: Response): Promise<void> {
+    const payrolls = await this.payrollUseCase.getAllPayroll();
+
+    res.status(HTTP_STATUS_CODES.OK).json({
+      payrolls,
+    });
+  }
 }

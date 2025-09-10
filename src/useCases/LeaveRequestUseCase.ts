@@ -10,8 +10,7 @@ import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
 import { calculateWorkingDaysExcludingHolidays } from "../shared/utils/calculateWorkingDaysExcludingHolidays";
 import { CustomError } from "../shared/errors/CustomError";
 import { CreateLeaveRequestDTO } from "../entities/dtos/RequestDTOs/LeaveRequestDTO";
-import { LeaveRequestResponseDTO } from "../entities/dtos/ResponseDTOs/LeaveRequestDTO";
-import { LeaveBalanceMapper } from "../entities/mapping/LeaveBalanceMapping";
+import { LeaveRequestResponseDTO , LeaveRequestAdminResponseDTO} from "../entities/dtos/ResponseDTOs/LeaveRequestDTO";
 import { LeaveRequestMapper } from "../entities/mapping/LeaveRequestMapper";
 
 @injectable()
@@ -195,7 +194,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
       if (workingDays > 0) {
         const success = await this.leaveBalanceRepository.deductLeave(
           employeeId.toString(),
-          leaveTypeId.toString(),
+          leaveTypeId._id.toString(),
           workingDays
         );
 
@@ -214,19 +213,15 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     );
   }
 
-  // async editLeaveRequest(leaveRequestId: string, updates: Partial<LeaveRequest>): Promise<boolean> {
-  //     return await this.leaveRequestRepository.editLeaveRequest(leaveRequestId, updates);
-  // }
-
   async getAllLeaveRequests(options: {
     page: number;
     limit: number;
     status: string;
-  }): Promise<{ leaveRequests: LeaveRequestResponseDTO[]; totalPages: number }> {
+  }): Promise<{ leaveRequests: LeaveRequestAdminResponseDTO[]; totalPages: number }> {
     const leaveRequests =  await this.leaveRequestRepository.getAllLeaveRequests(options);
     return {
       leaveRequests: leaveRequests.leaveRequests.map(
-        LeaveRequestMapper.toResponseDTO
+        LeaveRequestMapper.toAdminResponseDTO
       ),
       totalPages: leaveRequests.totalPages,
     };
@@ -243,9 +238,9 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
   }
   async getFilteredLeaveRequests(
     filters: LeaveRequestFilter
-  ): Promise<LeaveRequestResponseDTO[]> {
+  ): Promise<LeaveRequestAdminResponseDTO[]> {
     const leaveRequests = await this.leaveRequestRepository.getFilteredLeaveRequests(filters);
-    return leaveRequests.map(LeaveRequestMapper.toResponseDTO);
+    return leaveRequests.map(LeaveRequestMapper.toAdminResponseDTO);
   }
 
   async getLeaveRequestById(

@@ -13,6 +13,42 @@ export interface LeaveRequest {
     assignedManager?: ObjectId | string;
     userRole: string
 }
+export interface ILeaveRequestEmployee {
+    _id: ObjectId | string;
+    employeeId: ObjectId | string;
+    leaveTypeId: {
+      _id : ObjectId | string,
+      name : string;
+    };
+    startDate: Date;
+    endDate: Date;
+    reason?: string;
+    duration?: "full" | "morning" | "afternoon";
+    status?: "Pending" | "Approved" | "Rejected" | "Cancelled";
+    rejectionReason?: string;
+    assignedManager?: ObjectId | string;
+    userRole: string
+}
+export interface ILeaveRequestAdmin {
+    _id?: ObjectId | string;
+    employeeId: {
+      _id : ObjectId | string,
+      fullName : string,
+      role : string
+    };
+    leaveTypeId: {
+      _id : ObjectId | string,
+      name : string;
+    };
+    startDate: Date;
+    endDate: Date;
+    reason?: string;
+    duration?: "full" | "morning" | "afternoon";
+    status?: "Pending" | "Approved" | "Rejected" | "Cancelled";
+    rejectionReason?: string;
+    assignedManager?: ObjectId | string;
+    userRole: string
+}
 
 export interface LeaveRequestFilter {
     status?: "Pending" | "Approved" | "Rejected";

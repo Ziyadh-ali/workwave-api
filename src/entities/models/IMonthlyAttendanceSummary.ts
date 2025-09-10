@@ -2,7 +2,7 @@ import { ObjectId, Types } from "mongoose";
 
 export interface IMonthlyAttendanceSummary {
   _id?: string | ObjectId;
-  employeeId: Types.ObjectId;
+  employeeId: ObjectId | string;
   month: number;
   year: number;
   workingDays: number;

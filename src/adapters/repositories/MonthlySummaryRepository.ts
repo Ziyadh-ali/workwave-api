@@ -217,8 +217,6 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
 
                 if (onLeave) {
                     const isPaid = leaveTypePaidMap.get(onLeave.leaveTypeId.toString()) ?? true;
-                    console.log(isPaid);
-                    console.log(employeeID);
                     presentDays++;
                     if (!isPaid) {
                         nonPaidLeaves++;
@@ -230,7 +228,7 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
         });
 
         return {
-            employeeId: employeeID,
+            employeeId: employeeID.toString(),
             month,
             year,
             workingDays,
@@ -245,7 +243,6 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
 
 
     async approveSummary(summaryId: string): Promise<IMonthlyAttendanceSummary> {
-        console.log(summaryId)
         const summary = await MonthlySummaryModel.findByIdAndUpdate(
             summaryId,
             {
@@ -254,7 +251,6 @@ export class MonthlySummaryRepository implements IMonthlySummaryRepository {
             { new: true }
         ).populate("employeeId", "fullName role");
 
-        console.log(summary)
         if (!summary) {
             throw new CustomError("Summary not found" , HTTP_STATUS_CODES.BAD_REQUEST);
         }

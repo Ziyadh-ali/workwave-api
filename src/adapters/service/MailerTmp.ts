@@ -35,7 +35,6 @@ export class EmailService implements IEmailService {
             };
 
             const info = await this.transporter.sendMail(mailOptions);
-            console.log("Email sent: " + info.response);
         } catch (error) {
             console.error("Error sending email:", error);
             throw new CustomError("Could not send email" , HTTP_STATUS_CODES.BAD_REQUEST);

@@ -2,7 +2,6 @@ import { inject, injectable } from "tsyringe";
 import { IMessageRepository } from "../entities/repositoryInterfaces/IMessage.respository";
 import { IMessage } from "../entities/models/IMessage.enities";
 import { IMessageUseCase } from "../entities/useCaseInterface/IMessageUseCase";
-// import { socketManager } from "../frameworks/di/resolver";
 
 @injectable()
 export class MessageUseCase implements IMessageUseCase {

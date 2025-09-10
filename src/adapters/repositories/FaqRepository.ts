@@ -16,7 +16,6 @@ export class FaqRepository implements IFaqRepository {
 
     async find(search: string, skip: number, limit: number): Promise<IFaqs[] | []> {
         const regex = new RegExp(search, "i");
-        console.log(search)
 
         const faqs = await FaqModel.find({
             $or: [

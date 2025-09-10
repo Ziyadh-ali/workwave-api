@@ -14,7 +14,6 @@ export class ProjectController {
     async createProject(req: Request, res: Response): Promise<void> {
         const projectManager = (req as CustomRequest).user.id;
         const { data } = req.body;
-        console.log(projectManager)
         const newProject = await this.projectUseCase.createProject({ ...data, projectManager });
 
         res.status(HTTP_STATUS_CODES.OK).json({

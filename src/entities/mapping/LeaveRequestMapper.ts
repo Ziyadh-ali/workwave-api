@@ -1,6 +1,6 @@
 import { CreateLeaveRequestDTO, UpdateLeaveRequestDTO } from "../dtos/RequestDTOs/LeaveRequestDTO";
-import { LeaveRequestResponseDTO } from "../dtos/ResponseDTOs/LeaveRequestDTO";
-import { LeaveRequest } from "../models/LeaveRequest.entity";
+import { LeaveRequestAdminResponseDTO, LeaveRequestResponseDTO } from "../dtos/ResponseDTOs/LeaveRequestDTO";
+import {  ILeaveRequestAdmin, ILeaveRequestEmployee, LeaveRequest } from "../models/LeaveRequest.entity";
 
 export class LeaveRequestMapper {
   static toEntity(dto: CreateLeaveRequestDTO): LeaveRequest {
@@ -33,11 +33,36 @@ export class LeaveRequestMapper {
     };
   }
 
-  static toResponseDTO(entity: LeaveRequest): LeaveRequestResponseDTO {
+  static toResponseDTO(entity: ILeaveRequestEmployee): LeaveRequestResponseDTO {
     return {
       _id: entity._id?.toString() || "",
       employeeId: entity.employeeId.toString(),
-      leaveTypeId: entity.leaveTypeId.toString(),
+      leaveTypeId: {
+        _id : entity.leaveTypeId._id.toString(),
+        name : entity.leaveTypeId.name
+      },
+      startDate: entity.startDate.toISOString(),
+      endDate: entity.endDate.toISOString(),
+      reason: entity.reason,
+      duration: entity.duration,
+      status: entity.status || "Pending",
+      rejectionReason: entity.rejectionReason,
+      assignedManager: entity.assignedManager?.toString(),
+      userRole: entity.userRole,
+    };
+  }
+  static toAdminResponseDTO(entity: ILeaveRequestAdmin): LeaveRequestAdminResponseDTO {
+    return {
+      _id: entity._id?.toString() || "",
+      employeeId: {
+        _id : entity.employeeId._id.toString(),
+        fullName : entity.employeeId.fullName,
+         role : entity.employeeId.role
+      },
+      leaveTypeId: {
+        _id : entity.leaveTypeId._id.toString(),
+        name : entity.leaveTypeId.name
+      },
       startDate: entity.startDate.toISOString(),
       endDate: entity.endDate.toISOString(),
       reason: entity.reason,

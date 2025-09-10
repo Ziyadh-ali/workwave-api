@@ -91,6 +91,5 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
 
     async deleteLeaveBalance(employeeId: string): Promise<void> {
         await this.leaveBalanceRepository.deleteLeaveBalanceByEmployeeId(employeeId);
-        console.log(`Leave balance deleted for user: ${employeeId}`);
     }
 }

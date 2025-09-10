@@ -5,7 +5,6 @@ eventHandler.on("EMPLOYEE_CREATED", async (employeeId: string) => {
     try {
         const leaveTypes = await leaveTypeRepository.getEveryLeaveType();
 
-        console.log(employeeId)
 
         const leaveBalances = leaveTypes
             .map(leave => ({
@@ -20,7 +19,6 @@ eventHandler.on("EMPLOYEE_CREATED", async (employeeId: string) => {
         }
 
         await leaveBalanceUseCase.initializeLeaveBalance(employeeId, leaveBalances);
-        console.log(`Leave balance initialized for user: ${employeeId}`);
     } catch (error) {
         console.error("Error initializing leave balance:", error);
     }

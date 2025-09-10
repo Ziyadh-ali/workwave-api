@@ -24,7 +24,6 @@ export class RefreshController {
       res.status(HTTP_STATUS_CODES.OK).json({ accessToken });
     } catch (error) {
       if (error instanceof Error && error.message === "Invalid or Expired Refresh Token") {
-        console.log("error undd")
         res.status(HTTP_STATUS_CODES.FORBIDDEN).json({ message: "Forbidden: Invalid or expired refresh token" });
       } else {
         res.status(500).json({ message: 'Internal server error' });

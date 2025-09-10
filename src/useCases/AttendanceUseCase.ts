@@ -165,7 +165,7 @@ export class AttendanceUseCase implements IAttendanceUseCase {
     }
 
     async requestRegularization(attendanceId: string, request: Omit<RegularizationRequestDTO, "status">): Promise<AttendanceResponseDTO | null> {
-        const regularizationRequest =  await this.attendanceRepository.requestRegularization(attendanceId, request.requestedBy, request.reason);
+        const regularizationRequest =  await this.attendanceRepository.requestRegularization(attendanceId, request.requestedBy.toString(), request.reason);
         return regularizationRequest ? AttendanceMapper.toResponseDTO(regularizationRequest) : null;
     }
 

@@ -6,8 +6,6 @@ export async function calculateWorkingDaysExcludingHolidays(start: Date, end: Da
     const year = startDate.getFullYear();
   
     const holidayDates = await fetchHolidayDates(year);
-
-    console.log(holidayDates)
   
     let count = 0;
   

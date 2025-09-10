@@ -1,8 +1,6 @@
 import { injectable , inject } from "tsyringe";
 import { IFaqUseCase } from "../entities/useCaseInterface/IFaqUseCase";
-import { IFaqRepository } from "../entities/repositoryInterfaces/IFaq.respository";
 import { FaqRepository } from "../adapters/repositories/FaqRepository";
-import { IFaqs } from "../entities/models/IFaqs";
 import { ObjectId } from "mongoose";
 import { FaqResponseDTO } from "../entities/dtos/ResponseDTOs/FaqDTO";
 import { CreateFaqRequestDTO, UpdateFaqRequestDTO } from "../entities/dtos/RequestDTOs/FaqDTO";

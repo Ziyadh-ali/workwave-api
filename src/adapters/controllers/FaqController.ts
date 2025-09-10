@@ -20,7 +20,6 @@ export class FaqController {
     }
 
     async getFaqs(req: Request, res: Response): Promise<void> {
-        console.log("hellooo")
         const search = (req.query.search as string) || "";
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 10;

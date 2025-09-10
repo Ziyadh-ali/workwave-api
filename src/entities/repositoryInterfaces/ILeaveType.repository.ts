@@ -1,8 +1,8 @@
-import { LeaveTypeDTO } from "../dtos/LeaveTypeDTO";
+import { CreateLeaveTypeDTO } from "../dtos/RequestDTOs/LeaveTypeDTO";
 import { LeaveType } from "../models/LeaveType.entity";
 
 export interface ILeaveTypeRepository {
-    createLeaveType(data: LeaveTypeDTO): Promise<LeaveType>;
+    createLeaveType(data: CreateLeaveTypeDTO): Promise<LeaveType>;
     getLeaveTypeById(id: string): Promise<LeaveType | null>;
     getAllLeaveTypes(options: {
         page: number;
@@ -10,6 +10,6 @@ export interface ILeaveTypeRepository {
         isPaid?: boolean;
     }): Promise<{ leaveTypes: LeaveType[]; totalPages: number }>;
     getEveryLeaveType(): Promise<LeaveType[]>;
-    updateLeaveType(id: string, data: Partial<LeaveTypeDTO>): Promise<LeaveType | null>;
+    updateLeaveType(id: string, data: Partial<LeaveType>): Promise<LeaveType | null>;
     deleteLeaveType(id: string): Promise<boolean>;
 }
