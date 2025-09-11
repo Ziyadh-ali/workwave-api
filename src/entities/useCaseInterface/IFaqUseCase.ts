@@ -12,4 +12,5 @@ export interface IFaqUseCase {
     ): Promise<FaqResponseDTO[] | []>;
     findById(faqId: string | ObjectId): Promise<FaqResponseDTO | null>;
     deleteFaq(faqId: string | ObjectId): Promise<void>;
+    getAllFaqs(): Promise<FaqResponseDTO[] | []>;
 }

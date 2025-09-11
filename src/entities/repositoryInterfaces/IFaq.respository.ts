@@ -11,4 +11,5 @@ export interface IFaqRepository {
         skip: number,
         limit: number,
     ): Promise<IFaqs[] | []>; 
+    getAllFaqs(): Promise<IFaqs[] | []>;
 };

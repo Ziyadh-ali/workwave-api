@@ -43,6 +43,6 @@ export class MeetingRepository implements IMeetingRepository {
                 { participants: employeeId },
                 { createdBy: employeeId },
             ],
-        }).populate("createdBy");
+        }).populate("createdBy" , "fullName , role").populate("participants" , "fullName , role");
     }
 }

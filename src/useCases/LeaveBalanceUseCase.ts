@@ -3,6 +3,7 @@ import { ILeaveBalanceRepository } from "../entities/repositoryInterfaces/ILeave
 import { ILeaveBalanceUseCase } from "../entities/useCaseInterface/ILeaveBalanceUseCase";
 import { ILeaveTypeRepository } from "../entities/repositoryInterfaces/ILeaveType.repository";
 import { LeaveBalanceResponseDTO, } from "../entities/dtos/ResponseDTOs/LeaveBalanceDTO";
+import { LeaveBalanceMapper } from "../entities/mapping/LeaveBalanceMapping";
 
 @injectable()
 export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
@@ -25,24 +26,8 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
     async getLeaveBalanceByEmployeeId(employeeId: string): Promise<LeaveBalanceResponseDTO | null> {
         const leaveBalances = await this.leaveBalanceRepository.getLeaveBalanceByEmployeeId(employeeId);
         if (!leaveBalances) return null;
-
-        const leaveTypes = await this.leaveTypeRepository.getEveryLeaveType();
-
-        const leaveBalancesWithNames = leaveBalances.leaveBalances.map(lb => {
-            const leaveType = leaveTypes.find(lt => lt._id?lt._id.toString() === lb.leaveTypeId : "");
-            return {
-                leaveTypeId: lb.leaveTypeId,
-                leaveTypeName: leaveType ? leaveType.name : "Unknown Leave Type",
-                totalDays: lb.totalDays,
-                availableDays: lb.availableDays,
-                usedDays: lb.usedDays || 0
-            };
-        });
-
-        return { 
-            _id : leaveBalances._id?.toString()!,
-            employeeId: leaveBalances.employeeId,
-            leaveBalances: leaveBalancesWithNames };   
+        
+        return LeaveBalanceMapper.toResponseDTO(leaveBalances);
     }
 
     async deductLeave(employeeId: string, leaveTypeId: string, usedDays: number): Promise<boolean> {
@@ -61,7 +46,7 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
         const leaveBalance = await this.getLeaveBalanceByEmployeeId(employeeId);
         if (!leaveBalance) return false;
 
-        const leaveType = leaveBalance.leaveBalances.find(lb => lb.leaveTypeId === leaveTypeId);
+        const leaveType = leaveBalance.leaveBalances.find(lb => lb.leaveTypeId.toString() === leaveTypeId);
         if (!leaveType) return false;
 
         leaveType.totalDays = newTotalDays;

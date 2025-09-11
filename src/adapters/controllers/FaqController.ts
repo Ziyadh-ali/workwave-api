@@ -19,12 +19,17 @@ export class FaqController {
         res.status(HTTP_STATUS_CODES.CREATED).json(faq);
     }
 
+    async getAllFaqs(req: Request, res: Response): Promise<void> {
+        const faqs = await this.faqUseCase.getAllFaqs();
+        res.status(HTTP_STATUS_CODES.OK).json({ faqs: faqs });
+    }
+
     async getFaqs(req: Request, res: Response): Promise<void> {
         const search = (req.query.search as string) || "";
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
 
-        const faqs = await this.faqUseCase.find(search, page, pageSize);
+        const faqs = await this.faqUseCase.find(search, page, pageSize); 
         res.status(HTTP_STATUS_CODES.OK).json({ faqs: faqs });
     }
 

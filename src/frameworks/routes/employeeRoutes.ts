@@ -232,6 +232,11 @@ export class UserRoute {
                 verifyAuth("employee"),
                 asyncHandler((req: Request, res: Response) => faqController.getFaqs(req, res))
             )
+            .get(
+                "/faq/all",
+                verifyAuth("employee"),
+                asyncHandler((req: Request, res: Response) => faqController.getAllFaqs(req, res))
+            )
             .patch(
                 "/faq/:faqId",
                 verifyAuth("employee"),

@@ -18,7 +18,7 @@ export class FaqMapper {
 
   static toResponseDTO(entity: IFaqs): FaqResponseDTO {
     return {
-      _id: entity._id!,
+      _id: entity._id!.toString(),
       topic: entity.topic,
       description: entity.description,
       questions: entity.questions.map(q => ({

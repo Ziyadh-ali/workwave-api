@@ -39,4 +39,8 @@ export class FaqUseCase implements IFaqUseCase {
         const faq =  await this.faqRepository.updateFaq(faqId , updatedData);
         return faq ? FaqMapper.toResponseDTO(faq) : null;
     }
+    async getAllFaqs(): Promise<FaqResponseDTO[] | []> {
+        const faqs =  await this.faqRepository.getAllFaqs();
+        return faqs.map(FaqMapper.toResponseDTO);
+    }
 }

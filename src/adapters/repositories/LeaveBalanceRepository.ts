@@ -13,7 +13,8 @@ export class LeaveBalanceRepository implements ILeaveBalanceRepository {
     }
 
     async getLeaveBalanceByEmployeeId(employeeId: string): Promise<LeaveBalance | null> {
-        return await LeaveBalanceModel.findOne({employeeId}).lean();
+        const leavebalances =  await LeaveBalanceModel.findOne({employeeId}).populate("leaveBalances.leaveTypeId" , "name").lean();
+        return leavebalances;
     }
 
     async deductLeave(employeeId: string, leaveTypeId: string, usedDays: number): Promise<boolean> {

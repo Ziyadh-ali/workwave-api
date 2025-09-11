@@ -2,10 +2,11 @@ import { injectable, inject } from "tsyringe";
 import { IMeetingUseCase } from "../entities/useCaseInterface/IMeetingUseCase";
 import { IMeeting } from "../entities/models/Meeting.entities";
 import { IMeetingRepository } from "../entities/repositoryInterfaces/IMeeting.repository";
-import { ObjectId } from "mongoose";
 import { IEmployeeRepository } from "../entities/repositoryInterfaces/employee/EmployeeRepository";
 import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
 import { CustomError } from "../shared/errors/CustomError";
+import { MeetingResponseDTO, MeetingResponseWithParticipantsDTO } from "../entities/dtos/ResponseDTOs/MeetingDTO";
+import { MeetingMapper } from "../entities/mapping/MeetingMapper";
 
 @injectable()
 export class MeetingUseCase implements IMeetingUseCase {
@@ -14,7 +15,7 @@ export class MeetingUseCase implements IMeetingUseCase {
         @inject("IEmployeeRepository") private employeeRepository: IEmployeeRepository,
     ) { }
 
-    async createMeeting(meeting: IMeeting, filter: { role?: string; department?: string }): Promise<IMeeting> {
+    async createMeeting(meeting: IMeeting, filter: { role?: string; department?: string }): Promise<MeetingResponseDTO> {
         if (!filter.role && !filter.department) {
             throw new CustomError(MESSAGES.ERROR.MEETING.ROLE_REQUIRED  , HTTP_STATUS_CODES.BAD_REQUEST);
         }
@@ -77,30 +78,32 @@ export class MeetingUseCase implements IMeetingUseCase {
         }
 
         meeting.participants = filteredParticipants;
-        return await this.meetingRepository.createMeeting(meeting);
+        return MeetingMapper.toResponseDTO(await this.meetingRepository.createMeeting(meeting));
     }
 
     async deleteMeeting(id: string): Promise<void> {
         await this.meetingRepository.deleteMeeting(id);
     }
 
-    async getMeetingByDate(date: Date): Promise<IMeeting[]> {
-        return this.meetingRepository.getMeetingByDate(date);
+    async getMeetingByDate(date: Date): Promise<MeetingResponseDTO[]> {
+        return (await (this.meetingRepository.getMeetingByDate(date))).map(MeetingMapper.toResponseDTO);
     }
 
-    async getMeetingById(id: string): Promise<IMeeting | null> {
-        return this.meetingRepository.getMeetingById(id);
+    async getMeetingById(id: string): Promise<MeetingResponseDTO | null> {
+        const meeting = await this.meetingRepository.getMeetingById(id);
+        return meeting ? MeetingMapper.toResponseDTO(meeting) : null;
     }
 
-    async getMeetingsByHost(hostId: string): Promise<IMeeting[]> {
-        return this.meetingRepository.getMeetingsByHost(hostId);
+    async getMeetingsByHost(hostId: string): Promise<MeetingResponseDTO[]> {
+        return (await this.meetingRepository.getMeetingsByHost(hostId)).map(MeetingMapper.toResponseDTO);
     }
 
-    async updateMeeting(id: string, updateData: Partial<IMeeting>): Promise<IMeeting | null> {
-        return this.meetingRepository.updateMeeting(id, updateData);
+    async updateMeeting(id: string, updateData: Partial<IMeeting>): Promise<MeetingResponseDTO | null> {
+        const meeting = await this.meetingRepository.updateMeeting(id, updateData);
+        return meeting ? MeetingMapper.toResponseDTO(meeting) : null;
     }
 
-    async editMeeting(meeting: IMeeting, filter: { role?: string; department?: string }): Promise<IMeeting |  null> {
+    async editMeeting(meeting: IMeeting, filter: { role?: string; department?: string }): Promise<MeetingResponseDTO |  null> {
         if (!filter.role && !filter.department) {
             throw new CustomError(MESSAGES.ERROR.MEETING.ROLE_REQUIRED , HTTP_STATUS_CODES.BAD_REQUEST);
         }
@@ -169,10 +172,12 @@ export class MeetingUseCase implements IMeetingUseCase {
 
         meeting.participants = filteredParticipants;
 
-        return await this.meetingRepository.updateMeeting(meeting._id ? meeting._id.toString() : "", meeting);
+        const data =  await this.meetingRepository.updateMeeting(meeting._id ? meeting._id.toString() : "", meeting);
+        return MeetingMapper.toResponseDTO(data as IMeeting);
     }
 
-    async getMeetingByEmployeeId(employeeId: string): Promise<IMeeting[]> {
-        return this.meetingRepository.getMeetingsByEmployeeId(employeeId);
+    async getMeetingByEmployeeId(employeeId: string): Promise<MeetingResponseWithParticipantsDTO[]> {
+        const meetings = await this.meetingRepository.getMeetingsByEmployeeId(employeeId);
+        return meetings.map(MeetingMapper.toResponseWithParticipantsDTO);
     }
 }

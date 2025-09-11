@@ -18,7 +18,6 @@ export class LeaveBalanceController {
                 });
             }
             const leaveBalances = await this.leaveBalanceUseCase.getLeaveBalanceByEmployeeId(employeeId);
-
             res.status(HTTP_STATUS_CODES.OK).json({
                 success : true , 
                 leaveBalances,

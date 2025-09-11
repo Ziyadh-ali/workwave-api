@@ -36,6 +36,7 @@ export class MeetingController {
     async getMeetingByEmployeeId(req: Request, res: Response): Promise<void> {
             const { employeeId } = req.params;
             const meetings = await this.meetingUseCase.getMeetingByEmployeeId(employeeId);
+            
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.METING_SCHEDULED,
                 meetings,

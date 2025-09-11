@@ -39,4 +39,8 @@ export class FaqRepository implements IFaqRepository {
     async updateFaq(faqId: string | ObjectId, updatedData: Partial<IFaqs>): Promise<IFaqs | null> {
         return await FaqModel.findByIdAndUpdate(faqId, updatedData, { new: true });
     }
+
+    async getAllFaqs(): Promise<IFaqs[] | []> {
+        return await FaqModel.find().sort({ createdAt: -1 });
+    }
 }
