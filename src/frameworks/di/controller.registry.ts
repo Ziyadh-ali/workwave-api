@@ -12,7 +12,6 @@ import { ResetPasswordController } from "../../adapters/controllers/employee/Res
 import { MeetingController } from "../../adapters/controllers/MeetingController";
 import { FaqController } from "../../adapters/controllers/FaqController";
 import { MessageController } from "../../adapters/controllers/MessageController";
-import { ProjectController } from "../../adapters/controllers/ProjectController";
 import { GroupController } from "../../adapters/controllers/GroupController";
 import { QuestionController } from "../../adapters/controllers/QuestionController";
 import { MonthlySummaryController } from "../../adapters/controllers/MonthlySummaryController";
@@ -75,9 +74,6 @@ export class ControllerRegistry {
             useClass : MessageController
         });
 
-        container.register("ProjectController",{
-            useClass : ProjectController
-        });
 
         container.register("GroupController",{
             useClass : GroupController,

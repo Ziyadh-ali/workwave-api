@@ -157,7 +157,6 @@ export class PayrollController {
     const payslip = await this.payrollUseCase.getPayrollByEmployeeId(
       employeeId
     );
-    console.log(payslip)
     res.status(HTTP_STATUS_CODES.OK).json({
       payslip,
     });

@@ -158,7 +158,7 @@ export class SocketManager {
 
             socket.on('createGroup', async (groupData: { name: string; members: string[]; createdBy: string }, callback: (response: { success: boolean; group?: IGroup; error?: string }) => void) => {
                 try {
-                    const newGroup = await this.groupRepository.createGroup(groupData);
+                    const newGroup = await this.groupRepository.create(groupData);
                     const members = [...groupData.members, groupData.createdBy];
                     await this.groupRepository.addMembers(newGroup?._id!.toString(), members);
 

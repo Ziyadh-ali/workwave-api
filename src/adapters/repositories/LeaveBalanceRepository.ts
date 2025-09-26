@@ -1,12 +1,16 @@
 import { injectable  } from "tsyringe";
 import { ILeaveBalanceRepository } from "../../entities/repositoryInterfaces/ILeaveBalance.repository";
-import { LeaveBalanceModel } from "../../frameworks/database/models/LeaveBalanceModel";
+import { ILeaveBalance, LeaveBalanceModel } from "../../frameworks/database/models/LeaveBalanceModel";
 import { LeaveBalance } from "../../entities/models/LeaveBalance.entity";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class LeaveBalanceRepository implements ILeaveBalanceRepository {
+export class LeaveBalanceRepository extends BaseRepository<ILeaveBalance> implements ILeaveBalanceRepository {
+    constructor(){
+        super(LeaveBalanceModel)
+    }
     async initializeLeaveBalance(employeeId: string, leaveBalances: { leaveTypeId: string;totalDays : number; availableDays: number; }[]): Promise<void> {
         const newLeaveBalances = new LeaveBalanceModel({employeeId , leaveBalances});
         await newLeaveBalances.save();
@@ -20,8 +24,8 @@ export class LeaveBalanceRepository implements ILeaveBalanceRepository {
     async deductLeave(employeeId: string, leaveTypeId: string, usedDays: number): Promise<boolean> {
         const leaveBalance = await LeaveBalanceModel.findOne({employeeId});
         if(!leaveBalance) return false;
+        const leaveType = leaveBalance.leaveBalances.find(lb => lb.leaveTypeId.toString() === leaveTypeId);
 
-        const leaveType = leaveBalance.leaveBalances.find(lb => lb.leaveTypeId === leaveTypeId);
         if(!leaveType || leaveType.availableDays < usedDays) return false;
 
         leaveType.availableDays -= usedDays;
@@ -92,7 +96,7 @@ export class LeaveBalanceRepository implements ILeaveBalanceRepository {
             { employeeId, "leaveBalances.leaveTypeId": leaveTypeId },
             { "leaveBalances.$": 1 }
         );
-
+        console.log("leaveBalances" , leaveBalance)
         if (!leaveBalance || leaveBalance.leaveBalances.length === 0) {
             return null;
         }

@@ -4,7 +4,7 @@ import { QuestionSchema } from "../schemas/QuestionSchema";
 
 
 export interface IQuestionModel extends Omit<IQuestion , "_id">, Document {
-    _id : ObjectId;
+    _id : ObjectId | string;
 }
 
 export const QuestionModel = model<IQuestionModel>("Question",QuestionSchema);

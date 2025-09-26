@@ -33,8 +33,6 @@ import { IMeetingUseCase } from "../../entities/useCaseInterface/IMeetingUseCase
 import { IFaqUseCase } from "../../entities/useCaseInterface/IFaqUseCase";
 import { IMessageUseCase } from "../../entities/useCaseInterface/IMessageUseCase";
 import { MessageUseCase } from "../../useCases/MessageUseCase";
-import { IProjectUseCase } from "../../entities/useCaseInterface/IProjectUseCase";
-import { ProjectUseCase } from "../../useCases/ProjectUseCase";
 import { IGroupUseCase } from "../../entities/useCaseInterface/IGroupUseCase";
 import { GroupUseCase } from "../../useCases/GroupUseCase";
 import { QuestionUseCase } from "../../useCases/QuestionUseCase";
@@ -113,10 +111,6 @@ export class UseCaseRegistry {
 
         container.register<IMessageUseCase>("IMessageUseCase",{
             useClass : MessageUseCase,
-        });
-
-        container.register<IProjectUseCase>("IProjectUseCase",{
-            useClass : ProjectUseCase,
         });
 
         container.register<IGroupUseCase>("IGroupUseCase",{

@@ -3,7 +3,7 @@ import { leaveBalanceUseCase, leaveTypeRepository } from "../frameworks/di/resol
 
 eventHandler.on("EMPLOYEE_CREATED", async (employeeId: string) => {
     try {
-        const leaveTypes = await leaveTypeRepository.getEveryLeaveType();
+        const leaveTypes = await leaveTypeRepository.getAll();
 
 
         const leaveBalances = leaveTypes
@@ -38,6 +38,6 @@ eventHandler.on("EMPLOYEE_DELETED" , async (employeeId : string)=> {
         await leaveBalanceUseCase.deleteLeaveBalance(employeeId);
         console.log("Leave balance deleted");
     } catch (error) {
-        console.log("error deleting user leave balance");
+        console.log("error deleting user leave balance" , error);
     }
 })

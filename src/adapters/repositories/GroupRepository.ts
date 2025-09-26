@@ -1,15 +1,14 @@
 import { injectable } from "tsyringe";
 import { IGroupRepository } from "../../entities/repositoryInterfaces/IGroup.repository";
 import { IGroup } from "../../entities/models/IGroup.entities";
-import { GroupModel } from "../../frameworks/database/models/GroupModel";
+import { GroupModel, IGroupModel } from "../../frameworks/database/models/GroupModel";
 import { ObjectId } from "mongoose";
-import { CustomError } from "../../shared/errors/CustomError";
-import { HTTP_STATUS_CODES } from "../../shared/constants";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class GroupRepository implements IGroupRepository {
-    async createGroup(group: IGroup): Promise<IGroup> {
-        return await GroupModel.create(group);
+export class GroupRepository extends BaseRepository<IGroupModel> implements IGroupRepository {
+    constructor(){
+        super(GroupModel)
     }
 
     async getGroupsByUser(userId: string | ObjectId): Promise<IGroup[]> {

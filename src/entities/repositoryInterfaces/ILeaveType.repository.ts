@@ -1,15 +1,12 @@
-import { CreateLeaveTypeDTO } from "../dtos/RequestDTOs/LeaveTypeDTO";
+import { ILeaveType } from "../../frameworks/database/models/LeaveTypeModel";
 import { LeaveType } from "../models/LeaveType.entity";
+import { IBaseRepository } from "./IBase.repository";
 
-export interface ILeaveTypeRepository {
-    createLeaveType(data: CreateLeaveTypeDTO): Promise<LeaveType>;
-    getLeaveTypeById(id: string): Promise<LeaveType | null>;
+export interface ILeaveTypeRepository extends IBaseRepository<ILeaveType> {
     getAllLeaveTypes(options: {
         page: number;
         limit: number;
         isPaid?: boolean;
     }): Promise<{ leaveTypes: LeaveType[]; totalPages: number }>;
-    getEveryLeaveType(): Promise<LeaveType[]>;
-    updateLeaveType(id: string, data: Partial<LeaveType>): Promise<LeaveType | null>;
     deleteLeaveType(id: string): Promise<boolean>;
 }

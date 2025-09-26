@@ -15,7 +15,7 @@ export class GroupUseCase implements IGroupUseCase {
 
 
   async createGroup(data: IGroup): Promise<IGroup> {
-    const group = await this.groupRepository.createGroup(data);
+    const group = await this.groupRepository.create(data);
     return group;
   }
 

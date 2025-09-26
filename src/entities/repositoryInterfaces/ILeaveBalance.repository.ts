@@ -1,7 +1,9 @@
+import { ILeaveBalance } from "../../frameworks/database/models/LeaveBalanceModel";
 import { LeaveBalance } from "../models/LeaveBalance.entity";
+import { IBaseRepository } from "./IBase.repository";
 
 
-export interface ILeaveBalanceRepository {
+export interface ILeaveBalanceRepository extends IBaseRepository<ILeaveBalance> {
     initializeLeaveBalance(employeeId: string, leaveBalances: { leaveTypeId: string; totalDays: number , availableDays : number }[]): Promise<void>;
     getLeaveBalanceByEmployeeId(employeeId: string): Promise<LeaveBalance | null>;
     deductLeave(employeeId: string, leaveTypeId: string, usedDays: number): Promise<boolean>;

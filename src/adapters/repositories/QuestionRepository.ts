@@ -1,20 +1,20 @@
-import { injectable, inject } from "tsyringe";
+import { injectable } from "tsyringe";
 import { IQuestionRepository } from "../../entities/repositoryInterfaces/IQuestion.repository";
-import { QuestionModel } from "../../frameworks/database/models/QuestionModel";
+import { IQuestionModel, QuestionModel } from "../../frameworks/database/models/QuestionModel";
 import { IQuestion } from "../../entities/models/IQuestion";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class QuestionRepository implements IQuestionRepository {
-    async create(question: Partial<IQuestion>): Promise<IQuestion> {
-        const created = new QuestionModel(question);
-        return await created.save();
+export class QuestionRepository extends BaseRepository<IQuestionModel> implements IQuestionRepository {
+    constructor(){
+        super(QuestionModel);
     }
 
     async findUnanswered(): Promise<IQuestion[]> {
         return await QuestionModel.find({ isAnswered: false }).populate("employeeId");
     }
 
-    async findAll(): Promise<IQuestion[]> {
+    async findAllQuestions(): Promise<IQuestion[]> {
         return await QuestionModel.find().populate("employeeId");
     }
 
@@ -29,10 +29,6 @@ export class QuestionRepository implements IQuestionRepository {
             },
             { new: true }
         );
-    }
-
-    async delete(id: string): Promise<void> {
-        await QuestionModel.findByIdAndDelete(id);
     }
 
     async findByEmployeeId(employeeId: string): Promise<IQuestion[] | null> {

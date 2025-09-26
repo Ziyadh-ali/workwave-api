@@ -17,8 +17,6 @@ import { IAttendanceRepository } from "../../entities/repositoryInterfaces/IAtte
 import { IMeetingRepository } from "../../entities/repositoryInterfaces/IMeeting.repository";
 import { IFaqRepository } from "../../entities/repositoryInterfaces/IFaq.respository";
 import { IMessageRepository } from "../../entities/repositoryInterfaces/IMessage.respository";
-import { IProjectRepository } from "../../entities/repositoryInterfaces/IProject.repository";
-import { ProjectRepository } from "../../adapters/repositories/ProjectRepository";
 import { IGroupRepository } from "../../entities/repositoryInterfaces/IGroup.repository";
 import { GroupRepository } from "../../adapters/repositories/GroupRepository";
 import { QuestionRepository } from "../../adapters/repositories/QuestionRepository";
@@ -68,10 +66,6 @@ export class RepositoryRegistry {
 
         container.register<IMessageRepository>("IMessageRepository",{
             useClass : MessageRepository,
-        });
-
-        container.register<IProjectRepository>("IProjectRepository",{
-            useClass : ProjectRepository,
         });
 
         container.register<IGroupRepository>("IGroupRepository",{

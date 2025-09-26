@@ -78,11 +78,11 @@ export class MeetingUseCase implements IMeetingUseCase {
         }
 
         meeting.participants = filteredParticipants;
-        return MeetingMapper.toResponseDTO(await this.meetingRepository.createMeeting(meeting));
+        return MeetingMapper.toResponseDTO(await this.meetingRepository.create(meeting));
     }
 
     async deleteMeeting(id: string): Promise<void> {
-        await this.meetingRepository.deleteMeeting(id);
+        await this.meetingRepository.delete(id);
     }
 
     async getMeetingByDate(date: Date): Promise<MeetingResponseDTO[]> {
@@ -90,7 +90,7 @@ export class MeetingUseCase implements IMeetingUseCase {
     }
 
     async getMeetingById(id: string): Promise<MeetingResponseDTO | null> {
-        const meeting = await this.meetingRepository.getMeetingById(id);
+        const meeting = await this.meetingRepository.findById(id);
         return meeting ? MeetingMapper.toResponseDTO(meeting) : null;
     }
 
@@ -99,7 +99,7 @@ export class MeetingUseCase implements IMeetingUseCase {
     }
 
     async updateMeeting(id: string, updateData: Partial<IMeeting>): Promise<MeetingResponseDTO | null> {
-        const meeting = await this.meetingRepository.updateMeeting(id, updateData);
+        const meeting = await this.meetingRepository.update(id, updateData);
         return meeting ? MeetingMapper.toResponseDTO(meeting) : null;
     }
 
@@ -172,7 +172,7 @@ export class MeetingUseCase implements IMeetingUseCase {
 
         meeting.participants = filteredParticipants;
 
-        const data =  await this.meetingRepository.updateMeeting(meeting._id ? meeting._id.toString() : "", meeting);
+        const data =  await this.meetingRepository.update(meeting._id ? meeting._id.toString() : "", meeting);
         return MeetingMapper.toResponseDTO(data as IMeeting);
     }
 

@@ -4,7 +4,7 @@ import { MeetingSchema } from "../schemas/MeetingSchema";
 
 
 export interface IMeetingModel extends Omit<IMeeting , "_id">, Document {
-    _id : ObjectId;
+    _id : ObjectId | string;
 }
 
 export const meetingModel = model<IMeetingModel>("Meeting",MeetingSchema);

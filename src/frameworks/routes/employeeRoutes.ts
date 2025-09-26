@@ -1,4 +1,4 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import {
     employeeController,
     employeeProfile,
@@ -13,7 +13,6 @@ import {
     faqController,
     adminUserManagement,
     messageController,
-    projectController,
     groupController,
     questionController,
     monthlySummaryController,

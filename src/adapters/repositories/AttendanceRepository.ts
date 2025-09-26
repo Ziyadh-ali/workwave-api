@@ -1,12 +1,16 @@
 import { injectable } from "tsyringe";
 import { IAttendanceRepository } from "../../entities/repositoryInterfaces/IAttendance.repository";
 import { Attendance } from "../../entities/models/Attendance.entities";
-import { attendanceModel } from "../../frameworks/database/models/AttendanceModel";
+import { attendanceModel, IAttendanceModel } from "../../frameworks/database/models/AttendanceModel";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class AttendanceRepository implements IAttendanceRepository {
+export class AttendanceRepository extends BaseRepository<IAttendanceModel> implements IAttendanceRepository {
+    constructor() {
+        super(attendanceModel)
+    }
     async createAttendance(employeeId: string, date: Date): Promise<Attendance> {
         return await attendanceModel.create({
             employeeId,

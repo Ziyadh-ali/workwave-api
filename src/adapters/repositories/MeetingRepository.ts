@@ -1,21 +1,13 @@
-import { inject, injectable } from "tsyringe";
+import { injectable } from "tsyringe";
 import { IMeetingRepository } from "../../entities/repositoryInterfaces/IMeeting.repository";
 import { IMeeting } from "../../entities/models/Meeting.entities";
-import { meetingModel } from "../../frameworks/database/models/MeetingModel";
+import { IMeetingModel, meetingModel } from "../../frameworks/database/models/MeetingModel";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class MeetingRepository implements IMeetingRepository {
-    async createMeeting(meeting: IMeeting): Promise<IMeeting> {
-        const createdMeeting = await meetingModel.create(meeting);
-        return createdMeeting;
-    }
-
-    async getMeetingById(id: string): Promise<IMeeting | null> {
-        return await meetingModel.findById(id);
-    }
-
-    async deleteMeeting(id: string): Promise<void> {
-        await meetingModel.findByIdAndDelete(id);
+export class MeetingRepository extends BaseRepository<IMeetingModel> implements IMeetingRepository {
+    constructor() {
+        super(meetingModel)
     }
 
     async getMeetingByDate(date: Date): Promise<IMeeting[]> {
@@ -27,10 +19,6 @@ export class MeetingRepository implements IMeetingRepository {
         return await meetingModel.find({
             date: { $gte: startOfDay, $lte: endOfDay }
         }).populate("participants createdBy");
-    }
-
-    async updateMeeting(id: string, updates: Partial<IMeeting>): Promise<IMeeting | null> {
-        return await meetingModel.findByIdAndUpdate(id, updates, { new: true });
     }
 
     async getMeetingsByHost(hostId: string): Promise<IMeeting[]> {

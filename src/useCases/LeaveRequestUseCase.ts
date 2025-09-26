@@ -45,7 +45,6 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
         HTTP_STATUS_CODES.BAD_REQUEST
       );
     }
-
     const leaveBalance = await this.leaveBalanceRepository.getLeaveBalance(
       leaveRequest?.employeeId.toString(),
       leaveRequest.leaveTypeId.toString()
@@ -56,11 +55,12 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
         HTTP_STATUS_CODES.BAD_REQUEST
       );
     }
-
+    console.log(leaveRequest.employeeId)
     const existingLeaves =
       await this.leaveRequestRepository.getLeaveRequestsOfEmployee(
         leaveRequest?.employeeId.toString()
       );
+    console.log(existingLeaves)
     if (existingLeaves) {
       for (const leave of existingLeaves) {
         if (leave.status === "Cancelled") continue;
@@ -105,7 +105,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
         HTTP_STATUS_CODES.BAD_REQUEST
       );
     }
-    return await this.leaveRequestRepository.createLeaveRequest(leaveRequest);
+    return await this.leaveRequestRepository.create(leaveRequest);
   }
 
   async getLeaveRequestByEmployee(options: {
@@ -190,7 +190,6 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
         endDate,
         duration ? duration : ""
       );
-
       if (workingDays > 0) {
         const success = await this.leaveBalanceRepository.deductLeave(
           employeeId.toString(),

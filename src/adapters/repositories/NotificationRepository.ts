@@ -1,4 +1,4 @@
-import { injectable, inject } from "tsyringe";
+import { injectable } from "tsyringe";
 import { INotification } from "../../entities/models/INotification";
 import { INotificationRepository } from "../../entities/repositoryInterfaces/INotification.repository";
 import { NotificationModel } from "../../frameworks/database/models/NotificationModel";

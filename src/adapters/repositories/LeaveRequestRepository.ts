@@ -1,4 +1,4 @@
-import { inject, injectable } from "tsyringe";
+import { injectable } from "tsyringe";
 import {
   ILeaveRequestAdmin,
   ILeaveRequestEmployee,
@@ -7,16 +7,17 @@ import {
   LeaveRequestQuery,
 } from "../../entities/models/LeaveRequest.entity";
 import { ILeaveRequestRepository } from "../../entities/repositoryInterfaces/ILeaveRequest.repository";
-import { LeaveRequestModel } from "../../frameworks/database/models/LeaveRequestModel";
+import { ILeaveRequest, LeaveRequestModel } from "../../frameworks/database/models/LeaveRequestModel";
 import { EmployeeModel } from "../../frameworks/database/models/employee/EmployeeModel";
 import { ObjectId } from "mongoose";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class LeaveRequestRepository implements ILeaveRequestRepository {
-  async createLeaveRequest(leaveRequest: LeaveRequest): Promise<LeaveRequest> {
-    return await LeaveRequestModel.create(leaveRequest);
-  }
+export class LeaveRequestRepository extends BaseRepository<ILeaveRequest> implements ILeaveRequestRepository {
 
+  constructor() {
+    super(LeaveRequestModel)
+  }
   async getLeaveRequestForApproval(managerId: string): Promise<LeaveRequest[]> {
     return await LeaveRequestModel.find({
       assignedManager: managerId,
@@ -31,7 +32,7 @@ export class LeaveRequestRepository implements ILeaveRequestRepository {
     search: string;
     status: string;
   }): Promise<{ leaveRequests: ILeaveRequestEmployee[]; totalPages: number }> {
-    const { employeeId, page, limit, search, status } = options;
+    const { employeeId, page, limit, status } = options;
 
     const query: {
       employeeId: string;
@@ -222,6 +223,6 @@ export class LeaveRequestRepository implements ILeaveRequestRepository {
   async getLeaveRequestsOfEmployee(
     employeeId: string
   ): Promise<LeaveRequest[] | null> {
-    return await LeaveRequestModel.findById(employeeId);
+    return await LeaveRequestModel.find({ employeeId });
   }
 }

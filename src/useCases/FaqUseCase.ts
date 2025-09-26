@@ -14,12 +14,12 @@ export class FaqUseCase implements IFaqUseCase {
 
     async createFaq(data: CreateFaqRequestDTO): Promise<FaqResponseDTO> {
         const updatedData = FaqMapper.toEntity(data);
-        const createdFaq = await this.faqRepository.createFaq(updatedData);
+        const createdFaq = await this.faqRepository.create(updatedData);
         return FaqMapper.toResponseDTO(createdFaq);
     }
 
     async deleteFaq(faqId: string | ObjectId): Promise<void> {
-        await this.faqRepository.deleteFaq(faqId);
+        await this.faqRepository.delete(faqId.toString());
     }
 
     async find(search: string, page: number, pageSize: number): Promise<FaqResponseDTO[] | []> {
@@ -31,16 +31,16 @@ export class FaqUseCase implements IFaqUseCase {
     }
 
     async findById(faqId: string | ObjectId): Promise<FaqResponseDTO | null> {
-        const faq =  await this.faqRepository.findFaqById(faqId);
+        const faq =  await this.faqRepository.findById(faqId.toString());
         return faq ? FaqMapper.toResponseDTO(faq) : null;
     }
 
     async updateFaq(faqId: string | ObjectId, updatedData: UpdateFaqRequestDTO): Promise<FaqResponseDTO | null> {
-        const faq =  await this.faqRepository.updateFaq(faqId , updatedData);
+        const faq =  await this.faqRepository.update(faqId.toString() , updatedData);
         return faq ? FaqMapper.toResponseDTO(faq) : null;
     }
     async getAllFaqs(): Promise<FaqResponseDTO[] | []> {
-        const faqs =  await this.faqRepository.getAllFaqs();
+        const faqs =  await this.faqRepository.getAll();
         return faqs.map(FaqMapper.toResponseDTO);
     }
 }

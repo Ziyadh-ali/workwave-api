@@ -1,7 +1,9 @@
+import { IMessageModel } from "../../frameworks/database/models/MessageModel";
 import { IMessage } from "../models/IMessage.enities";
+import { IBaseRepository } from "./IBase.repository";
 
 
-export interface IMessageRepository {
+export interface IMessageRepository extends IBaseRepository<IMessageModel> {
   createMessage(data: IMessage): Promise<IMessage>;
 
   getMessagesByRoomId(roomId: string): Promise<IMessage[]>;
@@ -11,6 +13,4 @@ export interface IMessageRepository {
   markAsDelivered(messageId: string, userId: string): Promise<void>;
 
   markAsRead(messageId: string, userId: string): Promise<void>;
-
-  deleteMessage(messageId: string): Promise<void>;
 }

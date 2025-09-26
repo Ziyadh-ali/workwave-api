@@ -1,7 +1,9 @@
+import { ILeaveRequest } from "../../frameworks/database/models/LeaveRequestModel";
 import {  ILeaveRequestAdmin, ILeaveRequestEmployee, LeaveRequest, LeaveRequestFilter } from "../models/LeaveRequest.entity";
+import { IBaseRepository } from "./IBase.repository";
 
-export interface ILeaveRequestRepository {
-    createLeaveRequest(leaveRequest: LeaveRequest): Promise<LeaveRequest>;
+export interface ILeaveRequestRepository extends IBaseRepository<ILeaveRequest> {
+    // createLeaveRequest(leaveRequest: LeaveRequest): Promise<LeaveRequest>;
     // getLeaveRequestForApproval(managerId: string): Promise<LeaveRequest[]>;
     getLeaveRequestByEmployee(options: {
         employeeId: string;

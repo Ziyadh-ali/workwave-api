@@ -1,8 +1,9 @@
 import { ObjectId } from "mongoose";
 import { IGroup } from "../models/IGroup.entities";
+import { IBaseRepository } from "./IBase.repository";
+import { IGroupModel } from "../../frameworks/database/models/GroupModel";
 
-export interface IGroupRepository {
-  createGroup(group: IGroup): Promise<IGroup>;
+export interface IGroupRepository extends IBaseRepository<IGroupModel> {
   getGroupsByUser(userId: string | ObjectId): Promise<IGroup[]>;
   deleteGroup(groupId: string | ObjectId): Promise<void>;
   removeMember(roomId: string | ObjectId, memberId: string | ObjectId): Promise<void>;

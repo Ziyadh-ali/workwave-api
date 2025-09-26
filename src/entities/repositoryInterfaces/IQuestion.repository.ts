@@ -1,10 +1,10 @@
+import { IQuestionModel } from "../../frameworks/database/models/QuestionModel";
 import { IQuestion } from "../models/IQuestion";
+import { IBaseRepository } from "./IBase.repository";
 
-export interface IQuestionRepository {
-    create(question: Partial<IQuestion>): Promise<IQuestion>;
+export interface IQuestionRepository extends IBaseRepository<IQuestionModel> {
     findUnanswered(): Promise<IQuestion[]>;
-    findAll(): Promise<IQuestion[]>;
+    findAllQuestions(): Promise<IQuestion[]>;
     answerQuestion(id: string, answer: string, answeredBy: string): Promise<IQuestion | null>;
-    delete(id: string): Promise<void>;
     findByEmployeeId(employeeId : string) : Promise<IQuestion[] | null>;
 }

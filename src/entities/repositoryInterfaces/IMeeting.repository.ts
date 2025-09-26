@@ -1,13 +1,11 @@
 
+import { IMeetingModel } from "../../frameworks/database/models/MeetingModel";
 import { IMeeting } from "../models/Meeting.entities";
+import { IBaseRepository } from "./IBase.repository";
 
 
-export interface IMeetingRepository {
-    createMeeting(meeting : IMeeting) : Promise<IMeeting>;
-    getMeetingById(id : string) : Promise<IMeeting | null>;
+export interface IMeetingRepository extends IBaseRepository<IMeetingModel> {
     getMeetingsByHost(hostId : string) : Promise<IMeeting[]>;
     getMeetingsByEmployeeId(employeeId:  string | string): Promise<IMeeting[]>
     getMeetingByDate(date : Date) : Promise<IMeeting[]>;
-    updateMeeting(id : string , updateData : Partial<IMeeting>) : Promise<IMeeting | null>;
-    deleteMeeting(id : string) : Promise<void>;
 }

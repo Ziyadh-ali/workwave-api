@@ -1,17 +1,14 @@
-import { injectable, inject } from "tsyringe";
+import { injectable } from "tsyringe";
 import { IFaqRepository } from "../../entities/repositoryInterfaces/IFaq.respository";
 import { IFaqs } from "../../entities/models/IFaqs";
 import { FaqModel } from "../../frameworks/database/models/FaqModel";
-import { ObjectId } from "mongoose";
+import { BaseRepository } from "./BaseRepository";
+import { IFaqModel } from './../../frameworks/database/models/FaqModel';
 
 @injectable()
-export class FaqRepository implements IFaqRepository {
-    async createFaq(data: IFaqs): Promise<IFaqs> {
-        return await FaqModel.create(data);
-    }
-
-    async deleteFaq(faqId: string | ObjectId): Promise<void> {
-        await FaqModel.findByIdAndDelete(faqId);
+export class FaqRepository extends BaseRepository<IFaqModel> implements IFaqRepository {
+    constructor() {
+        super(FaqModel)
     }
 
     async find(search: string, skip: number, limit: number): Promise<IFaqs[] | []> {
@@ -30,17 +27,5 @@ export class FaqRepository implements IFaqRepository {
             .sort({ createdAt: -1 });
 
         return faqs;
-    }
-
-    async findFaqById(faqId: string | ObjectId): Promise<IFaqs | null> {
-        return await FaqModel.findById(faqId);
-    }
-
-    async updateFaq(faqId: string | ObjectId, updatedData: Partial<IFaqs>): Promise<IFaqs | null> {
-        return await FaqModel.findByIdAndUpdate(faqId, updatedData, { new: true });
-    }
-
-    async getAllFaqs(): Promise<IFaqs[] | []> {
-        return await FaqModel.find().sort({ createdAt: -1 });
     }
 }

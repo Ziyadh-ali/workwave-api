@@ -1,10 +1,14 @@
 import { IMessage } from "../../entities/models/IMessage.enities";
 import { IMessageRepository } from "../../entities/repositoryInterfaces/IMessage.respository";
 import { injectable } from "tsyringe";
-import { MessageModel } from "../../frameworks/database/models/MessageModel";
+import { IMessageModel, MessageModel } from "../../frameworks/database/models/MessageModel";
+import { BaseRepository } from "./BaseRepository";
 
 @injectable()
-export class MessageRepository implements IMessageRepository {
+export class MessageRepository extends BaseRepository<IMessageModel> implements IMessageRepository {
+    constructor() {
+        super(MessageModel)
+    }
     async createMessage(data: IMessage): Promise<IMessage> {
         const message = await MessageModel.create({
             content: data.content,
@@ -43,9 +47,5 @@ export class MessageRepository implements IMessageRepository {
         await MessageModel.findByIdAndUpdate(messageId, {
             $addToSet: { readBy: userId },
         });
-    }
-
-    async deleteMessage(messageId: string): Promise<void> {
-        await MessageModel.findByIdAndDelete(messageId);
     }
 }
