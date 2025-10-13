@@ -6,6 +6,7 @@ import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { leaveRequestSchema } from "../../shared/validation/validator";
 import { CustomError } from "../../shared/errors/CustomError";
+import { CustomRequest } from "../middlewares/AuthMiddleware";
 
 @injectable()
 export class LeaveRequestController {
@@ -133,15 +134,23 @@ export class LeaveRequestController {
 
   async getAllLeaveRequests(req: Request, res: Response): Promise<void> {
     const { page = "1", limit = "5", status = "" } = req.query;
+    const user = (req as CustomRequest).user
 
     const pageNum = parseInt(page as string, 10);
     const limitNum = parseInt(limit as string, 10);
 
-    const result = await this.leaveRequestUseCase.getAllLeaveRequests({
+    let result = await this.leaveRequestUseCase.getAllLeaveRequests({
       page: pageNum,
       limit: limitNum,
       status: status as string,
     });
+    if(user.role === "hr"){
+      result.leaveRequests = result.leaveRequests.filter((r) => {
+        return r.employeeId._id !== user.id
+      });
+
+      result.totalPages = Math.ceil(result.leaveRequests.length / limitNum);
+    }
     res.status(HTTP_STATUS_CODES.OK).json({
       success: true,
       ...result,
