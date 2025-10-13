@@ -111,6 +111,11 @@ export class AdminRoute {
         verifyAuth("admin"),
         asyncHandler((req: Request, res: Response) => leaveRequestController.getAllLeaveRequests(req, res))
       )
+      .get(
+        "/leave/requests/all",
+        verifyAuth("admin"),
+        asyncHandler((req: Request, res: Response) => leaveRequestController.getAllLeaveRequests(req, res))
+      )
 
       .patch(
         "/leave/requests/:leaveRequestId",

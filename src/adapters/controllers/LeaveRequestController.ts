@@ -156,4 +156,9 @@ export class LeaveRequestController {
       ...result,
     });
   }
+
+  async getEveryLeaveRequests(req: Request , res: Response): Promise<void> {
+    const leaveRequests = await this.leaveRequestUseCase.getEveryRequests();
+    res.status(HTTP_STATUS_CODES.OK).json({leaveRequests});
+  }
 }

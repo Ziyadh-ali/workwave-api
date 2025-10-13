@@ -225,4 +225,18 @@ export class LeaveRequestRepository extends BaseRepository<ILeaveRequest> implem
   ): Promise<LeaveRequest[] | null> {
     return await LeaveRequestModel.find({ employeeId });
   }
+
+  async getEveryLeaveRequests(): Promise<ILeaveRequestAdmin[] | []> {
+    return await LeaveRequestModel.find({ status: "Pending" })
+      .populate<{ leaveTypeId: { _id: ObjectId | string; name: string } }>({
+        path: "leaveTypeId",
+        select: "name",
+      })
+      .populate<{
+        employeeId: { _id: ObjectId | string; fullName: string; role: string };
+      }>({
+        path: "employeeId",
+        select: "fullName role",
+      });
+  }
 }

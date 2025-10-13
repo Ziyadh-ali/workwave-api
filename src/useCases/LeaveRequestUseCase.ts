@@ -251,4 +251,9 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     if(!leaveRequest) return null;
     return LeaveRequestMapper.toResponseDTO(leaveRequest)
   }
+
+  async getEveryRequests(): Promise<LeaveRequestAdminResponseDTO[] | []> {
+    const leaveRequests =  await this.leaveRequestRepository.getEveryLeaveRequests();
+    return leaveRequests.map(LeaveRequestMapper.toAdminResponseDTO);
+  }
 }

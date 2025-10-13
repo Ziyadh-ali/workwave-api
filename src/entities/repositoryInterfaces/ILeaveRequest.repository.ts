@@ -25,4 +25,5 @@ export interface ILeaveRequestRepository extends IBaseRepository<ILeaveRequest> 
     setRejectionReason(leaveRequestId: string, reason: string): Promise<void>;
     getLeaveRequestForDate(employeeId: string, date: Date): Promise<LeaveRequest | null>;
     getFilteredLeaveRequests(filters: LeaveRequestFilter): Promise<ILeaveRequestAdmin[]>;
+    getEveryLeaveRequests(): Promise<ILeaveRequestAdmin[] | []>
 }
