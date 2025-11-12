@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 import { IGroup } from "../models/IGroup.entities";
 import { IBaseRepository } from "./IBase.repository";
-import { IGroupModel } from "../../frameworks/database/models/GroupModel";
+import { IGroupModel } from "../../adapters/database/models/GroupModel";
 
 export interface IGroupRepository extends IBaseRepository<IGroupModel> {
   getGroupsByUser(userId: string | ObjectId): Promise<IGroup[]>;

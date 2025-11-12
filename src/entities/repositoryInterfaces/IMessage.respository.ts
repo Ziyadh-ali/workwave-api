@@ -1,4 +1,4 @@
-import { IMessageModel } from "../../frameworks/database/models/MessageModel";
+import { IMessageModel } from "../../adapters/database/models/MessageModel";
 import { IMessage } from "../models/IMessage.enities";
 import { IBaseRepository } from "./IBase.repository";
 

@@ -1,4 +1,4 @@
-import { ILeaveType } from "../../frameworks/database/models/LeaveTypeModel";
+import { ILeaveType } from "../../adapters/database/models/LeaveTypeModel";
 import { LeaveType } from "../models/LeaveType.entity";
 import { IBaseRepository } from "./IBase.repository";
 

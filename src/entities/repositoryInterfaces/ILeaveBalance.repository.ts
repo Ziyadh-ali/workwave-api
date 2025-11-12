@@ -1,4 +1,4 @@
-import { ILeaveBalance } from "../../frameworks/database/models/LeaveBalanceModel";
+import { ILeaveBalance } from "../../adapters/database/models/LeaveBalanceModel";
 import { LeaveBalance } from "../models/LeaveBalance.entity";
 import { IBaseRepository } from "./IBase.repository";
 

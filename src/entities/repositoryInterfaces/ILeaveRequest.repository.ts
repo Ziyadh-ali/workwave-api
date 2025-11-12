@@ -1,4 +1,4 @@
-import { ILeaveRequest } from "../../frameworks/database/models/LeaveRequestModel";
+import { ILeaveRequest } from "../../adapters/database/models/LeaveRequestModel";
 import {  ILeaveRequestAdmin, ILeaveRequestEmployee, LeaveRequest, LeaveRequestFilter } from "../models/LeaveRequest.entity";
 import { IBaseRepository } from "./IBase.repository";
 

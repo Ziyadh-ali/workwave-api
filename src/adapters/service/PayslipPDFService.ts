@@ -4,8 +4,8 @@ import { inject, injectable } from "tsyringe";
 import { IPayrollUseCase } from "../../entities/useCaseInterface/IPayrollUseCase";
 import { IPayroll } from "../../entities/models/IPayroll";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
-import { Employee } from "../../entities/models/employeeEntities/EmployeeEnitity";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
+import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs/EmployeeDTO";
 
 @injectable()
 export class PayslipPDFService {
@@ -21,7 +21,7 @@ export class PayslipPDFService {
         year: number,
     ) {
         const payroll: IPayroll | null = await this.payrollUseCase.getPayrollByMonthAndEmployeeId(employeeId, month, year);
-        const employee: Employee | null = await this.employeeUseCase.getEmployeeDetails(employeeId);
+        const employee = await this.employeeUseCase.getEmployeeDetails(employeeId);
 
 
         if (!payroll || !employee) {
@@ -51,7 +51,7 @@ export class PayslipPDFService {
 
     private buildPDFContent(
         doc: PDFKit.PDFDocument,
-        employee: Employee,
+        employee: EmployeeResponseDTO,
         payroll: IPayroll,
         month: number,
         year: number

@@ -1,4 +1,4 @@
-import { IQuestionModel } from "../../frameworks/database/models/QuestionModel";
+import { IQuestionModel } from "../../adapters/database/models/QuestionModel";
 import { IQuestion } from "../models/IQuestion";
 import { IBaseRepository } from "./IBase.repository";
 

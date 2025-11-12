@@ -1,5 +1,5 @@
 
-import { IMeetingModel } from "../../frameworks/database/models/MeetingModel";
+import { IMeetingModel } from "../../adapters/database/models/MeetingModel";
 import { IMeeting } from "../models/Meeting.entities";
 import { IBaseRepository } from "./IBase.repository";
 

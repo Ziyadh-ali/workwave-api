@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { injectable, inject } from 'tsyringe';
-import { PayslipPDFService } from '../service/PayslipPDFService';
 import { HTTP_STATUS_CODES } from '../../shared/constants';
+import { PayslipPDFService } from '../../adapters/service/PayslipPDFService';
 
 @injectable()
 export class PayslipController {
