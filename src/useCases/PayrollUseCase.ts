@@ -2,17 +2,18 @@ import { injectable, inject } from "tsyringe";
 import { IPayrollUseCase } from "../entities/useCaseInterface/IPayrollUseCase";
 import { IPayrollRepository } from "../entities/repositoryInterfaces/IPayrollRepository";
 import { IMonthlyAttendanceSummary } from "../entities/models/IMonthlyAttendanceSummary";
-import { EmployeeModel } from "../frameworks/database/models/employee/EmployeeModel";
 import { CustomError } from "../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../shared/constants";
 import { PayrollResponseDTO, PayrollResponseWithEmployeeDTO } from "../entities/dtos/ResponseDTOs/PayrollDTO";
 import { PayrollMapper } from "../entities/mapping/PayrollMapper";
+import { IEmployeeRepository } from "../entities/repositoryInterfaces/employee/EmployeeRepository";
 
 
 @injectable()
 export class PayrollUseCase implements IPayrollUseCase {
     constructor(
-        @inject("IPayrollRepository") private payrollRepository: IPayrollRepository,
+        @inject("IPayrollRepository") private _payrollRepository: IPayrollRepository,
+        @inject("IEmployeeRepository") private _employeeRepository: IEmployeeRepository,
     ) { }
 
     async generatePayroll(
@@ -31,7 +32,7 @@ export class PayrollUseCase implements IPayrollUseCase {
             throw new CustomError("Present days cannot exceed working days" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
-        const payroll = await this.payrollRepository.generatePayroll(summary, employeeSalary, taxPercentage);
+        const payroll = await this._payrollRepository.generatePayroll(summary, employeeSalary, taxPercentage);
         return PayrollMapper.toResponseDTO(payroll);
     }
 
@@ -44,7 +45,7 @@ export class PayrollUseCase implements IPayrollUseCase {
 
         return Promise.all(
             approvedSummaries.map(async summary => {
-                const employee = await EmployeeModel.findById(summary.employeeId);
+                const employee = await this._employeeRepository.findById(summary.employeeId.toString());
                 if (!employee) {
                     throw new CustomError(`Employee not found for ID: ${summary.employeeId}` , HTTP_STATUS_CODES.BAD_REQUEST);
                 }
@@ -60,7 +61,7 @@ export class PayrollUseCase implements IPayrollUseCase {
         status?: "Pending" | "Paid";
     }): Promise<PayrollResponseWithEmployeeDTO[]> {
         
-        const payrolls = await this.payrollRepository.getPayrollRecords(filter);
+        const payrolls = await this._payrollRepository.getPayrollRecords(filter);
         return payrolls.map(PayrollMapper.toResponseWithEmployeeDTO);
     }
 
@@ -69,21 +70,21 @@ export class PayrollUseCase implements IPayrollUseCase {
             throw new CustomError("Can only update status to 'Paid'" , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
-        const payroll = await this.payrollRepository.updatePayrollStatus(payrollId, status);
+        const payroll = await this._payrollRepository.updatePayrollStatus(payrollId, status);
         return PayrollMapper.toResponseDTO(payroll);
     }
     async getPayrollByEmployeeId(employeeId: string): Promise<PayrollResponseWithEmployeeDTO[] | []> {
-        const payrolls =  await this.payrollRepository.getPayrollByEmployeeId(employeeId);
+        const payrolls =  await this._payrollRepository.getPayrollByEmployeeId(employeeId);
         return payrolls.map(PayrollMapper.toResponseWithEmployeeDTO);
     }
 
     async getPayrollByMonthAndEmployeeId(employeeId: string, month: number, year: number): Promise<PayrollResponseDTO | null> {
-        const payroll =  await this.payrollRepository.getPayrollByMonthAndEmployeeId(employeeId , month , year);
+        const payroll =  await this._payrollRepository.getPayrollByMonthAndEmployeeId(employeeId , month , year);
         return payroll ? PayrollMapper.toResponseDTO(payroll) : null;
     }
 
     async getAllPayroll(): Promise<PayrollResponseDTO[] | []> {
-        const payrolls =  await this.payrollRepository.getAllPayroll();
+        const payrolls =  await this._payrollRepository.getAllPayroll();
         return PayrollMapper.toResponseList(payrolls);
     }
 }

@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { IMeetingRepository } from "../../entities/repositoryInterfaces/IMeeting.repository";
 import { IMeeting } from "../../entities/models/Meeting.entities";
-import { IMeetingModel, meetingModel } from "../../frameworks/database/models/MeetingModel";
+import { IMeetingModel, meetingModel } from "../database/models/MeetingModel";
 import { BaseRepository } from "./BaseRepository";
 
 @injectable()

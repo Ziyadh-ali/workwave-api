@@ -7,8 +7,8 @@ import {
   LeaveRequestQuery,
 } from "../../entities/models/LeaveRequest.entity";
 import { ILeaveRequestRepository } from "../../entities/repositoryInterfaces/ILeaveRequest.repository";
-import { ILeaveRequest, LeaveRequestModel } from "../../frameworks/database/models/LeaveRequestModel";
-import { EmployeeModel } from "../../frameworks/database/models/employee/EmployeeModel";
+import { ILeaveRequest, LeaveRequestModel } from "../database/models/LeaveRequestModel";
+import { EmployeeModel } from "../database/models/employee/EmployeeModel";
 import { ObjectId } from "mongoose";
 import { BaseRepository } from "./BaseRepository";
 

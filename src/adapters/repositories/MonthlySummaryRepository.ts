@@ -1,13 +1,13 @@
 import { injectable } from "tsyringe";
 import { IMonthlySummaryRepository } from "../../entities/repositoryInterfaces/IMonthlySummaryRepository";
 import { IMonthlyAttendanceSummary } from "../../entities/models/IMonthlyAttendanceSummary";
-import { EmployeeModel } from "../../frameworks/database/models/employee/EmployeeModel";
+import { EmployeeModel } from "../database/models/employee/EmployeeModel";
 import { fetchHolidayDates } from "../../shared/utils/fetchHolidayDates";
-import { MonthlySummaryModel } from "../../frameworks/database/models/MonthlyAttendanceSummaryModel";
-import { attendanceModel } from "../../frameworks/database/models/AttendanceModel";
-import { LeaveRequestModel } from "../../frameworks/database/models/LeaveRequestModel";
+import { MonthlySummaryModel } from "../database/models/MonthlyAttendanceSummaryModel";
+import { attendanceModel } from "../database/models/AttendanceModel";
+import { LeaveRequestModel } from "../database/models/LeaveRequestModel";
 import { Types } from "mongoose";
-import { LeaveTypeModel } from "../../frameworks/database/models/LeaveTypeModel";
+import { LeaveTypeModel } from "../database/models/LeaveTypeModel";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 

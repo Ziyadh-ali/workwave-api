@@ -1,7 +1,7 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "./CloudinaryTmp";
-import { CustomRequest } from "../middlewares/AuthMiddleware";
+import cloudinary from "../../adapters/service/CloudinaryTmp";
+import { CustomRequest } from "./AuthMiddleware";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 

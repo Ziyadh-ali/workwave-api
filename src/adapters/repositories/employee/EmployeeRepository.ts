@@ -1,7 +1,7 @@
 import { IEmployeeRepository } from "../../../entities/repositoryInterfaces/employee/EmployeeRepository";
 import { injectable } from "tsyringe";
 import { Employee, EmployeeFilter } from "../../../entities/models/employeeEntities/EmployeeEnitity";
-import { EmployeeModel } from "../../../frameworks/database/models/employee/EmployeeModel";
+import { EmployeeModel } from "../../database/models/employee/EmployeeModel";
 
 @injectable()
 export class EmployeeRepository implements IEmployeeRepository {

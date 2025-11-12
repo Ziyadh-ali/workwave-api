@@ -3,15 +3,15 @@ import { IPayrollUseCase } from "../../entities/useCaseInterface/IPayrollUseCase
 import { injectable, inject } from "tsyringe";
 import { IMonthlySummaryUseCase } from "../../entities/useCaseInterface/IMonthlySummaryUseCase";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
-import { EmployeeModel } from "../../frameworks/database/models/employee/EmployeeModel";
 import { IMonthlyAttendanceSummary } from "../../entities/models/IMonthlyAttendanceSummary";
+import { IEmployeeManagementUseCase } from "../../entities/useCaseInterface/IEmployeeManagementUseCase";
 
 @injectable()
 export class PayrollController {
   constructor(
-    @inject("IMonthlySummaryUseCase")
-    private monthlySummaryUseCase: IMonthlySummaryUseCase,
-    @inject("IPayrollUseCase") private payrollUseCase: IPayrollUseCase
+    @inject("IMonthlySummaryUseCase") private _monthlySummaryUseCase: IMonthlySummaryUseCase,
+    @inject("IPayrollUseCase") private _payrollUseCase: IPayrollUseCase,
+    @inject("IEmployeeManagementUseCase") private _employeeManagementUseCase: IEmployeeManagementUseCase,
   ) {}
 
   async generatePayroll(req: Request, res: Response) {
@@ -24,7 +24,7 @@ export class PayrollController {
       return;
     }
 
-    const summaries = await this.monthlySummaryUseCase.getExistingSummaries(
+    const summaries = await this._monthlySummaryUseCase.getExistingSummaries(
       month,
       year
     );
@@ -40,7 +40,7 @@ export class PayrollController {
       return;
     }
 
-    const employee = await EmployeeModel.findById(employeeId);
+    const employee = await this._employeeManagementUseCase.findById(employeeId);
     if (!employee) {
       res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
         message: "Employee not found",
@@ -48,7 +48,7 @@ export class PayrollController {
       return;
     }
 
-    const payroll = await this.payrollUseCase.generatePayroll(
+    const payroll = await this._payrollUseCase.generatePayroll(
       {
         ...summary,
         employeeId: summary.employeeId._id,
@@ -76,7 +76,7 @@ export class PayrollController {
       return;
     }
 
-    const summaries = await this.monthlySummaryUseCase.getExistingSummaries(
+    const summaries = await this._monthlySummaryUseCase.getExistingSummaries(
       month,
       year
     );
@@ -96,7 +96,7 @@ export class PayrollController {
         generatedAt: s.generatedAt ? new Date(s.generatedAt) : undefined,
       })
     );
-    const payrolls = await this.payrollUseCase.generateBulkPayroll(
+    const payrolls = await this._payrollUseCase.generateBulkPayroll(
       domainSummaries,
       taxPercentage
     );
@@ -122,7 +122,7 @@ export class PayrollController {
       filter.status = status as "Pending" | "Paid";
     }
 
-    const payrolls = await this.payrollUseCase.getPayrollRecords(filter);
+    const payrolls = await this._payrollUseCase.getPayrollRecords(filter);
 
     res.status(HTTP_STATUS_CODES.OK).json({
       success: true,
@@ -141,7 +141,7 @@ export class PayrollController {
       return;
     }
 
-    const updatedPayroll = await this.payrollUseCase.updatePayrollStatus(
+    const updatedPayroll = await this._payrollUseCase.updatePayrollStatus(
       payrollId,
       "Paid"
     );
@@ -154,7 +154,7 @@ export class PayrollController {
 
   async getPayslipByEmployeeId(req: Request, res: Response): Promise<void> {
     const { employeeId } = req.params;
-    const payslip = await this.payrollUseCase.getPayrollByEmployeeId(
+    const payslip = await this._payrollUseCase.getPayrollByEmployeeId(
       employeeId
     );
     res.status(HTTP_STATUS_CODES.OK).json({
@@ -163,7 +163,7 @@ export class PayrollController {
   }
 
   async getAllPayroll(req: Request, res: Response): Promise<void> {
-    const payrolls = await this.payrollUseCase.getAllPayroll();
+    const payrolls = await this._payrollUseCase.getAllPayroll();
 
     res.status(HTTP_STATUS_CODES.OK).json({
       payrolls,

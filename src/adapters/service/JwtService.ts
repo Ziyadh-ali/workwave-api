@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
-import { TJwtPayload ,IJwtService} from "../../entities/services/JwtInterface";
-import  jwt ,{JwtPayload,Secret } from "jsonwebtoken";
+import { TJwtPayload, IJwtService } from "../../entities/services/JwtInterface";
+import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { config } from "../../shared/config";
 import ms from "ms";
 import { CustomError } from "../../shared/errors/CustomError";
@@ -8,44 +8,44 @@ import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class JwtService implements IJwtService {
-    private accessSecret : Secret;
-    private accessExpiresIn : string;
-    private refreshSecret : Secret;
-    private refreshExpiresIn : string;
-    private resetTokenSecret : string;
-    private resetTokenExpiresIn : string;
-    constructor(){
+    private accessSecret: Secret;
+    private accessExpiresIn: string;
+    private refreshSecret: Secret;
+    private refreshExpiresIn: string;
+    private resetTokenSecret: string;
+    private resetTokenExpiresIn: string;
+    constructor() {
         this.accessSecret = config.jwt.ACCESS_SECRET_KEY,
-        this.accessExpiresIn = config.jwt.ACCESS_EXPIRES_IN,
+            this.accessExpiresIn = config.jwt.ACCESS_EXPIRES_IN,
 
-        this.refreshSecret = config.jwt.REFRESH_SECRET_KEY,
-        this.refreshExpiresIn = config.jwt.REFRESH_EXPIRES_IN,
+            this.refreshSecret = config.jwt.REFRESH_SECRET_KEY,
+            this.refreshExpiresIn = config.jwt.REFRESH_EXPIRES_IN,
 
-        this.resetTokenSecret = config.jwt.RESET_PASSWORD_SECRET_KEY,
-        this.resetTokenExpiresIn = config.jwt.RESET_TOKEN_EXPIRES_IN
+            this.resetTokenSecret = config.jwt.RESET_PASSWORD_SECRET_KEY,
+            this.resetTokenExpiresIn = config.jwt.RESET_TOKEN_EXPIRES_IN
     }
 
     generateAccessToken(data: TJwtPayload): string {
-        return jwt.sign(data , this.accessSecret, {expiresIn : this.accessExpiresIn as ms.StringValue});
+        return jwt.sign(data, this.accessSecret, { expiresIn: this.accessExpiresIn as ms.StringValue });
     }
 
     generateRefreshToken(data: TJwtPayload): string {
-        return jwt.sign(data, this.refreshSecret,{expiresIn : this.refreshExpiresIn as ms.StringValue});
+        return jwt.sign(data, this.refreshSecret, { expiresIn: this.refreshExpiresIn as ms.StringValue });
     }
 
     verifyAccessToken(token: string): JwtPayload | null {
         try {
             return jwt.verify(token, this.accessSecret) as TJwtPayload
-        } catch (error) {
-            throw new CustomError("Invalid or Expired Access Token" , HTTP_STATUS_CODES.BAD_REQUEST);
+        } catch {
+            throw new CustomError("Invalid or Expired Access Token", HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 
     verifyRefreshToken(token: string): JwtPayload | null {
         try {
             return jwt.verify(token, this.refreshSecret) as JwtPayload;
-        } catch (error) {
-            throw new CustomError("Invalid or Expired Refresh Token" , HTTP_STATUS_CODES.BAD_REQUEST);
+        } catch {
+            throw new CustomError("Invalid or Expired Refresh Token", HTTP_STATUS_CODES.BAD_REQUEST);
         }
     }
 
@@ -55,14 +55,14 @@ export class JwtService implements IJwtService {
     }
 
     generateResetToken(email: string): string {
-        return jwt.sign({email : email} , this.resetTokenSecret ,{expiresIn : this.resetTokenExpiresIn as ms.StringValue});
+        return jwt.sign({ email: email }, this.resetTokenSecret, { expiresIn: this.resetTokenExpiresIn as ms.StringValue });
     }
 
-    verifyResetToken(resetToken: string): {email : string} | null {
+    verifyResetToken(resetToken: string): { email: string } | null {
         try {
-            const decoded = jwt.verify(resetToken, this.resetTokenSecret) as {email : string};
+            const decoded = jwt.verify(resetToken, this.resetTokenSecret) as { email: string };
             return decoded;
-        } catch (error) {
+        } catch {
             return null;
         }
     }

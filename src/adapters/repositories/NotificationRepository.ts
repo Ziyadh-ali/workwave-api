@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { INotification } from "../../entities/models/INotification";
 import { INotificationRepository } from "../../entities/repositoryInterfaces/INotification.repository";
-import { NotificationModel } from "../../frameworks/database/models/NotificationModel";
+import { NotificationModel } from "../database/models/NotificationModel";
 import mongoose from "mongoose";
 
 @injectable()

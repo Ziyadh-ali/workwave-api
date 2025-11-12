@@ -7,7 +7,7 @@ import { Response } from "express";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { loginSchema } from "../../shared/validation/validator";
 import { IJwtService } from "../../entities/services/JwtInterface";
-import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
+import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
 
 @injectable()

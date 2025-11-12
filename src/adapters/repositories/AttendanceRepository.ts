@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { IAttendanceRepository } from "../../entities/repositoryInterfaces/IAttendance.repository";
 import { Attendance } from "../../entities/models/Attendance.entities";
-import { attendanceModel, IAttendanceModel } from "../../frameworks/database/models/AttendanceModel";
+import { attendanceModel, IAttendanceModel } from "../database/models/AttendanceModel";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { BaseRepository } from "./BaseRepository";

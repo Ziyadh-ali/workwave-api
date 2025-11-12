@@ -1,7 +1,7 @@
 import { IAdminRepository } from "../../../entities/repositoryInterfaces/admin/AdminRepository";
 import { Admin } from "../../../entities/models/adminEntities/AdminEnitity";
 import { injectable } from "tsyringe";
-import { AdminModel } from "../../../frameworks/database/models/admin/AdminModel";
+import { AdminModel } from "../../database/models/admin/AdminModel";
 
 @injectable()
 export class AdminRepository implements IAdminRepository {

@@ -7,7 +7,7 @@ import {
 import { IEmployeeManagementUseCase } from "../../entities/useCaseInterface/IEmployeeManagementUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { eventHandler } from "../../shared/eventHandler";
-import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
+import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
 import { CreateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs/EmployeeDTO";
 import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs/EmployeeDTO";
@@ -91,5 +91,13 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
   async getDevelopers(): Promise<EmployeeResponseDTO[]> {
     const developers = await this.employeeRepository.getDevelopers();
     return EmployeeMapper.toResponseDTOs(developers as Employee[]);
+  }
+
+  async findById(employeeId: string): Promise<EmployeeResponseDTO | null> {
+    const employee = await this.employeeRepository.findById(employeeId);
+    if (!employee) {
+      return null;
+    }
+    return EmployeeMapper.toResponseDTO(employee);
   }
 }

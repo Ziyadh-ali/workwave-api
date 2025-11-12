@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { IQuestionRepository } from "../../entities/repositoryInterfaces/IQuestion.repository";
-import { IQuestionModel, QuestionModel } from "../../frameworks/database/models/QuestionModel";
+import { IQuestionModel, QuestionModel } from "../database/models/QuestionModel";
 import { IQuestion } from "../../entities/models/IQuestion";
 import { BaseRepository } from "./BaseRepository";
 

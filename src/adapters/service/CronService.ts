@@ -2,7 +2,7 @@ import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employe
 import { IAttendanceRepository } from '../../entities/repositoryInterfaces/IAttendance.repository';
 import cron from "node-cron";
 import { inject, injectable } from "tsyringe";
-import { cronService } from '../../frameworks/di/resolver';
+import { cronService } from '../../Presentation/di/resolver';
 
 @injectable()
 export class CronService {

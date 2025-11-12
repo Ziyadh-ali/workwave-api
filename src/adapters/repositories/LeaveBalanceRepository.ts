@@ -1,6 +1,6 @@
 import { injectable  } from "tsyringe";
 import { ILeaveBalanceRepository } from "../../entities/repositoryInterfaces/ILeaveBalance.repository";
-import { ILeaveBalance, LeaveBalanceModel } from "../../frameworks/database/models/LeaveBalanceModel";
+import { ILeaveBalance, LeaveBalanceModel } from "../database/models/LeaveBalanceModel";
 import { LeaveBalance } from "../../entities/models/LeaveBalance.entity";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";

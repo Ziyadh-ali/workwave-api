@@ -1,6 +1,6 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import cloudinary from "./CloudinaryTmp";
+import cloudinary from "../../adapters/service/CloudinaryTmp";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 
@@ -16,7 +16,7 @@ const chatMediaStorage = new CloudinaryStorage({
             } else if (file.mimetype.startsWith("video/")) {
                 resourceType = "video";
             }else if (file.mimetype === "application/pdf") {
-                resourceType = "raw"; 
+                resourceType = "raw";
             }
 
             return {

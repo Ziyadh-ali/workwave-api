@@ -1,6 +1,6 @@
 import { CreateEmployeeRequestDTO } from "../dtos/RequestDTOs/EmployeeDTO";
 import { EmployeeResponseDTO } from "../dtos/ResponseDTOs/EmployeeDTO";
-import { Employee, EmployeeFilter } from "../models/employeeEntities/EmployeeEnitity";
+import { EmployeeFilter } from "../models/employeeEntities/EmployeeEnitity";
 
 
 export interface IEmployeeManagementUseCase {
@@ -16,6 +16,8 @@ export interface IEmployeeManagementUseCase {
         active: number;
         inactive: number,
     }>;
+
+    findById(employeeId : string) : Promise<EmployeeResponseDTO | null>;
 
     deleteEmployee(employeeId : string) : Promise<void>;
 

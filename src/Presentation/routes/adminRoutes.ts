@@ -10,7 +10,7 @@ import {
   payrollController,
   faqController,
 } from '../di/resolver';
-import { verifyAuth } from '../../adapters/middlewares/AuthMiddleware';
+import { verifyAuth } from '../middlewares/AuthMiddleware';
 import { leaveTypeController } from '../di/resolver';
 import asyncHandler from "express-async-handler"
 

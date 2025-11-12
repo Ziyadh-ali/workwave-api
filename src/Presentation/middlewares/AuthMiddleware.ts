@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { JwtService } from "../service/JwtService";
 import { JwtPayload } from "jsonwebtoken";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { ObjectId } from "mongoose";
+import { JwtService } from "../../adapters/service/JwtService";
 
 const tokenService = new JwtService();
 

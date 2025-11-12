@@ -19,9 +19,9 @@ import {
     payrollController,
     pdfController
 } from "../di/resolver";
-import { verifyAuth } from "../../adapters/middlewares/AuthMiddleware";
-import upload from "../../adapters/service/Multer";
-import { chatMediaUpload } from "../../adapters/service/ChatUploadMulter";
+import { verifyAuth } from "../middlewares/AuthMiddleware";
+import upload from "../middlewares/Multer";
+import { chatMediaUpload } from "../middlewares/ChatUploadMulter";
 import { uploadEmployeeProfile } from "../../adapters/service/DeletePreviousTmp";
 import asyncHandler from "express-async-handler"
 

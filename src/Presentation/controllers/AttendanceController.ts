@@ -3,8 +3,8 @@ import { IAttendanceUseCase } from "../../entities/useCaseInterface/IAttendanceU
 import { injectable, inject } from "tsyringe";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { MESSAGES } from "../../shared/constants";
-import { CustomRequest } from "../middlewares/AuthMiddleware";
 import { CustomError } from "../../shared/errors/CustomError";
+import { CustomRequest } from "../middlewares/AuthMiddleware";
 
 @injectable()
 export class AttendanceController {

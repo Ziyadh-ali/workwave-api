@@ -1,5 +1,5 @@
 import { eventHandler } from "./eventHandler";
-import { leaveBalanceUseCase, leaveTypeRepository } from "../frameworks/di/resolver";
+import { leaveBalanceUseCase, leaveTypeRepository } from "../Presentation/di/resolver";
 
 eventHandler.on("EMPLOYEE_CREATED", async (employeeId: string) => {
     try {

@@ -1,7 +1,7 @@
 import { injectable , inject } from "tsyringe";
 import { IResetPasswordUseCase } from "../../entities/useCaseInterface/IResetPasswordUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
-import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
+import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
 import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/EmployeeRepository";
 import { IJwtService } from "../../entities/services/JwtInterface";
 import { CustomError } from "../../shared/errors/CustomError";

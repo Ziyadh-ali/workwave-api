@@ -1,7 +1,7 @@
 import { injectable } from "tsyringe";
 import { IGroupRepository } from "../../entities/repositoryInterfaces/IGroup.repository";
 import { IGroup } from "../../entities/models/IGroup.entities";
-import { GroupModel, IGroupModel } from "../../frameworks/database/models/GroupModel";
+import { GroupModel, IGroupModel } from "../database/models/GroupModel";
 import { ObjectId } from "mongoose";
 import { BaseRepository } from "./BaseRepository";
 

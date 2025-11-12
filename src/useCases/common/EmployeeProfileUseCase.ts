@@ -3,7 +3,7 @@ import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employe
 import { Employee } from "../../entities/models/employeeEntities/EmployeeEnitity";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
-import { IBcrypt } from "../../frameworks/security/bcrypt.interface";
+import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
 import { UpdateEmployeeRequestDTO } from "../../entities/dtos/RequestDTOs/EmployeeDTO";
 import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs/EmployeeDTO";

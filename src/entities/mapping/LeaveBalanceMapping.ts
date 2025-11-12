@@ -6,7 +6,7 @@ import { LeaveBalance } from "../models/LeaveBalance.entity";
 export class LeaveBalanceMapper {
   static toEntity(dto: CreateLeaveBalanceRequestDTO): LeaveBalance {
     return {
-      _id: undefined as any,
+      _id: undefined,
       employeeId: dto.employeeId,
       leaveBalances: dto.leaveBalances.map((lb) => ({
         leaveTypeId: lb.leaveTypeId,

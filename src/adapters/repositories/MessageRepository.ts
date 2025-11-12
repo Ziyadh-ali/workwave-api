@@ -1,7 +1,7 @@
 import { IMessage } from "../../entities/models/IMessage.enities";
 import { IMessageRepository } from "../../entities/repositoryInterfaces/IMessage.respository";
 import { injectable } from "tsyringe";
-import { IMessageModel, MessageModel } from "../../frameworks/database/models/MessageModel";
+import { IMessageModel, MessageModel } from "../database/models/MessageModel";
 import { BaseRepository } from "./BaseRepository";
 
 @injectable()
