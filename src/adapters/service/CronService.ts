@@ -1,29 +1,50 @@
 import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employee/EmployeeRepository';
 import { IAttendanceRepository } from '../../entities/repositoryInterfaces/IAttendance.repository';
-import cron from "node-cron";
 import { inject, injectable } from "tsyringe";
-import { cronService } from '../../Presentation/di/resolver';
+import { fetchHolidayDates } from '../../shared/utils/fetchHolidayDates';
 
 @injectable()
 export class CronService {
     constructor(
-        @inject("IEmployeeRepository") private employeeRepository: IEmployeeRepository,
-        @inject("IAttendanceRepository") private attendanceRepository: IAttendanceRepository,
+        @inject("IEmployeeRepository") private _employeeRepository: IEmployeeRepository,
+        @inject("IAttendanceRepository") private _attendanceRepository: IAttendanceRepository,
     ) { }
 
     async markAbsentees() {
         const today = new Date();
-        const employees = await this.employeeRepository.getAllEmployees();
-        const attendances = await this.attendanceRepository.getEveryAttendanceByDate(today);
 
-        const presentedEmployeeIds = new Set(attendances?.map(a => a.employeeId));
+        const day = today.getDay(); 
+        if (day === 0 || day === 6) {
+            console.log("Weekend — skipping absentee marking");
+            return;
+        }
+
+        const year = today.getFullYear();
+        const holidays = await fetchHolidayDates(year);
+
+        const formattedToday = today.toISOString().split("T")[0];
+
+        if (holidays.includes(formattedToday)) {
+            console.log("Holiday — skipping absentee marking");
+            return;
+        }
+
+        const employees = await this._employeeRepository.getAllEmployees();
+        const todaysAttendance = await this._attendanceRepository.getEveryAttendanceByDate(today);
+
+        const presentedEmployeeIds = new Set(todaysAttendance?.map(a => a.employeeId));
 
         if (employees) {
             for (const employee of employees) {
-                if (employee._id !== undefined && !presentedEmployeeIds.has(employee._id!)) {
-                    const attendance = await this.attendanceRepository.createAttendance(employee._id.toString(), today);
-                    if (attendance && attendance._id !== undefined) {
-                        await this.attendanceRepository.updateStatus(attendance._id.toString(), "Absent");
+                if (!employee._id) continue;
+
+                const id = employee._id.toString();
+
+                if (!presentedEmployeeIds.has(employee._id)) {
+                    const attendance = await this._attendanceRepository.createAttendance(id, today);
+
+                    if (attendance && attendance._id) {
+                        await this._attendanceRepository.updateStatus(attendance._id.toString(), "Absent");
                     }
                 }
             }
@@ -33,6 +54,3 @@ export class CronService {
     }
 }
 
-cron.schedule("50 23 * * *", () => cronService.markAbsentees());
-
-console.log("Scheduler running...");

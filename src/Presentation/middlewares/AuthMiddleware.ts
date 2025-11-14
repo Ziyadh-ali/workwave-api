@@ -1,23 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { JwtPayload } from "jsonwebtoken";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
-import { ObjectId } from "mongoose";
 import { JwtService } from "../../adapters/service/JwtService";
+import { CustomJwtPayload, CustomRequest } from "../../entities/services/JwtInterface";
 
 const tokenService = new JwtService();
-
-
-export interface CustomJwtPayload extends JwtPayload {
-    id: string | ObjectId;
-    email: string;
-    role: string;
-    access_token: string;
-    refresh_token: string;
-};
-
-export interface CustomRequest extends Request {
-    user: CustomJwtPayload;
-}
 
 const extractToken = (
     req: Request,

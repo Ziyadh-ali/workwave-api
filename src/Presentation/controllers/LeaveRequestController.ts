@@ -4,35 +4,22 @@ import { Request, Response } from "express";
 import { MESSAGES } from "../../shared/constants";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
-import { leaveRequestSchema } from "../../shared/validation/validator";
 import { CustomError } from "../../shared/errors/CustomError";
-import { CustomRequest } from "../middlewares/AuthMiddleware";
+import { CustomRequest } from "../../entities/services/JwtInterface";
 
 @injectable()
 export class LeaveRequestController {
   constructor(
     @inject("ILeaveRequestUseCase")
-    private leaveRequestUseCase: ILeaveRequestUseCase,
+    private _leaveRequestUseCase: ILeaveRequestUseCase,
     @inject("IEmployeeProfileUseCase")
-    private employeeProfileUseCase: IEmployeeProfileUseCase
+    private _employeeProfileUseCase: IEmployeeProfileUseCase
   ) {}
 
   async createLeaveRequest(req: Request, res: Response): Promise<void> {
     const { data } = req.body;
 
-    const validation = leaveRequestSchema.safeParse(data);
-    if (!validation.success) {
-      res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
-        success: false,
-        message: "Validation failed",
-        errors: validation.error.errors.map((err) => ({
-          field: err.path.join("."),
-          message: err.message,
-        })),
-      });
-    }
-
-    const user = await this.employeeProfileUseCase.getEmployeeDetails(
+    const user = await this._employeeProfileUseCase.getEmployeeDetails(
       data?.employeeId
     );
     const newData = {
@@ -40,10 +27,10 @@ export class LeaveRequestController {
       assignedManager: user?.manager,
       employeeRole: user?.role,
     };
-    const leaveRequest = await this.leaveRequestUseCase.createLeaveRequest(
+    
+    const leaveRequest = await this._leaveRequestUseCase.createLeaveRequest(
       newData
     );
-
     if (!leaveRequest) {
       res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({
         success: false,
@@ -65,7 +52,7 @@ export class LeaveRequestController {
     const pageNum = parseInt(page as string, 10);
     const limitNum = parseInt(limit as string, 10);
 
-    const result = await this.leaveRequestUseCase.getLeaveRequestByEmployee({
+    const result = await this._leaveRequestUseCase.getLeaveRequestByEmployee({
       employeeId,
       page: pageNum,
       limit: limitNum,
@@ -86,7 +73,7 @@ export class LeaveRequestController {
       );
     }
 
-    const leaveRequest = await this.leaveRequestUseCase.getLeaveRequestById(
+    const leaveRequest = await this._leaveRequestUseCase.getLeaveRequestById(
       leaveRequestId
     );
 
@@ -98,10 +85,10 @@ export class LeaveRequestController {
     }
 
     if (status === "Rejected") {
-      await this.leaveRequestUseCase.setRejectionReason(leaveRequestId, reason);
+      await this._leaveRequestUseCase.setRejectionReason(leaveRequestId, reason);
     }
 
-    await this.leaveRequestUseCase.updateLeaveRequestStatus(
+    await this._leaveRequestUseCase.updateLeaveRequestStatus(
       leaveRequestId,
       status
     );
@@ -116,7 +103,7 @@ export class LeaveRequestController {
   async cancelLeaveRequest(req: Request, res: Response): Promise<void> {
     const { leaveRequestId } = req.params;
 
-    const cancelled = await this.leaveRequestUseCase.cancelLeaveRequest(
+    const cancelled = await this._leaveRequestUseCase.cancelLeaveRequest(
       leaveRequestId
     );
     if (!cancelled) {
@@ -139,7 +126,7 @@ export class LeaveRequestController {
     const pageNum = parseInt(page as string, 10);
     const limitNum = parseInt(limit as string, 10);
 
-    let result = await this.leaveRequestUseCase.getAllLeaveRequests({
+    let result = await this._leaveRequestUseCase.getAllLeaveRequests({
       page: pageNum,
       limit: limitNum,
       status: status as string,
@@ -158,7 +145,7 @@ export class LeaveRequestController {
   }
 
   async getEveryLeaveRequests(req: Request , res: Response): Promise<void> {
-    const leaveRequests = await this.leaveRequestUseCase.getEveryRequests();
+    const leaveRequests = await this._leaveRequestUseCase.getEveryRequests();
     res.status(HTTP_STATUS_CODES.OK).json({leaveRequests});
   }
 }

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { injectable, inject } from 'tsyringe';
 import { HTTP_STATUS_CODES } from '../../shared/constants';
 import { IRefreshTokenUseCase } from '../../entities/useCaseInterface/IRefreshTokenUseCase';
@@ -6,7 +6,7 @@ import { IRefreshTokenUseCase } from '../../entities/useCaseInterface/IRefreshTo
 @injectable()
 export class RefreshController {
   constructor(
-    @inject('IRefreshTokenUseCase') private refreshTokenUseCase: IRefreshTokenUseCase,
+    @inject('IRefreshTokenUseCase') private _refreshTokenUseCase: IRefreshTokenUseCase,
   ) { }
 
   async refreshToken(req: Request, res: Response): Promise<void> {
@@ -19,7 +19,7 @@ export class RefreshController {
         return;
       }
 
-      const { accessToken } = await this.refreshTokenUseCase.execute(refreshToken, res, role);
+      const { accessToken } = await this._refreshTokenUseCase.execute(refreshToken, res, role);
 
       res.status(HTTP_STATUS_CODES.OK).json({ accessToken });
     } catch (error) {

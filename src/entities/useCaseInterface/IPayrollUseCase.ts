@@ -1,7 +1,5 @@
-import { IPayrollModel } from "../../adapters/database/models/PayrollModel";
 import { PayrollResponseDTO, PayrollResponseWithEmployeeDTO } from "../dtos/ResponseDTOs/PayrollDTO";
 import { IMonthlyAttendanceSummary } from "../models/IMonthlyAttendanceSummary";
-import { IPayroll } from "../models/IPayroll";
 
 export interface IPayrollUseCase {
   generatePayroll(summary: IMonthlyAttendanceSummary, employeeSalary: number, taxPercentage: number): Promise<PayrollResponseDTO>;

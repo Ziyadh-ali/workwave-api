@@ -1,3 +1,4 @@
+import { Request } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { ObjectId } from "mongoose";
 
@@ -15,4 +16,18 @@ export interface IJwtService {
   decodeRefreshToken(token: string): JwtPayload | null;
   generateResetToken(email : string) : string;
   verifyResetToken(resetToken : string) : {email : string} | null
+}
+
+export interface CustomJwtPayload extends JwtPayload {
+    id: string | ObjectId;
+    email: string;
+    role: string;
+    access_token: string;
+    refresh_token: string;
+};
+
+
+
+export interface CustomRequest extends Request {
+    user: CustomJwtPayload;
 }

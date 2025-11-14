@@ -11,25 +11,19 @@ import { CustomError } from "../../shared/errors/CustomError";
 @injectable()
 export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     constructor(
-        @inject("IEmailService") private emailService: EmailService,
-        @inject("IEmployeeRepository") private employeeRepository: IEmployeeRepository,
-        @inject("IJwtService") private jwtService: IJwtService,
+        @inject("IEmailService") private _emailService: EmailService,
+        @inject("IEmployeeRepository") private _employeeRepository: IEmployeeRepository,
+        @inject("IJwtService") private _jwtService: IJwtService,
     ) {}
 
     async confirmEmailAndSendLink(email: string): Promise<void> {
-        const employee = this.employeeRepository.findByEmail(email);
+        const employee = this._employeeRepository.findByEmail(email);
         if (!employee) throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
 
         const token = await this.generateResetToken(email);
         const resetLink = `${config.cors.ALLOWED_ORIGIN}/reset-password?token=${token}`;
 
-        const html = `
-            <h2>Password Reset</h2>
-            <p>Click the link below to reset your password:</p>
-            <a href="${resetLink}">${resetLink}</a>
-        `;
-
-        await this.emailService.sendEmail(
+        await this._emailService.sendEmail(
             email,
             "Reset Your Password",
             passwordResetText(resetLink),
@@ -38,6 +32,6 @@ export class ForgotPasswordUseCase implements IForgotPasswordUseCase {
     }
 
     private async generateResetToken(email: string): Promise<string> {
-        return this.jwtService.generateResetToken(email);
+        return this._jwtService.generateResetToken(email);
     }
 }

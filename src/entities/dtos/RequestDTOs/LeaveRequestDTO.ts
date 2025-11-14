@@ -8,7 +8,7 @@ export interface CreateLeaveRequestDTO {
   reason?: string;
   duration?: "full" | "morning" | "afternoon";
   assignedManager?: string;
-  userRole: string;
+  employeeRole: string;
 }
 
 export interface UpdateLeaveRequestDTO {

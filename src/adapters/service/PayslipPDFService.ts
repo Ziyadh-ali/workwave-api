@@ -1,4 +1,4 @@
-import { Response, Request } from "express";
+import { Response } from "express";
 import PDFDocument from 'pdfkit';
 import { inject, injectable } from "tsyringe";
 import { IPayrollUseCase } from "../../entities/useCaseInterface/IPayrollUseCase";
@@ -10,8 +10,8 @@ import { EmployeeResponseDTO } from "../../entities/dtos/ResponseDTOs/EmployeeDT
 @injectable()
 export class PayslipPDFService {
     constructor(
-        @inject("IPayrollUseCase") private payrollUseCase: IPayrollUseCase,
-        @inject("IEmployeeProfileUseCase") private employeeUseCase: IEmployeeProfileUseCase,
+        @inject("IPayrollUseCase") private _payrollUseCase: IPayrollUseCase,
+        @inject("IEmployeeProfileUseCase") private _employeeUseCase: IEmployeeProfileUseCase,
     ) { }
 
     async generateAndSendPDF(
@@ -20,8 +20,8 @@ export class PayslipPDFService {
         month: number,
         year: number,
     ) {
-        const payroll: IPayroll | null = await this.payrollUseCase.getPayrollByMonthAndEmployeeId(employeeId, month, year);
-        const employee = await this.employeeUseCase.getEmployeeDetails(employeeId);
+        const payroll: IPayroll | null = await this._payrollUseCase.getPayrollByMonthAndEmployeeId(employeeId, month, year);
+        const employee = await this._employeeUseCase.getEmployeeDetails(employeeId);
 
 
         if (!payroll || !employee) {

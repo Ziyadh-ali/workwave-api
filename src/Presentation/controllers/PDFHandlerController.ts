@@ -6,7 +6,7 @@ import { PayslipPDFService } from '../../adapters/service/PayslipPDFService';
 @injectable()
 export class PayslipController {
   constructor(
-    @inject("PayslipPDFService") private payslipPDFService: PayslipPDFService
+    @inject("PayslipPDFService") private _payslipPDFService: PayslipPDFService
   ) {}
 
   async downloadPayslip(req: Request, res: Response) {
@@ -15,7 +15,7 @@ export class PayslipController {
         res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: 'Missing required query params' });
     }
 
-    await this.payslipPDFService.generateAndSendPDF(
+    await this._payslipPDFService.generateAndSendPDF(
       res,
       employeeId as string,
       Number(month),

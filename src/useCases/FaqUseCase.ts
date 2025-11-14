@@ -9,38 +9,38 @@ import { FaqMapper } from "../entities/mapping/FaqMapper";
 @injectable()
 export class FaqUseCase implements IFaqUseCase {
     constructor(
-        @inject("IFaqRepository") private faqRepository : FaqRepository,
+        @inject("IFaqRepository") private _faqRepository : FaqRepository,
     ){}
 
     async createFaq(data: CreateFaqRequestDTO): Promise<FaqResponseDTO> {
         const updatedData = FaqMapper.toEntity(data);
-        const createdFaq = await this.faqRepository.create(updatedData);
+        const createdFaq = await this._faqRepository.create(updatedData);
         return FaqMapper.toResponseDTO(createdFaq);
     }
 
     async deleteFaq(faqId: string | ObjectId): Promise<void> {
-        await this.faqRepository.delete(faqId.toString());
+        await this._faqRepository.delete(faqId.toString());
     }
 
     async find(search: string, page: number, pageSize: number): Promise<FaqResponseDTO[] | []> {
         const limit = pageSize;
         const skip = (page -1) * pageSize;
 
-        const faqs =  await this.faqRepository.find(search , skip , limit);
+        const faqs =  await this._faqRepository.find(search , skip , limit);
         return faqs.map(FaqMapper.toResponseDTO);
     }
 
     async findById(faqId: string | ObjectId): Promise<FaqResponseDTO | null> {
-        const faq =  await this.faqRepository.findById(faqId.toString());
+        const faq =  await this._faqRepository.findById(faqId.toString());
         return faq ? FaqMapper.toResponseDTO(faq) : null;
     }
 
     async updateFaq(faqId: string | ObjectId, updatedData: UpdateFaqRequestDTO): Promise<FaqResponseDTO | null> {
-        const faq =  await this.faqRepository.update(faqId.toString() , updatedData);
+        const faq =  await this._faqRepository.update(faqId.toString() , updatedData);
         return faq ? FaqMapper.toResponseDTO(faq) : null;
     }
     async getAllFaqs(): Promise<FaqResponseDTO[] | []> {
-        const faqs =  await this.faqRepository.getAll();
+        const faqs =  await this._faqRepository.getAll();
         return faqs.map(FaqMapper.toResponseDTO);
     }
 }

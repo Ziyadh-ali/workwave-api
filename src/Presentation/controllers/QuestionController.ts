@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import { injectable, inject } from "tsyringe";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
 import { IQuestionUseCase } from "../../entities/useCaseInterface/IQuestionUseCase";
-import { CustomRequest } from "../middlewares/AuthMiddleware";
+import { CustomRequest } from "../../entities/services/JwtInterface";
 
 @injectable()
 export class QuestionController {
     constructor(
-        @inject("IQuestionUseCase") private questionUseCase: IQuestionUseCase,
+        @inject("IQuestionUseCase") private _questionUseCase: IQuestionUseCase,
     ) { }
 
     async submitQuestion(req: Request, res: Response): Promise<void> {
@@ -18,7 +18,7 @@ export class QuestionController {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: "Question and employee ID are required" });
             }
 
-            const result = await this.questionUseCase.submitQuestion({
+            const result = await this._questionUseCase.submitQuestion({
                 employeeId,
                 question,
             });
@@ -27,12 +27,12 @@ export class QuestionController {
     }
 
     async getAllQuestions(_req: Request, res: Response): Promise<void> {
-            const questions = await this.questionUseCase.getAllQuestions();
+            const questions = await this._questionUseCase.getAllQuestions();
             res.status(HTTP_STATUS_CODES.OK).json({questions});
     }
 
     async getUnansweredQuestions(_req: Request, res: Response): Promise<void> {
-            const questions = await this.questionUseCase.getUnansweredQuestions();
+            const questions = await this._questionUseCase.getUnansweredQuestions();
             res.status(HTTP_STATUS_CODES.OK).json(questions);
     }
 
@@ -45,7 +45,7 @@ export class QuestionController {
                 res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: "Answer is required" });
             }
 
-            const updated = await this.questionUseCase.answerQuestion(id, answer, answeredBy);
+            const updated = await this._questionUseCase.answerQuestion(id, answer, answeredBy);
 
             if (!updated) res.status(HTTP_STATUS_CODES.NOT_FOUND).json({ message: "Question not found" });
 
@@ -57,13 +57,13 @@ export class QuestionController {
 
     async deleteQuestion(req: Request, res: Response): Promise<void> {
             const { id } = req.params;
-            await this.questionUseCase.deleteQuestion(id);
+            await this._questionUseCase.deleteQuestion(id);
             res.status(HTTP_STATUS_CODES.OK).json({ message: "Question deleted" });
     }
 
     async getQuestionsByEmployeeId(req: Request , res: Response): Promise<void> {
             const { employeeId } = req.params;
-            const questions = await this.questionUseCase.findByEmployeeId(employeeId);
+            const questions = await this._questionUseCase.findByEmployeeId(employeeId);
             res.status(HTTP_STATUS_CODES.OK).json({ questions });
     }
 

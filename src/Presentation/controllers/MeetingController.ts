@@ -3,13 +3,13 @@ import { IMeetingUseCase } from "../../entities/useCaseInterface/IMeetingUseCase
 import { injectable, inject } from "tsyringe";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IMeeting } from "../../entities/models/Meeting.entities";
-import { CustomRequest } from "../middlewares/AuthMiddleware";
 import { createMeetingSchema } from "../../shared/validation/validator";
+import { CustomRequest } from "../../entities/services/JwtInterface";
 
 @injectable()
 export class MeetingController {
     constructor(
-        @inject("IMeetingUseCase") private meetingUseCase: IMeetingUseCase,
+        @inject("IMeetingUseCase") private _meetingUseCase: IMeetingUseCase,
     ) { }
 
     async createMeeting(req: Request, res: Response): Promise<void> {
@@ -25,7 +25,7 @@ export class MeetingController {
                 date: new Date(),
                 status : "upcoming"
             };
-            const createdMeeting = await this.meetingUseCase.createMeeting(meetingWithCreator, filter);
+            const createdMeeting = await this._meetingUseCase.createMeeting(meetingWithCreator, filter);
 
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.METING_SCHEDULED,
@@ -35,7 +35,7 @@ export class MeetingController {
 
     async getMeetingByEmployeeId(req: Request, res: Response): Promise<void> {
             const { employeeId } = req.params;
-            const meetings = await this.meetingUseCase.getMeetingByEmployeeId(employeeId);
+            const meetings = await this._meetingUseCase.getMeetingByEmployeeId(employeeId);
             
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.METING_SCHEDULED,
@@ -66,7 +66,7 @@ export class MeetingController {
                 });
             }
 
-            const meeting = await this.meetingUseCase.updateMeeting(meetingId, updateData);
+            const meeting = await this._meetingUseCase.updateMeeting(meetingId, updateData);
 
             const successMessage =
                 link ? MESSAGES.SUCCESS.LINK_ADDED :
@@ -84,7 +84,7 @@ export class MeetingController {
             const { meeting, filter } = req.body;
             meeting.createdBy = user.id;
 
-            const updatedMeeting = await this.meetingUseCase.editMeeting(meeting, filter);
+            const updatedMeeting = await this._meetingUseCase.editMeeting(meeting, filter);
 
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.MEETING_UPDATED,
@@ -96,7 +96,7 @@ export class MeetingController {
 
     async deleteMeeting(req: Request, res: Response): Promise<void> {
             const { meetingId } = req.params;
-            await this.meetingUseCase.deleteMeeting(meetingId);
+            await this._meetingUseCase.deleteMeeting(meetingId);
             res.status(HTTP_STATUS_CODES.OK).json({
                 message: MESSAGES.SUCCESS.MEETING_DELETED,
             });

@@ -5,7 +5,6 @@ import { IEmployeeLoginUseCase } from "../../entities/useCaseInterface/IEmployee
 import { clearAuthCookies } from "../../shared/utils/cookieHelper";
 import { Response } from "express";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
-import { loginSchema } from "../../shared/validation/validator";
 import { IJwtService } from "../../entities/services/JwtInterface";
 import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
@@ -13,19 +12,19 @@ import { CustomError } from "../../shared/errors/CustomError";
 @injectable()
 export class EmployeeLoginUseCase implements IEmployeeLoginUseCase {
     constructor(
-        @inject("IEmployeeRepository") private userRepository: IEmployeeRepository,
-        @inject("IBcrypt") private passWordBcrypt: IBcrypt,
-        @inject("IJwtService") private jwtService: IJwtService,
+        @inject("IEmployeeRepository") private _userRepository: IEmployeeRepository,
+        @inject("IBcrypt") private _passWordBcrypt: IBcrypt,
+        @inject("IJwtService") private _jwtService: IJwtService,
     ) { }
 
     async login(email: string, password: string): Promise<EmployeeLoginResponse | null> {
-        const employee = await this.userRepository.findByEmail(email);
+        const employee = await this._userRepository.findByEmail(email);
         if (!employee) {
             throw new CustomError(MESSAGES.ERROR.USER.USER_NOT_FOUND , HTTP_STATUS_CODES.BAD_REQUEST);
         }
 
         if (password) {
-            const isPasswordMatch = await this.passWordBcrypt.compare(password, employee.password);
+            const isPasswordMatch = await this._passWordBcrypt.compare(password, employee.password);
             if (!isPasswordMatch) {
                 throw new CustomError(MESSAGES.ERROR.AUTH.INVALID_CREDENTIALS , HTTP_STATUS_CODES.BAD_REQUEST);
             }
@@ -37,9 +36,9 @@ export class EmployeeLoginUseCase implements IEmployeeLoginUseCase {
             role: employee.role,
         }
 
-        const accessToken = this.jwtService.generateAccessToken(userData);
+        const accessToken = this._jwtService.generateAccessToken(userData);
 
-        const refreshToken = this.jwtService.generateRefreshToken(userData);
+        const refreshToken = this._jwtService.generateRefreshToken(userData);
 
         return {
             accessToken,

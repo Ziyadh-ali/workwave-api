@@ -41,6 +41,7 @@ import { IMonthlySummaryUseCase } from "../../entities/useCaseInterface/IMonthly
 import { MonthlySummaryUseCase } from "../../useCases/MonthlySummaryUseCase";
 import { IPayrollUseCase } from "../../entities/useCaseInterface/IPayrollUseCase";
 import { PayrollUseCase } from "../../useCases/PayrollUseCase";
+import { EventService } from "../../shared/events";
 
 
 export class UseCaseRegistry {
@@ -57,79 +58,83 @@ export class UseCaseRegistry {
             useClass: PasswordBcrypt,
         });
 
-        container.register<IEmployeeProfileUseCase>("IEmployeeProfileUseCase",{
-            useClass : EmployeeProfileUseCase,
+        container.register<IEmployeeProfileUseCase>("IEmployeeProfileUseCase", {
+            useClass: EmployeeProfileUseCase,
         });
 
-        container.register<IEmployeeManagementUseCase>("IEmployeeManagementUseCase",{
-            useClass : EmployeeManagementUseCase,
+        container.register<IEmployeeManagementUseCase>("IEmployeeManagementUseCase", {
+            useClass: EmployeeManagementUseCase,
         });
 
-        container.register<IEmployeeLoginUseCase>("IEmployeeLoginUseCase",{
-            useClass : EmployeeLoginUseCase,
+        container.register<IEmployeeLoginUseCase>("IEmployeeLoginUseCase", {
+            useClass: EmployeeLoginUseCase,
         });
 
         container.register<IRefreshTokenUseCase>("IRefreshTokenUseCase", {
-            useClass : RefreshTokenUseCase,
+            useClass: RefreshTokenUseCase,
         });
 
-        container.register<ILeaveTypeUseCase>("ILeaveTypeUseCase",{
-            useClass : LeaveTypeUseCase,
+        container.register<ILeaveTypeUseCase>("ILeaveTypeUseCase", {
+            useClass: LeaveTypeUseCase,
         });
 
-        container.register<ILeaveBalanceUseCase>("ILeaveBalanceUseCase",{
-            useClass : LeaveBalanceUseCase,
+        container.register<ILeaveBalanceUseCase>("ILeaveBalanceUseCase", {
+            useClass: LeaveBalanceUseCase,
         });
 
-        container.register<ILeaveRequestUseCase>("ILeaveRequestUseCase" ,{
-            useClass : LeaveRequestUseCase,
+        container.register<ILeaveRequestUseCase>("ILeaveRequestUseCase", {
+            useClass: LeaveRequestUseCase,
         });
 
-        container.register<IEmailService>("IEmailService",{
-            useClass : EmailService,
+        container.register<IEmailService>("IEmailService", {
+            useClass: EmailService,
         });
 
-        container.register<IForgotPasswordUseCase>("IForgotPasswordUseCase",{
-            useClass : ForgotPasswordUseCase,
+        container.register<IForgotPasswordUseCase>("IForgotPasswordUseCase", {
+            useClass: ForgotPasswordUseCase,
         });
 
-        container.register<IResetPasswordUseCase>("IResetPasswordUseCase",{
-            useClass : ResetPasswordUseCase
+        container.register<IResetPasswordUseCase>("IResetPasswordUseCase", {
+            useClass: ResetPasswordUseCase
         });
 
-        container.register<IAttendanceUseCase>("IAttendanceUseCase",{
-            useClass : AttendanceUseCase
+        container.register("EventService", {
+            useClass: EventService,
         });
 
-        container.register<IMeetingUseCase>("IMeetingUseCase",{
-            useClass : MeetingUseCase,
+        container.register<IAttendanceUseCase>("IAttendanceUseCase", {
+            useClass: AttendanceUseCase
         });
 
-        container.register<IFaqUseCase>("IFaqUseCase",{
-            useClass : FaqUseCase,
+        container.register<IMeetingUseCase>("IMeetingUseCase", {
+            useClass: MeetingUseCase,
         });
 
-        container.register<IMessageUseCase>("IMessageUseCase",{
-            useClass : MessageUseCase,
+        container.register<IFaqUseCase>("IFaqUseCase", {
+            useClass: FaqUseCase,
         });
 
-        container.register<IGroupUseCase>("IGroupUseCase",{
-            useClass : GroupUseCase,
+        container.register<IMessageUseCase>("IMessageUseCase", {
+            useClass: MessageUseCase,
         });
-        container.register<IQuestionUseCase>("IQuestionUseCase",{
-            useClass : QuestionUseCase,
+
+        container.register<IGroupUseCase>("IGroupUseCase", {
+            useClass: GroupUseCase,
+        });
+        container.register<IQuestionUseCase>("IQuestionUseCase", {
+            useClass: QuestionUseCase,
         });
 
         // container.register<SocketManager>("SocketManager",{
         //     useClass : SocketManager,
         // });
 
-        container.register<IMonthlySummaryUseCase>("IMonthlySummaryUseCase",{
-            useClass : MonthlySummaryUseCase,
+        container.register<IMonthlySummaryUseCase>("IMonthlySummaryUseCase", {
+            useClass: MonthlySummaryUseCase,
         });
 
-        container.register<IPayrollUseCase>("IPayrollUseCase",{
-            useClass : PayrollUseCase,
+        container.register<IPayrollUseCase>("IPayrollUseCase", {
+            useClass: PayrollUseCase,
         });
     }
 }

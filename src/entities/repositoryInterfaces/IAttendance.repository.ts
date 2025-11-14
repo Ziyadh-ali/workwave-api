@@ -1,6 +1,7 @@
 import { Attendance } from "../models/Attendance.entities";
+import { IBaseRepository } from "./IBase.repository";
 
-export interface IAttendanceRepository {
+export interface IAttendanceRepository extends IBaseRepository<Attendance> {
   createAttendance(employeeId: string, date: Date): Promise<Attendance>;
   markCheckIn(employeeId: string, time: Date, startOfDay: Date, endOfDay: Date): Promise<Attendance>;
   markCheckOut(

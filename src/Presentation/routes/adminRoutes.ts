@@ -15,35 +15,35 @@ import { leaveTypeController } from '../di/resolver';
 import asyncHandler from "express-async-handler"
 
 export class AdminRoute {
-  private router: express.Router;
+  private _router: express.Router;
 
   constructor() {
-    this.router = express.Router();
+    this._router = express.Router();
     this.setRoutes();
   }
 
   private setRoutes(): void {
-    this.router.post(
+    this._router.post(
       '/login',
       asyncHandler((req: Request, res: Response) => adminController.login(req, res))
     );
 
-    this.router.post(
+    this._router.post(
       '/register',
       asyncHandler((req: Request, res: Response) => adminController.save(req, res))
     );
 
-    this.router.post(
+    this._router.post(
       '/logout',
       asyncHandler((req: Request, res: Response) => adminController.logout(req, res))
     );
 
-    this.router.post(
+    this._router.post(
       '/refresh-token/:role',
       (req: Request, res: Response) => refreshController.refreshToken(req, res)
     );
 
-    this.router
+    this._router
       .post(
         '/users',
         verifyAuth("admin"),
@@ -70,14 +70,14 @@ export class AdminRoute {
         asyncHandler((req: Request, res: Response) => adminUserManagement.deleteUser(req, res))
       );
 
-    this.router
+    this._router
       .get(
         "/managers",
         verifyAuth("admin"),
         asyncHandler((req: Request, res: Response) => adminUserManagement.getManagers(req, res))
       )
 
-    this.router
+    this._router
       .get(
         "/leave/type",
         verifyAuth("admin"),
@@ -105,7 +105,7 @@ export class AdminRoute {
         verifyAuth("admin"),
         asyncHandler((req: Request, res: Response) => leaveTypeController.updateLeaveType(req, res)))
 
-    this.router
+    this._router
       .get(
         "/leave/requests",
         verifyAuth("admin"),
@@ -123,7 +123,7 @@ export class AdminRoute {
         asyncHandler((req: Request, res: Response) => leaveRequestController.updateLeaveRequestStatus(req, res))
       )
 
-    this.router
+    this._router
       .get(
         "/attendance",
         verifyAuth("admin"),
@@ -140,7 +140,7 @@ export class AdminRoute {
         asyncHandler((req: Request, res: Response) => attendanceController.respondToRegularizationRequest(req, res))
       )
 
-    this.router
+    this._router
       .get(
         "/question",
         verifyAuth("admin"),
@@ -157,7 +157,7 @@ export class AdminRoute {
         asyncHandler((req: Request, res: Response) => questionController.answerQuestion(req, res),)
       )
 
-    this.router
+    this._router
       .post(
         "/summary",
         verifyAuth("admin"),
@@ -189,7 +189,7 @@ export class AdminRoute {
         asyncHandler((req: Request, res: Response) => monthlySummaryController.getSummaries(req, res),)
       )
 
-    this.router
+    this._router
       .post(
         "/payroll/generate",
         verifyAuth("admin"),
@@ -218,7 +218,7 @@ export class AdminRoute {
         asyncHandler((req, res) => payrollController.updatePayrollStatus(req, res))
       )
 
-    this.router
+    this._router
       .post(
         "/faq",
         verifyAuth("admin"),
@@ -244,6 +244,6 @@ export class AdminRoute {
   }
 
   public getRouter(): express.Router {
-    return this.router;
+    return this._router;
   }
 }

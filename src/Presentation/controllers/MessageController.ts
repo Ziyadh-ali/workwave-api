@@ -8,13 +8,13 @@ type MulterFile = Express.Multer.File;
 @injectable()
 export class MessageController {
     constructor(
-        @inject("IMessageUseCase") private messageUseCase: IMessageUseCase,
+        @inject("IMessageUseCase") private _messageUseCase: IMessageUseCase,
     ) { }
 
     async getPrivateMessages(Req: Request, res: Response): Promise<void> {
             const { user1, user2 } = Req.query;
             if (user1 && user2) {
-                const messages = await this.messageUseCase.getPrivateMessages(user1.toString(), user2.toString());
+                const messages = await this._messageUseCase.getPrivateMessages(user1.toString(), user2.toString());
                 res.status(HTTP_STATUS_CODES.OK).json({
                     messages
                 })
@@ -23,7 +23,7 @@ export class MessageController {
     async getGroupMessages(Req: Request, res: Response): Promise<void> {
             const { roomId } = Req.params;
             if (roomId) {
-                const messages = await this.messageUseCase.getGroupMessages(roomId.toString());
+                const messages = await this._messageUseCase.getGroupMessages(roomId.toString());
                 res.status(HTTP_STATUS_CODES.OK).json({
                     messages
                 })

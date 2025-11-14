@@ -7,14 +7,14 @@ import { IAdminAuthUseCase } from "../../../entities/useCaseInterface/IAdaminAut
 @injectable()
 export class AdminController {
     constructor(
-        @inject("IAdminAuthUseCase") private adminAuthUseCase: IAdminAuthUseCase,
+        @inject("IAdminAuthUseCase") private _adminAuthUseCase: IAdminAuthUseCase,
     ) {
     }
 
 
     async login(req: Request, res: Response): Promise<void> {
         const { email, password } = req.body;
-        const response = await this.adminAuthUseCase.login(email, password);
+        const response = await this._adminAuthUseCase.login(email, password);
 
         if (response) {
             setAuthCookies(
@@ -43,7 +43,7 @@ export class AdminController {
 
     async save(req: Request, res: Response) {
         const { email, password } = req.body;
-        const response = await this.adminAuthUseCase.createAdmin(email, password);
+        const response = await this._adminAuthUseCase.createAdmin(email, password);
         res.status(HTTP_STATUS_CODES.CREATED).json(response);
     }
 }

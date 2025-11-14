@@ -14,16 +14,16 @@ import { errorHandler } from "../middlewares/ErrorHandler";
 import { errorLogger, requestLogger } from "../middlewares/Logger";
 
 export class Server {
-    private app: Application;
+    private _app: Application;
     private port: number;
     private server: http.Server;
     private io: IOServer;
     private socketManager: SocketManager;
 
     constructor(port: number) {
-        this.app = express();
+        this._app = express();
         this.port = port;
-        this.server = http.createServer(this.app);
+        this.server = http.createServer(this._app);
         this.io = new IOServer(this.server, {
             cors: {
                 origin: config.cors.ALLOWED_ORIGIN,
@@ -39,9 +39,9 @@ export class Server {
     }
 
     private setupMiddlewares(): void {
-        this.app.use(morgan("dev"));
-        this.app.use(requestLogger);
-        this.app.use(
+        this._app.use(morgan("dev"));
+        this._app.use(requestLogger);
+        this._app.use(
             cors({
                 origin: config.cors.ALLOWED_ORIGIN,
                 methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -49,20 +49,20 @@ export class Server {
                 credentials: true,
             })
         );
-        this.app.use(helmet());
-        this.app.use(express.json());
-        this.app.use(express.urlencoded({ extended: true }));
-        this.app.use(cookieParser());
+        this._app.use(helmet());
+        this._app.use(express.json());
+        this._app.use(express.urlencoded({ extended: true }));
+        this._app.use(cookieParser());
     }
 
     private configureRoutes(): void {
         const adminRoute = new AdminRoute();
         const userRoute = new UserRoute();
-        this.app.use("/", userRoute.getRoute());
-        this.app.use("/admin", adminRoute.getRouter());
+        this._app.use("/", userRoute.getRoute());
+        this._app.use("/admin", adminRoute.getRouter());
 
-        this.app.use(errorHandler)
-        this.app.use(errorLogger)
+        this._app.use(errorHandler)
+        this._app.use(errorLogger)
     }
 
     private setupSocket(): void {
@@ -76,7 +76,7 @@ export class Server {
     }
 
     public getApp(): Application {
-        return this.app;
+        return this._app;
     }
 
     public getIO(): IOServer {

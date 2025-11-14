@@ -4,7 +4,7 @@ import { RegularizationRequestDTO } from "../RequestDTOs/AttendanceDTO";
 export interface AttendanceResponseDTO {
   _id: string | ObjectId;
   employeeId: string | ObjectId;
-  date: string;
+  date: string | null;
   checkInTime: string | null;
   checkOutTime: string | null;
   status: "Present" | "Absent" | "Weekend" | "Holiday" | "Pending" | "Late";

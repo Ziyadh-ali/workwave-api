@@ -7,10 +7,10 @@ import { HTTP_STATUS_CODES } from "../../shared/constants";
 
 @injectable()
 export class EmailService implements IEmailService {
-    private transporter;
+    private _transporter;
 
     constructor() {
-        this.transporter = nodemailer.createTransport({
+        this._transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
                 user: config.email.EMAIL_USER,
@@ -34,7 +34,7 @@ export class EmailService implements IEmailService {
                 html,
             };
 
-            const info = await this.transporter.sendMail(mailOptions);
+            await this._transporter.sendMail(mailOptions);
         } catch (error) {
             console.error("Error sending email:", error);
             throw new CustomError("Could not send email" , HTTP_STATUS_CODES.BAD_REQUEST);

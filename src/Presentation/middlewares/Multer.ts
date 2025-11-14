@@ -1,9 +1,9 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../../adapters/service/CloudinaryTmp";
-import { CustomRequest } from "./AuthMiddleware";
 import { CustomError } from "../../shared/errors/CustomError";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
+import { CustomRequest } from "../../entities/services/JwtInterface";
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,

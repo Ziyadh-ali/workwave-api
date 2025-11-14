@@ -1,15 +1,13 @@
 import { injectable, inject } from "tsyringe";
 import { ILeaveBalanceRepository } from "../entities/repositoryInterfaces/ILeaveBalance.repository";
 import { ILeaveBalanceUseCase } from "../entities/useCaseInterface/ILeaveBalanceUseCase";
-import { ILeaveTypeRepository } from "../entities/repositoryInterfaces/ILeaveType.repository";
 import { LeaveBalanceResponseDTO, } from "../entities/dtos/ResponseDTOs/LeaveBalanceDTO";
 import { LeaveBalanceMapper } from "../entities/mapping/LeaveBalanceMapping";
 
 @injectable()
 export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
     constructor(
-        @inject("ILeaveBalanceRepository") private leaveBalanceRepository: ILeaveBalanceRepository,
-        @inject("ILeaveTypeRepository") private leaveTypeRepository: ILeaveTypeRepository,
+        @inject("ILeaveBalanceRepository") private _leaveBalanceRepository: ILeaveBalanceRepository,
     ) { }
 
     async initializeLeaveBalance(employeeId: string, leaveTypes: { leaveTypeId: string; totalDays: number }[]): Promise<void> {
@@ -20,26 +18,26 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
             usedDays: 0,
         }));
 
-        await this.leaveBalanceRepository.initializeLeaveBalance(employeeId, leaveBalances);
+        await this._leaveBalanceRepository.initializeLeaveBalance(employeeId, leaveBalances);
     }
 
     async getLeaveBalanceByEmployeeId(employeeId: string): Promise<LeaveBalanceResponseDTO | null> {
-        const leaveBalances = await this.leaveBalanceRepository.getLeaveBalanceByEmployeeId(employeeId);
+        const leaveBalances = await this._leaveBalanceRepository.getLeaveBalanceByEmployeeId(employeeId);
         if (!leaveBalances) return null;
         
         return LeaveBalanceMapper.toResponseDTO(leaveBalances);
     }
 
     async deductLeave(employeeId: string, leaveTypeId: string, usedDays: number): Promise<boolean> {
-        return await this.leaveBalanceRepository.deductLeave(employeeId, leaveTypeId, usedDays);
+        return await this._leaveBalanceRepository.deductLeave(employeeId, leaveTypeId, usedDays);
     }
 
     async restoreLeave(employeeId: string, leaveTypeId: string, restoredDays: number): Promise<boolean> {
-        return await this.leaveBalanceRepository.restoreLeave(employeeId, leaveTypeId, restoredDays);
+        return await this._leaveBalanceRepository.restoreLeave(employeeId, leaveTypeId, restoredDays);
     }
 
     async resetLeaveBalance(employeeId: string): Promise<void> {
-        await this.leaveBalanceRepository.resetLeaveBalance(employeeId);
+        await this._leaveBalanceRepository.resetLeaveBalance(employeeId);
     }
 
     async updateLeaveType(employeeId: string, leaveTypeId: string, newTotalDays: number): Promise<boolean> {
@@ -52,11 +50,11 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
         leaveType.totalDays = newTotalDays;
         leaveType.availableDays = Math.max(0, newTotalDays - leaveType.usedDays);
 
-        return await this.leaveBalanceRepository.updateLeaveType(employeeId, leaveTypeId, leaveType.availableDays);
+        return await this._leaveBalanceRepository.updateLeaveType(employeeId, leaveTypeId, leaveType.availableDays);
     }
 
     async addLeaveTypeToAllEmployees(leaveTypeId: string, totalDays: number): Promise<void> {
-        const allUsersLeaveBalances = await this.leaveBalanceRepository.getAllLeaveBalances();
+        const allUsersLeaveBalances = await this._leaveBalanceRepository.getAllLeaveBalances();
 
         for (const leaveBalance of allUsersLeaveBalances) {
             const leaveTypeExists = leaveBalance.leaveBalances.some(lb => lb.leaveTypeId === leaveTypeId);
@@ -69,12 +67,12 @@ export class LeaveBalanceUseCase implements ILeaveBalanceUseCase {
                     usedDays: 0,
                 });
 
-                await this.leaveBalanceRepository.updateLeaveBalance(leaveBalance.employeeId.toString(), leaveBalance.leaveBalances);
+                await this._leaveBalanceRepository.updateLeaveBalance(leaveBalance.employeeId.toString(), leaveBalance.leaveBalances);
             }
         }
     }
 
     async deleteLeaveBalance(employeeId: string): Promise<void> {
-        await this.leaveBalanceRepository.deleteLeaveBalanceByEmployeeId(employeeId);
+        await this._leaveBalanceRepository.deleteLeaveBalanceByEmployeeId(employeeId);
     }
 }

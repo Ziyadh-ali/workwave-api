@@ -17,14 +17,14 @@ import { EmployeeMapper } from "../../entities/mapping/EmployeeMapper";
 export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
   constructor(
     @inject("IEmployeeRepository")
-    private employeeRepository: IEmployeeRepository,
-    @inject("IBcrypt") private passwordBcrypt: IBcrypt
+    private _employeeRepository: IEmployeeRepository,
+    @inject("IBcrypt") private _passwordBcrypt: IBcrypt
   ) {}
 
   async addEmployee(
     data: CreateEmployeeRequestDTO
   ): Promise<EmployeeResponseDTO> {
-    const existingEmployee = await this.employeeRepository.findByEmail(
+    const existingEmployee = await this._employeeRepository.findByEmail(
       data.email
     );
 
@@ -35,7 +35,7 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
       );
     }
 
-    const hashedPassword = await this.passwordBcrypt.hash(data.password);
+    const hashedPassword = await this._passwordBcrypt.hash(data.password);
     const newEmployee: CreateEmployeeRequestDTO = {
       ...data,
       password: hashedPassword,
@@ -43,7 +43,7 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
 
     const employee = EmployeeMapper.toEntity(newEmployee);
 
-    const createEmployee = await this.employeeRepository.save(employee);
+    const createEmployee = await this._employeeRepository.save(employee);
 
     eventHandler.emit("EMPLOYEE_CREATED", createEmployee._id?.toString());
 
@@ -62,7 +62,7 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
   }> {
     const skip = (page - 1) * pageSize;
     const limit = pageSize;
-    const employees = await this.employeeRepository.find(filter, skip, limit);
+    const employees = await this._employeeRepository.find(filter, skip, limit);
     return {
       employees: EmployeeMapper.toResponseDTOs(
         employees.employees as Employee[]
@@ -75,26 +75,26 @@ export class EmployeeManagementUseCase implements IEmployeeManagementUseCase {
 
   async deleteEmployee(id: string): Promise<void> {
     eventHandler.emit("EMPLOYEE_DELETED", id);
-    await this.employeeRepository.findByIdAndDelete(id);
+    await this._employeeRepository.findByIdAndDelete(id);
   }
 
   async getManagers(): Promise<EmployeeResponseDTO[] | []> {
-    const managers = await this.employeeRepository.findManagers();
+    const managers = await this._employeeRepository.findManagers();
     return EmployeeMapper.toResponseDTOs(managers as Employee[]);
   }
 
   async getEmployeesForChat(): Promise<Partial<EmployeeResponseDTO[]>> {
-    const employees = await this.employeeRepository.getEmployeesForChat();
+    const employees = await this._employeeRepository.getEmployeesForChat();
     return EmployeeMapper.toResponseDTOs(employees as Employee[]);
   }
 
   async getDevelopers(): Promise<EmployeeResponseDTO[]> {
-    const developers = await this.employeeRepository.getDevelopers();
+    const developers = await this._employeeRepository.getDevelopers();
     return EmployeeMapper.toResponseDTOs(developers as Employee[]);
   }
 
   async findById(employeeId: string): Promise<EmployeeResponseDTO | null> {
-    const employee = await this.employeeRepository.findById(employeeId);
+    const employee = await this._employeeRepository.findById(employeeId);
     if (!employee) {
       return null;
     }

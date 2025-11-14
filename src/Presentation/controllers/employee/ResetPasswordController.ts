@@ -6,7 +6,7 @@ import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 @injectable()
 export class ResetPasswordController {
     constructor(
-        @inject("IResetPasswordUseCase") private resetPasswordUseCase: IResetPasswordUseCase
+        @inject("IResetPasswordUseCase") private _resetPasswordUseCase: IResetPasswordUseCase
     ) { }
 
     async execute(req: Request, res: Response): Promise<void> {
@@ -19,7 +19,7 @@ export class ResetPasswordController {
                 });
             }
 
-            await this.resetPasswordUseCase.resetPassword(token, newPassword);
+            await this._resetPasswordUseCase.resetPassword(token, newPassword);
 
             res.status(200).json({
                 success: true,

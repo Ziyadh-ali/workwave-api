@@ -6,7 +6,7 @@ import { ILeaveBalanceUseCase } from "../../entities/useCaseInterface/ILeaveBala
 @injectable()
 export class LeaveBalanceController {
     constructor(
-        @inject("ILeaveBalanceUseCase") private leaveBalanceUseCase : ILeaveBalanceUseCase,
+        @inject("ILeaveBalanceUseCase") private _leaveBalanceUseCase : ILeaveBalanceUseCase,
     ) {}
 
     async getLeaveBalanceById (req : Request , res : Response) : Promise<void> {
@@ -17,7 +17,7 @@ export class LeaveBalanceController {
                     message : MESSAGES.ERROR.USER.NO_USER_ID
                 });
             }
-            const leaveBalances = await this.leaveBalanceUseCase.getLeaveBalanceByEmployeeId(employeeId);
+            const leaveBalances = await this._leaveBalanceUseCase.getLeaveBalanceByEmployeeId(employeeId);
             res.status(HTTP_STATUS_CODES.OK).json({
                 success : true , 
                 leaveBalances,

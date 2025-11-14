@@ -4,7 +4,6 @@ import { Admin } from "../../entities/models/adminEntities/AdminEnitity";
 import { AdminLoginResponse } from "../../entities/adminInterface/AdminLoginInterface";
 import { IAdminAuthUseCase } from "../../entities/useCaseInterface/IAdaminAuthUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
-import { loginSchema } from "../../shared/validation/validator";
 import { IJwtService } from "../../entities/services/JwtInterface";
 import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
@@ -12,13 +11,13 @@ import { CustomError } from "../../shared/errors/CustomError";
 @injectable()
 export class AdminAuthUseCase implements IAdminAuthUseCase {
   constructor(
-    @inject("IAdminRepository") private adminRepository: IAdminRepository,
-    @inject("IBcrypt") private passwordBcrypt: IBcrypt,
-    @inject("IJwtService") private jwtService: IJwtService
+    @inject("IAdminRepository") private _adminRepository: IAdminRepository,
+    @inject("IBcrypt") private _passwordBcrypt: IBcrypt,
+    @inject("IJwtService") private _jwtService: IJwtService
   ) {}
 
   async createAdmin(email: string, password: string): Promise<Admin> {
-    const existingAdmin = await this.adminRepository.findByEmail(email);
+    const existingAdmin = await this._adminRepository.findByEmail(email);
     if (existingAdmin) {
       throw new CustomError(
         "Admin already exists",
@@ -26,14 +25,14 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
       );
     }
 
-    const hashedPassword = await this.passwordBcrypt.hash(password);
+    const hashedPassword = await this._passwordBcrypt.hash(password);
 
     const admin: Admin = {
       email,
       password: hashedPassword,
       role: "admin",
     };
-    await this.adminRepository.save(admin);
+    await this._adminRepository.save(admin);
     return admin;
   }
 
@@ -41,13 +40,13 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
     email: string,
     password: string
   ): Promise<AdminLoginResponse | null> {
-    const admin = await this.adminRepository.findByEmail(email);
+    const admin = await this._adminRepository.findByEmail(email);
     if (!admin) {
       throw new CustomError("Admin not found", HTTP_STATUS_CODES.BAD_REQUEST);
     }
 
     if (password) {
-      const isPasswordMatch = await this.passwordBcrypt.compare(
+      const isPasswordMatch = await this._passwordBcrypt.compare(
         password,
         admin.password
       );
@@ -59,13 +58,13 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
       }
     }
 
-    const accessToken = this.jwtService.generateAccessToken({
+    const accessToken = this._jwtService.generateAccessToken({
       id: admin._id || "",
       email: admin.email,
       role: admin.role,
     });
 
-    const refreshToken = this.jwtService.generateRefreshToken({
+    const refreshToken = this._jwtService.generateRefreshToken({
       id: admin._id || "",
       email: admin.email,
       role: admin.role,

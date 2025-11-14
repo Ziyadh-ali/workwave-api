@@ -13,7 +13,7 @@ import { MonthlyAttendanceSummaryMapper } from "../entities/mapping/MonthlySumma
 export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
   constructor(
     @inject("IMonthlySummaryRepository")
-    private monthlySummaryRepo: IMonthlySummaryRepository
+    private _monthlySummaryRepo: IMonthlySummaryRepository
   ) {}
 
   async generateSummary(
@@ -30,7 +30,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
     if (month < 1 || month > 12)
       throw new CustomError("Invalid month", HTTP_STATUS_CODES.BAD_REQUEST);
 
-    const summaries = await this.monthlySummaryRepo.generateSummary(
+    const summaries = await this._monthlySummaryRepo.generateSummary(
       month,
       year,
       generatedBy,
@@ -47,7 +47,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
     month: number,
     year: number
   ): Promise<MonthlyAttendanceSummaryWithEmployeeResponseDTO[]> {
-    const summaries = await this.monthlySummaryRepo.getExistingSummaries(
+    const summaries = await this._monthlySummaryRepo.getExistingSummaries(
       month,
       year
     );
@@ -67,7 +67,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
   ): Promise<
     MonthlyAttendanceSummaryResponseDTO | MonthlyAttendanceSummaryResponseDTO[]
   > {
-    const summaries = await this.monthlySummaryRepo.regenerateSummary(
+    const summaries = await this._monthlySummaryRepo.regenerateSummary(
       month,
       year,
       generatedBy,
@@ -84,7 +84,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
   async approveSummary(
     summaryId: string
   ): Promise<MonthlyAttendanceSummaryResponseDTO> {
-    const summary = await this.monthlySummaryRepo.approveSummary(summaryId);
+    const summary = await this._monthlySummaryRepo.approveSummary(summaryId);
 
     if (!summary) {
       throw new CustomError("Summary not found", HTTP_STATUS_CODES.NOT_FOUND);
@@ -97,7 +97,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
     summaryId: string,
     reason: string
   ): Promise<MonthlyAttendanceSummaryResponseDTO> {
-    const summary = await this.monthlySummaryRepo.rejectSummary(
+    const summary = await this._monthlySummaryRepo.rejectSummary(
       summaryId,
       reason
     );
@@ -119,7 +119,7 @@ export class MonthlySummaryUseCase implements IMonthlySummaryUseCase {
       );
     }
 
-    const summaries = await this.monthlySummaryRepo.bulkApproveSummaries(
+    const summaries = await this._monthlySummaryRepo.bulkApproveSummaries(
       summaryIds
     );
 

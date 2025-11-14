@@ -9,18 +9,18 @@ import { FaqMapper } from "../../entities/mapping/FaqMapper";
 @injectable()
 export class FaqController {
     constructor(
-        @inject("IFaqUseCase") private faqUseCase: IFaqUseCase,
+        @inject("IFaqUseCase") private _faqUseCase: IFaqUseCase,
     ) { }
 
     async createFaq(req: Request, res: Response): Promise<void> {
         const validatedData = faqValidationSchema.parse(req.body);
         const data = FaqMapper.toEntity(validatedData);
-        const faq = await this.faqUseCase.createFaq(data);
+        const faq = await this._faqUseCase.createFaq(data);
         res.status(HTTP_STATUS_CODES.CREATED).json(faq);
     }
 
     async getAllFaqs(req: Request, res: Response): Promise<void> {
-        const faqs = await this.faqUseCase.getAllFaqs();
+        const faqs = await this._faqUseCase.getAllFaqs();
         res.status(HTTP_STATUS_CODES.OK).json({ faqs: faqs });
     }
 
@@ -29,7 +29,7 @@ export class FaqController {
         const page = parseInt(req.query.page as string) || 1;
         const pageSize = parseInt(req.query.pageSize as string) || 10;
 
-        const faqs = await this.faqUseCase.find(search, page, pageSize); 
+        const faqs = await this._faqUseCase.find(search, page, pageSize); 
         res.status(HTTP_STATUS_CODES.OK).json({ faqs: faqs });
     }
 
@@ -39,7 +39,7 @@ export class FaqController {
             res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: "Invalid FAQ ID" });
         }
 
-        const faq = await this.faqUseCase!.findById(faqId);
+        const faq = await this._faqUseCase!.findById(faqId);
         if (!faq) {
             res.status(HTTP_STATUS_CODES.NOT_FOUND).json({ message: "FAQ not found" });
         }
@@ -54,7 +54,7 @@ export class FaqController {
             res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: "Invalid FAQ ID" });
         }
 
-        const updated = await this.faqUseCase.updateFaq(faqId, updatedData);
+        const updated = await this._faqUseCase.updateFaq(faqId, updatedData);
         if (!updated) {
             res.status(HTTP_STATUS_CODES.NOT_FOUND).json({ message: "FAQ not found" });
         }
@@ -68,7 +68,7 @@ export class FaqController {
             res.status(HTTP_STATUS_CODES.BAD_REQUEST).json({ message: "Invalid FAQ ID" });
         }
 
-        await this.faqUseCase!.deleteFaq(faqId);
+        await this._faqUseCase!.deleteFaq(faqId);
         res.status(HTTP_STATUS_CODES.OK).json({ message: "FAQ deleted successfully" });
     }
 }

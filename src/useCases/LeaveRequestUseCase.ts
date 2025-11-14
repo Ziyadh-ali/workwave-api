@@ -10,17 +10,17 @@ import { HTTP_STATUS_CODES, MESSAGES } from "../shared/constants";
 import { calculateWorkingDaysExcludingHolidays } from "../shared/utils/calculateWorkingDaysExcludingHolidays";
 import { CustomError } from "../shared/errors/CustomError";
 import { CreateLeaveRequestDTO } from "../entities/dtos/RequestDTOs/LeaveRequestDTO";
-import { LeaveRequestResponseDTO , LeaveRequestAdminResponseDTO} from "../entities/dtos/ResponseDTOs/LeaveRequestDTO";
+import { LeaveRequestResponseDTO, LeaveRequestAdminResponseDTO } from "../entities/dtos/ResponseDTOs/LeaveRequestDTO";
 import { LeaveRequestMapper } from "../entities/mapping/LeaveRequestMapper";
 
 @injectable()
 export class LeaveRequestUseCase implements ILeaveRequestUseCase {
   constructor(
     @inject("ILeaveRequestRepository")
-    private leaveRequestRepository: ILeaveRequestRepository,
+    private _leaveRequestRepository: ILeaveRequestRepository,
     @inject("ILeaveBalanceRepository")
-    private leaveBalanceRepository: ILeaveBalanceRepository
-  ) {}
+    private _leaveBalanceRepository: ILeaveBalanceRepository
+  ) { }
 
   async createLeaveRequest(
     leaveRequest: CreateLeaveRequestDTO
@@ -36,46 +36,52 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
       );
     }
 
-    if (
-      !leaveRequest.assignedManager &&
-      leaveRequest.userRole === "developer"
-    ) {
-      throw new CustomError(
-        "No manager assigned",
-        HTTP_STATUS_CODES.BAD_REQUEST
-      );
-    }
-    const leaveBalance = await this.leaveBalanceRepository.getLeaveBalance(
-      leaveRequest?.employeeId.toString(),
+
+    const leaveBalance = await this._leaveBalanceRepository.getLeaveBalance(
+      leaveRequest.employeeId.toString(),
       leaveRequest.leaveTypeId.toString()
     );
+
     if (!leaveBalance) {
       throw new CustomError(
         MESSAGES.ERROR.LEAVE.NO_LEAVE_BALANCE,
         HTTP_STATUS_CODES.BAD_REQUEST
       );
     }
-    console.log(leaveRequest.employeeId)
-    const existingLeaves =
-      await this.leaveRequestRepository.getLeaveRequestsOfEmployee(
-        leaveRequest?.employeeId.toString()
+
+    const newStart = new Date(leaveRequest.startDate);
+    const newEnd = new Date(leaveRequest.endDate);
+
+    newStart.setHours(0, 0, 0, 0);
+    newEnd.setHours(0, 0, 0, 0);
+
+    if (newEnd < newStart) {
+      throw new CustomError(
+        "End date cannot be before start date",
+        HTTP_STATUS_CODES.BAD_REQUEST
       );
-    console.log(existingLeaves)
+    }
+
+    const existingLeaves =
+      await this._leaveRequestRepository.getLeaveRequestsOfEmployee(
+        leaveRequest.employeeId.toString()
+      );
+
     if (existingLeaves) {
       for (const leave of existingLeaves) {
-        if (leave.status === "Cancelled") continue;
-        if (leave.status === "Rejected") continue;
+        if (leave.status === "Cancelled" || leave.status === "Rejected") continue;
 
         const existingStart = new Date(leave.startDate);
         const existingEnd = new Date(leave.endDate);
 
-        const newStart = new Date(leaveRequest.startDate);
-        const newEnd = new Date(leaveRequest.endDate);
+        existingStart.setHours(0, 0, 0, 0);
+        existingEnd.setHours(0, 0, 0, 0);
 
         const isOverlapping =
           newStart <= existingEnd && newEnd >= existingStart;
 
         if (isOverlapping) {
+          console.log("Overlaps")
           throw new CustomError(
             "Leave request overlaps with an existing leave.",
             HTTP_STATUS_CODES.BAD_REQUEST
@@ -84,29 +90,63 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
       }
     }
 
-    const startDate = new Date(leaveRequest.startDate);
-    const endDate = new Date(leaveRequest.endDate);
-    const duration = leaveRequest.duration || "full";
+    const ONE_DAY = 1000 * 60 * 60 * 24;
+
     let requestedDays =
-      Math.ceil(
-        (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-      ) + 1;
+      Math.ceil((newEnd.getTime() - newStart.getTime()) / ONE_DAY) + 1;
 
     if (
       requestedDays === 1 &&
-      (duration === "morning" || duration === "afternoon")
+      (leaveRequest.duration === "morning" ||
+        leaveRequest.duration === "afternoon")
     ) {
       requestedDays = 0.5;
     }
 
-    if (requestedDays > leaveBalance.availableDays) {
+    let pendingDaysUsed = 0;
+
+    if (existingLeaves?.length) {
+      for (const leave of existingLeaves) {
+        if (leave.status === "Cancelled" || leave.status === "Rejected") continue;
+
+        if (
+          leave.status === "Pending" ||
+          (leave.status === "Approved" &&
+            new Date(leave.endDate) >= new Date())
+        ) {
+          const pStart = new Date(leave.startDate);
+          const pEnd = new Date(leave.endDate);
+
+          pStart.setHours(0, 0, 0, 0);
+          pEnd.setHours(0, 0, 0, 0);
+
+          let pd =
+            Math.ceil((pEnd.getTime() - pStart.getTime()) / ONE_DAY) + 1;
+
+          if (
+            pd === 1 &&
+            (leave.duration === "morning" || leave.duration === "afternoon")
+          ) {
+            pd = 0.5;
+          }
+
+          pendingDaysUsed += pd;
+        }
+      }
+    }
+
+    const effectiveBalance = leaveBalance.availableDays - pendingDaysUsed;
+
+    if (requestedDays > effectiveBalance) {
       throw new CustomError(
-        MESSAGES.ERROR.LEAVE.INSUFFICIENT_BALANCE,
+        `You have only ${effectiveBalance} days available considering pending requests.`,
         HTTP_STATUS_CODES.BAD_REQUEST
       );
     }
-    return await this.leaveRequestRepository.create(leaveRequest);
+
+    return await this._leaveRequestRepository.create(leaveRequest);
   }
+
 
   async getLeaveRequestByEmployee(options: {
     employeeId: string;
@@ -119,7 +159,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     totalPages: number;
   }> {
     const leaveRequests =
-      await this.leaveRequestRepository.getLeaveRequestByEmployee(options);
+      await this._leaveRequestRepository.getLeaveRequestByEmployee(options);
     return {
       leaveRequests: leaveRequests.leaveRequests.map(
         LeaveRequestMapper.toResponseDTO
@@ -128,12 +168,8 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     };
   }
 
-  // async getLeaveRequestForApproval(managerId: string): Promise<LeaveRequest[]> {
-  //     return await this.leaveRequestRepository.getLeaveRequestForApproval(managerId);
-  // }
-
   async cancelLeaveRequest(leaveRequestId: string): Promise<boolean> {
-    const leaveRequest = await this.leaveRequestRepository.getLeaveRequestById(
+    const leaveRequest = await this._leaveRequestRepository.getLeaveRequestById(
       leaveRequestId
     );
 
@@ -144,7 +180,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
       );
     }
 
-    const updated = await this.leaveRequestRepository.cancelLeaveRequest(
+    const updated = await this._leaveRequestRepository.cancelLeaveRequest(
       leaveRequestId
     );
     if (!updated) return false;
@@ -154,15 +190,13 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
       leaveRequest.endDate,
       leaveRequest.duration ? leaveRequest.duration : ""
     );
-
     if (workingDays > 0) {
-      await this.leaveBalanceRepository.restoreLeave(
+      await this._leaveBalanceRepository.restoreLeave(
         leaveRequest.employeeId.toString(),
-        leaveRequest.leaveTypeId.toString(),
+        leaveRequest.leaveTypeId._id.toString(),
         workingDays
       );
     }
-
     return true;
   }
 
@@ -170,7 +204,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     leaveRequestId: string,
     status: "Approved" | "Rejected"
   ): Promise<boolean> {
-    const leaveRequest = await this.leaveRequestRepository.getLeaveRequestById(
+    const leaveRequest = await this._leaveRequestRepository.getLeaveRequestById(
       leaveRequestId
     );
 
@@ -190,8 +224,9 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
         endDate,
         duration ? duration : ""
       );
+      
       if (workingDays > 0) {
-        const success = await this.leaveBalanceRepository.deductLeave(
+        const success = await this._leaveBalanceRepository.deductLeave(
           employeeId.toString(),
           leaveTypeId._id.toString(),
           workingDays
@@ -206,7 +241,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
       }
     }
 
-    return await this.leaveRequestRepository.updateLeaveRequestStatus(
+    return await this._leaveRequestRepository.updateLeaveRequestStatus(
       leaveRequestId,
       status
     );
@@ -217,7 +252,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     limit: number;
     status: string;
   }): Promise<{ leaveRequests: LeaveRequestAdminResponseDTO[]; totalPages: number }> {
-    const leaveRequests =  await this.leaveRequestRepository.getAllLeaveRequests(options);
+    const leaveRequests = await this._leaveRequestRepository.getAllLeaveRequests(options);
     return {
       leaveRequests: leaveRequests.leaveRequests.map(
         LeaveRequestMapper.toAdminResponseDTO
@@ -230,7 +265,7 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
     leaveRequestId: string,
     reason: string
   ): Promise<void> {
-    return await this.leaveRequestRepository.setRejectionReason(
+    return await this._leaveRequestRepository.setRejectionReason(
       leaveRequestId,
       reason
     );
@@ -238,22 +273,22 @@ export class LeaveRequestUseCase implements ILeaveRequestUseCase {
   async getFilteredLeaveRequests(
     filters: LeaveRequestFilter
   ): Promise<LeaveRequestAdminResponseDTO[]> {
-    const leaveRequests = await this.leaveRequestRepository.getFilteredLeaveRequests(filters);
+    const leaveRequests = await this._leaveRequestRepository.getFilteredLeaveRequests(filters);
     return leaveRequests.map(LeaveRequestMapper.toAdminResponseDTO);
   }
 
   async getLeaveRequestById(
     leaveRequestId: string
   ): Promise<LeaveRequestResponseDTO | null> {
-    const leaveRequest =  await this.leaveRequestRepository.getLeaveRequestById(
+    const leaveRequest = await this._leaveRequestRepository.getLeaveRequestById(
       leaveRequestId
     );
-    if(!leaveRequest) return null;
+    if (!leaveRequest) return null;
     return LeaveRequestMapper.toResponseDTO(leaveRequest)
   }
 
   async getEveryRequests(): Promise<LeaveRequestAdminResponseDTO[] | []> {
-    const leaveRequests =  await this.leaveRequestRepository.getEveryLeaveRequests();
+    const leaveRequests = await this._leaveRequestRepository.getEveryLeaveRequests();
     return leaveRequests.map(LeaveRequestMapper.toAdminResponseDTO);
   }
 }

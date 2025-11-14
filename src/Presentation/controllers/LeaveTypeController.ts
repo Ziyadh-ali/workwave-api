@@ -8,12 +8,12 @@ import { LeaveTypeMapper } from "../../entities/mapping/LeaveTypeMapper";
 @injectable()
 export class LeaveTypeController implements ILeaveTypeController {
     constructor(
-        @inject("ILeaveTypeUseCase") private leaveTypeUseCase: ILeaveTypeUseCase,
+        @inject("ILeaveTypeUseCase") private _leaveTypeUseCase: ILeaveTypeUseCase,
     ) { }
 
     async createLeaveType(req: Request, res: Response): Promise<void> {
         const leaveTypeData = req.body;
-        const leaveType = await this.leaveTypeUseCase.createLeaveType(LeaveTypeMapper.toEntity(leaveTypeData));
+        const leaveType = await this._leaveTypeUseCase.createLeaveType(LeaveTypeMapper.toEntity(leaveTypeData));
         res.status(HTTP_STATUS_CODES.CREATED).json({
             success: true,
             message: MESSAGES.SUCCESS.LEAVE_TYPE_CREATED,
@@ -23,7 +23,7 @@ export class LeaveTypeController implements ILeaveTypeController {
 
     async getLeaveTypeById(req: Request, res: Response): Promise<void> {
         const { id } = req.body;
-        const leaveType = await this.leaveTypeUseCase.getLeaveTypeById(id);
+        const leaveType = await this._leaveTypeUseCase.getLeaveTypeById(id);
         res.status(HTTP_STATUS_CODES.OK).json({
             success: true,
             data: leaveType,
@@ -37,7 +37,7 @@ export class LeaveTypeController implements ILeaveTypeController {
         const limitNum = parseInt(limit as string, 10);
         const paidFilter = isPaid === "" ? undefined : isPaid === "true";
 
-        const result = await this.leaveTypeUseCase.getAllLeaveTypes({
+        const result = await this._leaveTypeUseCase.getAllLeaveTypes({
             page: pageNum,
             limit: limitNum,
             isPaid: paidFilter,
@@ -52,7 +52,7 @@ export class LeaveTypeController implements ILeaveTypeController {
     async updateLeaveType(req: Request, res: Response): Promise<void> {
         const { id } = req.params;
         const updateData = req.body;
-        const updatedLeaveType = await this.leaveTypeUseCase.updateLeaveType(id, LeaveTypeMapper.toEntity(updateData));
+        const updatedLeaveType = await this._leaveTypeUseCase.updateLeaveType(id, LeaveTypeMapper.toEntity(updateData));
         res.status(HTTP_STATUS_CODES.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.LEAVE_TYPE_UPDATED,
@@ -62,7 +62,7 @@ export class LeaveTypeController implements ILeaveTypeController {
 
     async deleteLeaveType(req: Request, res: Response): Promise<void> {
         const { id } = req.params;
-        await this.leaveTypeUseCase.deleteLeaveType(id);
+        await this._leaveTypeUseCase.deleteLeaveType(id);
         res.status(HTTP_STATUS_CODES.OK).json({
             success: true,
             message: MESSAGES.SUCCESS.LEAVE_TYPE_DELETED,
@@ -70,7 +70,7 @@ export class LeaveTypeController implements ILeaveTypeController {
     }
 
     async getEveryLeaveType(req: Request, res: Response): Promise<void> {
-        const leaveTypes = await this.leaveTypeUseCase.getEveryLeaveType();
+        const leaveTypes = await this._leaveTypeUseCase.getEveryLeaveType();
         res.status(HTTP_STATUS_CODES.OK).json({
             success: true,
             leaveTypes

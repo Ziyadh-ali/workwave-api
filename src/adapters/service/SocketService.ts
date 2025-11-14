@@ -20,30 +20,30 @@ interface RoomUsersMap {
 
 @injectable()
 export class SocketManager {
-    private io: IOServer | null = null;
-    private userSocketMap: UserSocketMap = {};
-    private roomUsersMap: RoomUsersMap = {};
+    private _io: IOServer | null = null;
+    private _userSocketMap: UserSocketMap = {};
+    private _roomUsersMap: RoomUsersMap = {};
 
     constructor(
-        @inject('IMessageRepository') private messageRepository: IMessageRepository,
-        @inject('IEmployeeRepository') private employeeRepository: IEmployeeRepository,
-        @inject('IGroupRepository') private groupRepository: IGroupRepository,
-        @inject('INotificationRepository') private notificationRepository: INotificationRepository,
+        @inject('IMessageRepository') private _messageRepository: IMessageRepository,
+        @inject('IEmployeeRepository') private _employeeRepository: IEmployeeRepository,
+        @inject('IGroupRepository') private _groupRepository: IGroupRepository,
+        @inject('INotificationRepository') private _notificationRepository: INotificationRepository,
     ) { }
 
     public initialize(io: IOServer): void {
-        this.io = io;
+        this._io = io;
         this.setupSocketEvents();
     }
 
     private setupSocketEvents(): void {
-        if (!this.io) throw new CustomError('Socket.IO server not initialized' , HTTP_STATUS_CODES.BAD_REQUEST);
+        if (!this._io) throw new CustomError('Socket.IO server not initialized' , HTTP_STATUS_CODES.BAD_REQUEST);
 
-        this.io.on('connection', (socket: Socket) => {
+        this._io.on('connection', (socket: Socket) => {
             console.log(`User connected: ${socket.id}`);
 
             socket.on('register', (userId: string) => {
-                this.userSocketMap[userId] = socket.id;
+                this._userSocketMap[userId] = socket.id;
                 console.log(`User ${userId} registered with socket ${socket.id}`);
                 this.updateOnlineUsers();
                 this.fetchAndEmitEmployees(socket);
@@ -51,18 +51,18 @@ export class SocketManager {
 
             socket.on('joinRoom', (roomId: string, userId: string) => {
                 socket.join(roomId);
-                if (!this.roomUsersMap[roomId]) {
-                    this.roomUsersMap[roomId] = new Set();
+                if (!this._roomUsersMap[roomId]) {
+                    this._roomUsersMap[roomId] = new Set();
                 }
-                this.roomUsersMap[roomId].add(userId);
+                this._roomUsersMap[roomId].add(userId);
                 console.log(`User ${userId} joined room ${roomId}`);
             });
 
             // Leave a room
             socket.on('leaveRoom', (roomId: string, userId: string) => {
                 socket.leave(roomId);
-                if (this.roomUsersMap[roomId]) {
-                    this.roomUsersMap[roomId].delete(userId);
+                if (this._roomUsersMap[roomId]) {
+                    this._roomUsersMap[roomId].delete(userId);
                 }
                 console.log(`User ${userId} left room ${roomId}`);
             });
@@ -70,10 +70,10 @@ export class SocketManager {
             // Private message
             socket.on('privateMessage', async (message: IMessage) => {
                 try {
-                    const savedMessage = await this.messageRepository.createMessage(message);
+                    const savedMessage = await this._messageRepository.createMessage(message);
 
                     socket.emit('newPrivateMessage', savedMessage);
-                    const sender = await this.employeeRepository.findById(savedMessage.sender.toString())
+                    const sender = await this._employeeRepository.findById(savedMessage.sender.toString())
 
                     await this.sendNotification({
                         recipient: message.recipient as string,
@@ -85,9 +85,9 @@ export class SocketManager {
                         }
                     });
 
-                    const recipientSocketId = this.userSocketMap[message.recipient as string];
+                    const recipientSocketId = this._userSocketMap[message.recipient as string];
                     if (recipientSocketId) {
-                        this.io!.to(recipientSocketId).emit('newPrivateMessage', savedMessage);
+                        this._io!.to(recipientSocketId).emit('newPrivateMessage', savedMessage);
                     }
                 } catch (error) {
                     console.error('Error sending private message:', error);
@@ -100,12 +100,11 @@ export class SocketManager {
                     if (!message.roomId) {
                         throw new Error('Room ID is required for room messages');
                     }
-                    const savedMessage = await this.messageRepository.createMessage(message);
+                    const savedMessage = await this._messageRepository.createMessage(message);
 
-                    this.io!.to(message.roomId as string).emit('newRoomMessage', savedMessage);
+                    this._io!.to(message.roomId as string).emit('newRoomMessage', savedMessage);
 
-                    const groupDetails = await this.groupRepository.getGroupDetails(message._id?.toString()!);
-
+                    const groupDetails = await this._groupRepository.getGroupDetails(message._id?.toString()!);
                     if (groupDetails) {
                         const recipients = groupDetails.members.filter(memberId =>
                             memberId !== (message.sender as unknown as string)
@@ -133,7 +132,7 @@ export class SocketManager {
             // Mark message as read
             socket.on('markAsRead', async (messageId: string, userId: string) => {
                 try {
-                    await this.messageRepository.markAsRead(messageId, userId);
+                    await this._messageRepository.markAsRead(messageId, userId);
                     socket.emit('messageRead', messageId);
                 } catch (error) {
                     console.error('Error marking message as read:', error);
@@ -141,9 +140,9 @@ export class SocketManager {
             });
 
             socket.on('typingPrivate', (recipientId: string, senderId: string) => {
-                const recipientSocketId = this.userSocketMap[recipientId];
+                const recipientSocketId = this._userSocketMap[recipientId];
                 if (recipientSocketId) {
-                    this.io!.to(recipientSocketId).emit('userTyping', senderId);
+                    this._io!.to(recipientSocketId).emit('userTyping', senderId);
                 }
             });
 
@@ -153,20 +152,20 @@ export class SocketManager {
 
             // Typing indicator for room chat
             socket.on('typingRoom', (roomId: string, senderId: string) => {
-                this.io!.to(roomId).emit('userTypingRoom', senderId, roomId);
+                this._io!.to(roomId).emit('userTypingRoom', senderId, roomId);
             });
 
             socket.on('createGroup', async (groupData: { name: string; members: string[]; createdBy: string }, callback: (response: { success: boolean; group?: IGroup; error?: string }) => void) => {
                 try {
-                    const newGroup = await this.groupRepository.create(groupData);
+                    const newGroup = await this._groupRepository.create(groupData);
                     const members = [...groupData.members, groupData.createdBy];
-                    await this.groupRepository.addMembers(newGroup?._id!.toString(), members);
+                    await this._groupRepository.addMembers(newGroup?._id!.toString(), members);
 
                     members.forEach(memberId => {
-                        const memberSocketId = this.userSocketMap[memberId];
+                        const memberSocketId = this._userSocketMap[memberId];
                         if (memberSocketId) {
                             console.log(newGroup)
-                            this.io!.to(memberSocketId).emit('groupCreated', newGroup);
+                            this._io!.to(memberSocketId).emit('groupCreated', newGroup);
                         }
                     });
 
@@ -179,7 +178,7 @@ export class SocketManager {
 
             socket.on('requestUserGroups', async (userId: string) => {
                 try {
-                    const groups = await this.groupRepository.getGroupsByUser(userId);
+                    const groups = await this._groupRepository.getGroupsByUser(userId);
                     socket.emit('userGroups', groups);
                 } catch (error) {
                     console.error('Error fetching user groups:', error);
@@ -189,24 +188,24 @@ export class SocketManager {
 
             socket.on('addGroupMembers', async (groupId: string, userIds: string[], callback: (response: { success: boolean; error?: string }) => void) => {
                 try {
-                    const success = await this.groupRepository.addMembers(groupId, userIds);
+                    const success = await this._groupRepository.addMembers(groupId, userIds);
                     if (success) {
                         // Notify new members
                         userIds.forEach(userId => {
-                            const memberSocketId = this.userSocketMap[userId];
+                            const memberSocketId = this._userSocketMap[userId];
                             if (memberSocketId) {
-                                this.io!.to(memberSocketId).emit('addedToGroup', groupId);
+                                this._io!.to(memberSocketId).emit('addedToGroup', groupId);
                             }
                         });
 
                         // Get updated group details
-                        const groupDetails = await this.groupRepository.getGroupDetails(groupId);
+                        const groupDetails = await this._groupRepository.getGroupDetails(groupId);
                         if (groupDetails) {
                             // Notify all group members about the update
                             groupDetails.members.forEach(memberId => {
-                                const memberSocketId = this.userSocketMap[memberId];
+                                const memberSocketId = this._userSocketMap[memberId];
                                 if (memberSocketId) {
-                                    this.io!.to(memberSocketId).emit('groupMembersUpdated', {
+                                    this._io!.to(memberSocketId).emit('groupMembersUpdated', {
                                         groupId,
                                         newMembers: userIds
                                     });
@@ -224,19 +223,19 @@ export class SocketManager {
 
             socket.on('removeGroupMember', async (groupId: string, memberId: string) => {
                 try {
-                    await this.groupRepository.removeMember(groupId, memberId);
+                    await this._groupRepository.removeMember(groupId, memberId);
 
-                    const removedUserSocketId = this.userSocketMap[memberId];
+                    const removedUserSocketId = this._userSocketMap[memberId];
                     if (removedUserSocketId) {
-                        this.io!.to(removedUserSocketId).emit('removedFromGroup', groupId);
+                        this._io!.to(removedUserSocketId).emit('removedFromGroup', groupId);
                     }
 
-                    const groupDetails = await this.groupRepository.getGroupDetails(groupId);
+                    const groupDetails = await this._groupRepository.getGroupDetails(groupId);
                     if (groupDetails) {
                         groupDetails.members.forEach(userId => {
-                            const memberSocketId = this.userSocketMap[userId];
+                            const memberSocketId = this._userSocketMap[userId];
                             if (memberSocketId) {
-                                this.io!.to(memberSocketId).emit('groupMemberRemoved', {
+                                this._io!.to(memberSocketId).emit('groupMemberRemoved', {
                                     groupId,
                                     removedMemberId: memberId
                                 });
@@ -251,18 +250,18 @@ export class SocketManager {
 
             socket.on('deleteGroup', async (groupId: string) => {
                 try {
-                    const groupDetails = await this.groupRepository.getGroupDetails(groupId);
+                    const groupDetails = await this._groupRepository.getGroupDetails(groupId);
                     if (!groupDetails) {
                         throw new Error('Group not found');
                     }
 
-                    await this.groupRepository.deleteGroup(groupId);
+                    await this._groupRepository.deleteGroup(groupId);
 
                     // Notify all group members
                     groupDetails.members.forEach(memberId => {
-                        const memberSocketId = this.userSocketMap[memberId];
+                        const memberSocketId = this._userSocketMap[memberId];
                         if (memberSocketId) {
-                            this.io!.to(memberSocketId).emit('groupDeleted', groupId);
+                            this._io!.to(memberSocketId).emit('groupDeleted', groupId);
                         }
                     });
                 } catch (error) {
@@ -273,7 +272,7 @@ export class SocketManager {
 
             socket.on('fetchPrivateMessages', async ({ user1, user2 }: { user1: string; user2: string }, callback: (messages: IMessage[]) => void) => {
                 try {
-                    const messages = await this.messageRepository.getPrivateMessages(user1, user2);
+                    const messages = await this._messageRepository.getPrivateMessages(user1, user2);
                     callback(messages);
                 } catch (error) {
                     console.error('Error fetching private messages:', error);
@@ -283,7 +282,7 @@ export class SocketManager {
 
             socket.on('fetchRoomMessages', async (roomId: string, callback: (messages: IMessage[]) => void) => {
                 try {
-                    const messages = await this.messageRepository.getMessagesByRoomId(roomId);
+                    const messages = await this._messageRepository.getMessagesByRoomId(roomId);
                     callback(messages);
                 } catch (error) {
                     console.error('Error fetching room messages:', error);
@@ -302,7 +301,7 @@ export class SocketManager {
 
             socket.on('getUserNotifications', async (userId: string, callback: (notifications: INotification[]) => void) => {
                 try {
-                    const { notifications } = await this.notificationRepository.getUserNotifications(userId);
+                    const { notifications } = await this._notificationRepository.getUserNotifications(userId);
                     callback(notifications);
                 } catch (error) {
                     console.error('Error getting user notifications:', error);
@@ -312,7 +311,7 @@ export class SocketManager {
 
             socket.on('getUnreadNotifications', async (userId: string, callback: (notifications: INotification[]) => void) => {
                 try {
-                    const notifications = await this.notificationRepository.getUnreadNotifications(userId);
+                    const notifications = await this._notificationRepository.getUnreadNotifications(userId);
                     callback(notifications);
                 } catch (error) {
                     console.error('Error getting unread notifications:', error);
@@ -403,9 +402,9 @@ export class SocketManager {
 
             socket.on('disconnect', () => {
                 console.log(`User disconnected: ${socket.id}`);
-                for (const [userId, socketId] of Object.entries(this.userSocketMap)) {
+                for (const [userId, socketId] of Object.entries(this._userSocketMap)) {
                     if (socketId === socket.id) {
-                        delete this.userSocketMap[userId];
+                        delete this._userSocketMap[userId];
                         console.log(`Removed user ${userId} from socket map`);
                         this.updateOnlineUsers();
                         break;
@@ -417,7 +416,7 @@ export class SocketManager {
 
     private async fetchAndEmitEmployees(socket: Socket) {
         try {
-            const employees = await this.employeeRepository.getEmployeesForChat();
+            const employees = await this._employeeRepository.getEmployeesForChat();
             socket.emit('employeeList', employees);
         } catch (error) {
             console.error('Error fetching employees:', error);
@@ -426,21 +425,21 @@ export class SocketManager {
     }
 
     private updateOnlineUsers(): void {
-        if (this.io) {
-            this.io.emit('onlineUsers', Object.keys(this.userSocketMap));
+        if (this._io) {
+            this._io.emit('onlineUsers', Object.keys(this._userSocketMap));
         }
     }
 
     private async sendNotification(notificationData: Omit<INotification, '_id' | 'createdAt' | 'updatedAt'>): Promise<void> {
         try {
-            const notification = await this.notificationRepository.createNotification({
+            const notification = await this._notificationRepository.createNotification({
                 ...notificationData,
                 read: false,
             });
 
-            const recipientSocketId = this.userSocketMap[notification.recipient as string];
+            const recipientSocketId = this._userSocketMap[notification.recipient as string];
             if (recipientSocketId) {
-                this.io!.to(recipientSocketId).emit('newNotification', notification);
+                this._io!.to(recipientSocketId).emit('newNotification', notification);
             }
         } catch (error) {
             console.error('Error sending notification:', error);
@@ -449,10 +448,10 @@ export class SocketManager {
 
     private async markNotificationsAsRead(userId: string, notificationIds: string[]): Promise<void> {
         try {
-            await this.notificationRepository.markAsRead(notificationIds);
-            const socketId = this.userSocketMap[userId];
+            await this._notificationRepository.markAsRead(notificationIds);
+            const socketId = this._userSocketMap[userId];
             if (socketId) {
-                this.io!.to(socketId).emit('notificationsRead', notificationIds);
+                this._io!.to(socketId).emit('notificationsRead', notificationIds);
             }
         } catch (error) {
             console.error('Error marking notifications as read:', error);

@@ -7,12 +7,12 @@ import { MESSAGES } from "../../../shared/constants";
 @injectable()
 export class ForgotPasswordController {
     constructor(
-        @inject("IForgotPasswordUseCase") private forgotPasswordUseCase : IForgotPasswordUseCase,
+        @inject("IForgotPasswordUseCase") private _forgotPasswordUseCase : IForgotPasswordUseCase,
     ){}
 
     async execute(req : Request , res : Response) : Promise<void>{
             const {email} = req.body;
-            await this.forgotPasswordUseCase.confirmEmailAndSendLink(email);
+            await this._forgotPasswordUseCase.confirmEmailAndSendLink(email);
             res.status(HTTP_STATUS_CODES.OK).json({
                 success : true,
                 message : MESSAGES.SUCCESS.RESET_LINK_SENDED,

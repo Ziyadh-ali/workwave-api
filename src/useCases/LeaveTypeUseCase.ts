@@ -11,11 +11,11 @@ import { LeaveTypeMapper } from "../entities/mapping/LeaveTypeMapper";
 @injectable()
 export class LeaveTypeUseCase implements ILeaveTypeUseCase {
     constructor(
-        @inject("ILeaveTypeRepository") private leaveTypeRepository: ILeaveTypeRepository,
+        @inject("ILeaveTypeRepository") private _leaveTypeRepository: ILeaveTypeRepository,
     ) { }
 
     async createLeaveType(data: CreateLeaveTypeDTO): Promise<LeaveTypeResponseDTO> {
-        const newLeaveType = await this.leaveTypeRepository.create(data);
+        const newLeaveType = await this._leaveTypeRepository.create(data);
 
         eventHandler.emit("LEAVE_TYPE_ADDED", newLeaveType._id, newLeaveType.maxDaysAllowed);
 
@@ -23,7 +23,7 @@ export class LeaveTypeUseCase implements ILeaveTypeUseCase {
     }
 
     async getLeaveTypeById(id: string): Promise<LeaveTypeResponseDTO | null> {
-        const leaveType = await this.leaveTypeRepository.findById(id);
+        const leaveType = await this._leaveTypeRepository.findById(id);
         if (!leaveType) {
             throw new CustomError(MESSAGES.ERROR.LEAVE_TYPE.NOT_FOUND , HTTP_STATUS_CODES.NOT_FOUND);
         }
@@ -35,7 +35,7 @@ export class LeaveTypeUseCase implements ILeaveTypeUseCase {
         limit: number;
         isPaid?: boolean;
     }): Promise<{ leaveTypes: LeaveTypeResponseDTO[]; totalPages: number }> {
-        const leaveTypes =  await this.leaveTypeRepository.getAllLeaveTypes(options);
+        const leaveTypes =  await this._leaveTypeRepository.getAllLeaveTypes(options);
         return {
             leaveTypes : leaveTypes.leaveTypes.map(LeaveTypeMapper.toResponseDTO),
             totalPages : leaveTypes.totalPages
@@ -43,7 +43,7 @@ export class LeaveTypeUseCase implements ILeaveTypeUseCase {
     }
 
     async updateLeaveType(id: string, data: UpdateLeaveTypeDTO): Promise<LeaveTypeResponseDTO | null> {
-        const updatedLeaveType = await this.leaveTypeRepository.update(id, data);
+        const updatedLeaveType = await this._leaveTypeRepository.update(id, data);
         if (!updatedLeaveType) {
             throw new CustomError(MESSAGES.ERROR.LEAVE_TYPE.UPDATE_FAILED , HTTP_STATUS_CODES.BAD_REQUEST);
         }
@@ -51,7 +51,7 @@ export class LeaveTypeUseCase implements ILeaveTypeUseCase {
     }
 
     async deleteLeaveType(id: string): Promise<boolean> {
-        const isDeleted = await this.leaveTypeRepository.deleteLeaveType(id);
+        const isDeleted = await this._leaveTypeRepository.deleteLeaveType(id);
         if (!isDeleted) {
             throw new CustomError(MESSAGES.ERROR.LEAVE_TYPE.DELETE_FAILED , HTTP_STATUS_CODES.BAD_REQUEST);
         }
@@ -59,6 +59,6 @@ export class LeaveTypeUseCase implements ILeaveTypeUseCase {
     }
 
     async getEveryLeaveType(): Promise<LeaveTypeResponseDTO[]> {
-        return (await this.leaveTypeRepository.getAll()).map(LeaveTypeMapper.toResponseDTO);
+        return (await this._leaveTypeRepository.getAll()).map(LeaveTypeMapper.toResponseDTO);
     }
 }

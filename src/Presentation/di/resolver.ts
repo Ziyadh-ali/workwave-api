@@ -22,6 +22,7 @@ import { PayslipController } from "../controllers/PDFHandlerController";
 import { CronService } from "../../adapters/service/CronService";
 import { LeaveBalanceUseCase } from "../../useCases/LeaveBalanceUseCase";
 import { LeaveTypeRepository } from "../../adapters/repositories/LeaveTypeRepository";
+import { EventService } from "../../shared/events";
 
 DependencyInjection.registerAll();
 
@@ -55,7 +56,8 @@ export const meetingController = container.resolve(MeetingController);
 
 export const faqController = container.resolve(FaqController);
 
-// export const socketManager = container.resolve(SocketManager);
+const eventService = container.resolve<EventService>("EventService");
+eventService.initialize();
 
 export const messageController = container.resolve(MessageController);
 

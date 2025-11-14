@@ -17,6 +17,7 @@ export class LeaveBalanceMapper {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static toResponseDTO(entity: any): LeaveBalanceResponseDTO {
     return {
       _id: entity._id?.toString() ?? "",

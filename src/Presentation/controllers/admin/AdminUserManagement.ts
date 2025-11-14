@@ -13,14 +13,14 @@ import { ParsedQs } from "qs";
 export class AdminUserManagement {
   constructor(
     @inject("IEmployeeManagementUseCase")
-    private employeeManagementUseCase: IEmployeeManagementUseCase,
+    private _employeeManagementUseCase: IEmployeeManagementUseCase,
     @inject("IEmployeeProfileUseCase")
-    private employeeProfileUseCase: IEmployeeProfileUseCase,
+    private _employeeProfileUseCase: IEmployeeProfileUseCase,
   ) {}
 
   async addUser(req: Request, res: Response): Promise<void> {
     const { userData } = req.body;
-    const response = await this.employeeManagementUseCase.addEmployee(userData);
+    const response = await this._employeeManagementUseCase.addEmployee(userData);
 
     res
       .status(HTTP_STATUS_CODES.CREATED)
@@ -28,7 +28,7 @@ export class AdminUserManagement {
   }
 
   async getUsers(req: Request, res: Response): Promise<void> {
-    const {
+    const { 
       page = 1,
       pageSize = 10,
       role,
@@ -49,7 +49,7 @@ export class AdminUserManagement {
         : undefined,
     };
 
-    const result = await this.employeeManagementUseCase.getEmployees(
+    const result = await this._employeeManagementUseCase.getEmployees(
       filter,
       Number(page),
       Number(pageSize)
@@ -69,7 +69,7 @@ export class AdminUserManagement {
   async getUserDetails(req: Request, res: Response): Promise<void> {
     const { employeeId } = req.params;
 
-    const userDetails = await this.employeeProfileUseCase.getEmployeeDetails(
+    const userDetails = await this._employeeProfileUseCase.getEmployeeDetails(
       employeeId
     );
 
@@ -78,14 +78,14 @@ export class AdminUserManagement {
 
   async deleteUser(req: Request, res: Response): Promise<void> {
     const { employeeId } = req.params;
-    await this.employeeManagementUseCase.deleteEmployee(employeeId);
+    await this._employeeManagementUseCase.deleteEmployee(employeeId);
     res
       .status(HTTP_STATUS_CODES.OK)
       .json({ message: MESSAGES.SUCCESS.USER_DELETED });
   }
 
   async getManagers(req: Request, res: Response): Promise<void> {
-    const response = await this.employeeManagementUseCase.getManagers();
+    const response = await this._employeeManagementUseCase.getManagers();
     res.status(HTTP_STATUS_CODES.OK).json({
       success: true,
       message: "Managers found",
@@ -112,7 +112,7 @@ export class AdminUserManagement {
       return;
     }
 
-    const user = await this.employeeProfileUseCase.updateEmployee(
+    const user = await this._employeeProfileUseCase.updateEmployee(
       employeeId,
       userData
     );
@@ -135,14 +135,14 @@ export class AdminUserManagement {
 
   async getEmployeesForChat(req: Request, res: Response): Promise<void> {
     const employees =
-      await this.employeeManagementUseCase.getEmployeesForChat();
+      await this._employeeManagementUseCase.getEmployeesForChat();
     res.status(HTTP_STATUS_CODES.OK).json({
       employees,
     });
   }
 
   async getDevelopers(req: Request, res: Response): Promise<void> {
-    const developers = await this.employeeManagementUseCase.getDevelopers();
+    const developers = await this._employeeManagementUseCase.getDevelopers();
     res.status(HTTP_STATUS_CODES.OK).json({
       developers,
     });

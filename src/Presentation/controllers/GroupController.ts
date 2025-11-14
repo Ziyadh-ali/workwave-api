@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { IGroupUseCase } from "../../entities/useCaseInterface/IGroupUseCase";
 import { injectable, inject } from "tsyringe";
-import { CustomRequest } from "../middlewares/AuthMiddleware";
 import { HTTP_STATUS_CODES } from "../../shared/constants";
+import { CustomRequest } from "../../entities/services/JwtInterface";
 
 @injectable()
 export class GroupController {
     constructor(
-        @inject("IGroupUseCase") private groupUseCase: IGroupUseCase,
+        @inject("IGroupUseCase") private _groupUseCase: IGroupUseCase,
     ) { }
 
     async createGroup(req: Request, res: Response): Promise<void> {
@@ -20,7 +20,7 @@ export class GroupController {
             return;
         }
 
-        const group = await this.groupUseCase.createGroup({
+        const group = await this._groupUseCase.createGroup({
             name,
             members,
             createdBy,
@@ -35,7 +35,7 @@ export class GroupController {
     async getGroupsByUser(req: Request, res: Response): Promise<void> {
         const employeeId = (req as CustomRequest).user.id;
 
-        const groups = await this.groupUseCase.getGroupsByUser(employeeId);
+        const groups = await this._groupUseCase.getGroupsByUser(employeeId);
 
         res.status(HTTP_STATUS_CODES.OK).json(groups);
     }
@@ -44,7 +44,7 @@ export class GroupController {
         const { groupId } = req.params;
         const { userIds } = req.body;
 
-        const group = await this.groupUseCase.addMembers(groupId, userIds);
+        const group = await this._groupUseCase.addMembers(groupId, userIds);
 
         res.json({
             message: 'Members added successfully',

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import cloudinary from "./CloudinaryTmp";
-import { CustomRequest } from "../../Presentation/middlewares/AuthMiddleware";
+import { CustomRequest } from "../../entities/services/JwtInterface";
 
 
 export const uploadEmployeeProfile = async (req : Request, res : Response, next : NextFunction) => {

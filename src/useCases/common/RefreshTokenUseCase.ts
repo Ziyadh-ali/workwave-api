@@ -8,11 +8,11 @@ import { IJwtService, TJwtPayload } from "../../entities/services/JwtInterface";
 @injectable()
 export class RefreshTokenUseCase implements IRefreshTokenUseCase {
     constructor(
-        @inject("IJwtService") private jwtService: IJwtService,
+        @inject("IJwtService") private _jwtService: IJwtService,
     ) { }
     async execute(refreshToken: string , res : Response , role : string): Promise<{ accessToken: string; }> {
         try {
-            const decoded = this.jwtService.verifyRefreshToken(refreshToken) as TJwtPayload;
+            const decoded = this._jwtService.verifyRefreshToken(refreshToken) as TJwtPayload;
 
             const newPayload = {
                 id: decoded.id,
@@ -20,7 +20,7 @@ export class RefreshTokenUseCase implements IRefreshTokenUseCase {
                 role: decoded.role,
             }
 
-            const accessToken = this.jwtService.generateAccessToken(newPayload);
+            const accessToken = this._jwtService.generateAccessToken(newPayload);
 
             updateCookieWithAccessToken(
                 res,

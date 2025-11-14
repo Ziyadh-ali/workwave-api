@@ -7,7 +7,7 @@ import { IEmployeeProfileUseCase } from "../../../entities/useCaseInterface/IEmp
 @injectable()
 export class EmployeeProfile implements IEmployeeProfile {
     constructor(
-        @inject("IEmployeeProfileUseCase") private employeeProfileUseCase: IEmployeeProfileUseCase,
+        @inject("IEmployeeProfileUseCase") private _employeeProfileUseCase: IEmployeeProfileUseCase,
     ) { }
     async getProfileDetails(req: Request, res: Response): Promise<void> {
         const { employeeId } = req.params;
@@ -18,7 +18,7 @@ export class EmployeeProfile implements IEmployeeProfile {
                 });
             }
 
-            const details = await this.employeeProfileUseCase.getEmployeeDetails(employeeId);
+            const details = await this._employeeProfileUseCase.getEmployeeDetails(employeeId);
 
             if (details) {
 
@@ -57,7 +57,7 @@ export class EmployeeProfile implements IEmployeeProfile {
                 return;
             }
 
-            const user = await this.employeeProfileUseCase.updateEmployee(employeeId, userData);
+            const user = await this._employeeProfileUseCase.updateEmployee(employeeId, userData);
 
             if (user) {
                 res.status(HTTP_STATUS_CODES.OK).json({
@@ -98,7 +98,7 @@ export class EmployeeProfile implements IEmployeeProfile {
                 newPassword,
             }
 
-            await this.employeeProfileUseCase.changePassword(employeeId, data);
+            await this._employeeProfileUseCase.changePassword(employeeId, data);
             res.status(HTTP_STATUS_CODES.OK).json({
                 success: true,
                 message: MESSAGES.SUCCESS.PASSWORD_CHANGED,

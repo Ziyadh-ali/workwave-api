@@ -27,41 +27,41 @@ import asyncHandler from "express-async-handler"
 
 
 export class UserRoute {
-    private router: express.Router;
+    private _router: express.Router;
 
     constructor() {
-        this.router = express.Router()
+        this._router = express.Router()
         this.setRoutes();
     }
 
     private setRoutes(): void {
-        this.router.post(
+        this._router.post(
             "/login",
             asyncHandler((req: Request, res: Response) => employeeController.login(req, res),)
         );
 
-        this.router.post(
+        this._router.post(
             "/logout",
             asyncHandler((req: Request, res: Response) => employeeController.logout(req, res),)
         );
-        this.router.post(
+        this._router.post(
             '/refresh-token/:role',
             (req: Request, res: Response) => refreshController.refreshToken(req, res)
         );
-        this.router.post(
+        this._router.post(
             "/forgot-password",
             asyncHandler((req: Request, res: Response) => forgotPasswordController.execute(req, res))
         )
-        this.router.post(
+        this._router.post(
             "/reset-password",
             asyncHandler((req: Request, res: Response) => resetPasswordController.execute(req, res),)
         )
-        this.router.get(
+        this._router.get(
             "/employees",
             asyncHandler((req: Request, res: Response) => adminUserManagement.getEmployeesForChat(req, res),)
         )
 
-        this.router
+        this._router
             .post(
                 '/users',
                 verifyAuth("employee"),
@@ -88,7 +88,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => adminUserManagement.deleteUser(req, res))
             );
 
-        this.router
+        this._router
             .get(
                 "/profile/:employeeId",
                 verifyAuth("employee"),
@@ -106,14 +106,14 @@ export class UserRoute {
                 verifyAuth("employee"),
                 asyncHandler((req: Request, res: Response) => employeeProfile.changePassword(req, res),)
             );
-        this.router
+        this._router
             .get(
                 "/leave/balance/:employeeId",
                 verifyAuth("employee"),
                 asyncHandler((req: Request, res: Response) => leaveBalanceController.getLeaveBalanceById(req, res))
             )
 
-        this.router
+        this._router
             .post(
                 "/leave/request",
                 verifyAuth("employee"),
@@ -149,7 +149,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => leaveRequestController.updateLeaveRequestStatus(req, res))
             )
 
-        this.router
+        this._router
             .get(
                 "/leave/types",
                 verifyAuth("employee"),
@@ -161,7 +161,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => leaveTypeController.getEveryLeaveType(req, res))
             )
 
-        this.router
+        this._router
             .post(
                 "/attendance/:employeeId",
                 verifyAuth("employee"),
@@ -188,7 +188,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => attendanceController.getAttendanceByMonth(req, res))
             )
 
-        this.router
+        this._router
             .post(
                 "/meeting",
                 verifyAuth("employee"),
@@ -220,7 +220,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => meetingController.deleteMeeting(req, res))
             )
 
-        this.router
+        this._router
             .post(
                 "/faq",
                 verifyAuth("employee"),
@@ -248,26 +248,26 @@ export class UserRoute {
             )
 
 
-        this.router
+        this._router
             .get(
                 "/messages",
                 verifyAuth("employee"),
                 asyncHandler((req: Request, res: Response) => messageController.getPrivateMessages(req, res))
             )
-        this.router
+        this._router
             .get(
                 "/messages/:roomId",
                 verifyAuth("employee"),
                 asyncHandler((req: Request, res: Response) => messageController.getGroupMessages(req, res))
             )
-        this.router
+        this._router
             .get(
                 "/developers",
                 verifyAuth("employee"),
                 asyncHandler((req: Request, res: Response) => adminUserManagement.getDevelopers(req, res))
             )
 
-        this.router
+        this._router
             .post(
                 "/groups",
                 verifyAuth("employee"),
@@ -284,7 +284,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => groupController.addMembers(req, res),)
             )
 
-        this.router
+        this._router
             .post(
                 "/question",
                 verifyAuth("employee"),
@@ -316,7 +316,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => questionController.answerQuestion(req, res),)
             )
 
-        this.router
+        this._router
             .post(
                 "/chat/upload",
                 verifyAuth("employee"),
@@ -324,7 +324,7 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => messageController.uploadMedia(req, res),)
             )
 
-        this.router
+        this._router
             .post(
                 "/summary",
                 verifyAuth("employee"),
@@ -341,14 +341,14 @@ export class UserRoute {
                 asyncHandler((req: Request, res: Response) => monthlySummaryController.getSummaries(req, res),)
             )
 
-        this.router
+        this._router
             .get(
                 "/payslip/:employeeId",
                 verifyAuth("employee"),
                 asyncHandler((req: Request, res: Response) => payrollController.getPayslipByEmployeeId(req, res),)
             )
 
-        this.router
+        this._router
             .get(
                 '/payslip/download/pdf',
                 verifyAuth("employee"),
@@ -357,6 +357,6 @@ export class UserRoute {
     }
 
     public getRoute(): express.Router {
-        return this.router;
+        return this._router;
     }
 }

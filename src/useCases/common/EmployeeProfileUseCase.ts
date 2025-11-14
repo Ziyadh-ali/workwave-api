@@ -1,6 +1,5 @@
 import { inject, injectable } from "tsyringe";
 import { IEmployeeRepository } from "../../entities/repositoryInterfaces/employee/EmployeeRepository";
-import { Employee } from "../../entities/models/employeeEntities/EmployeeEnitity";
 import { IEmployeeProfileUseCase } from "../../entities/useCaseInterface/IEmployeeProfileUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
@@ -13,8 +12,8 @@ import { EmployeeMapper } from "../../entities/mapping/EmployeeMapper";
 export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
   constructor(
     @inject("IEmployeeRepository")
-    private employeeRepository: IEmployeeRepository,
-    @inject("IBcrypt") private passwordBcrypt: IBcrypt
+    private _employeeRepository: IEmployeeRepository,
+    @inject("IBcrypt") private _passwordBcrypt: IBcrypt
   ) {}
 
   async updateEmployee(
@@ -22,7 +21,7 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
     data: UpdateEmployeeRequestDTO
   ): Promise<EmployeeResponseDTO | null> {
     if (data.email) {
-      let employee = await this.employeeRepository.findByEmail(data.email);
+      let employee = await this._employeeRepository.findByEmail(data.email);
 
       if (employee) {
         throw new CustomError(
@@ -34,7 +33,7 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
 
     const employee = EmployeeMapper.toUpdateEntity(data);
 
-    const updateEmployee = await this.employeeRepository.updateEmployeeById(
+    const updateEmployee = await this._employeeRepository.updateEmployeeById(
       employeeId,
       employee
     );
@@ -48,7 +47,7 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
   }
 
   async getEmployeeDetails(id: string): Promise<EmployeeResponseDTO | null> {
-    const employee = await this.employeeRepository.findById(id);
+    const employee = await this._employeeRepository.findById(id);
     if (!employee) {
       throw new CustomError(
         MESSAGES.ERROR.USER.USER_NOT_FOUND,
@@ -62,7 +61,7 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
     employeeId: string,
     data: { currentPassword: string; newPassword: string }
   ): Promise<void> {
-    const employee = await this.employeeRepository.findById(employeeId);
+    const employee = await this._employeeRepository.findById(employeeId);
     if (!employee) {
       throw new CustomError(
         MESSAGES.ERROR.USER.USER_NOT_FOUND,
@@ -77,7 +76,7 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
       );
     }
 
-    const isPasswordValid = await this.passwordBcrypt.compare(
+    const isPasswordValid = await this._passwordBcrypt.compare(
       data.currentPassword,
       employee.password
     );
@@ -88,8 +87,8 @@ export class EmployeeProfileUseCase implements IEmployeeProfileUseCase {
       );
     }
 
-    const hashedPassword = await this.passwordBcrypt.hash(data.newPassword);
-    const passwordChange = await this.employeeRepository.updateEmployeeById(
+    const hashedPassword = await this._passwordBcrypt.hash(data.newPassword);
+    const passwordChange = await this._employeeRepository.updateEmployeeById(
       employeeId,
       { password: hashedPassword }
     );

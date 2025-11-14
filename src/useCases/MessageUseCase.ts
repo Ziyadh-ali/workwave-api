@@ -6,24 +6,24 @@ import { IMessageUseCase } from "../entities/useCaseInterface/IMessageUseCase";
 @injectable()
 export class MessageUseCase implements IMessageUseCase {
   constructor(
-    @inject("IMessageRepository") private messageRepository: IMessageRepository,
+    @inject("IMessageRepository") private _messageRepository: IMessageRepository,
   ) { }
 
   async createMessage(data: IMessage): Promise<IMessage> {
-    const savedMessage = await this.messageRepository.createMessage(data)
+    const savedMessage = await this._messageRepository.createMessage(data)
     return savedMessage;
   }
 
   async getPrivateMessages(user1: string, user2: string): Promise<IMessage[]> {
-    return await this.messageRepository.getPrivateMessages(user1, user2);
+    return await this._messageRepository.getPrivateMessages(user1, user2);
   }
 
   async getGroupMessages(roomId: string): Promise<IMessage[]> {
-    return await this.messageRepository.getMessagesByRoomId(roomId);
+    return await this._messageRepository.getMessagesByRoomId(roomId);
   }
   async createMessageWithMedia(data: IMessage): Promise<IMessage> {
 
-    const savedMessage = await this.messageRepository.createMessage({
+    const savedMessage = await this._messageRepository.createMessage({
       content: data.content,
       sender: data.sender,
       recipient: data.recipient,

@@ -1,20 +1,19 @@
-import { Request, response, Response } from "express";
+import { Request, Response } from "express";
 import { IEmployeeLoginUseCase } from "../../../entities/useCaseInterface/IEmployeeLoginUseCase";
 import { inject, injectable } from "tsyringe";
-import { setAuthCookies, clearAuthCookies } from "../../../shared/utils/cookieHelper";
+import { setAuthCookies } from "../../../shared/utils/cookieHelper";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../../shared/constants";
 import { loginSchema } from "../../../shared/validation/validator";
-import { ZodError } from "zod";
 
 @injectable()
 export class EmployeeController {
     constructor(
-        @inject("IEmployeeLoginUseCase") private userLoginUseCase: IEmployeeLoginUseCase,
+        @inject("IEmployeeLoginUseCase") private _userLoginUseCase: IEmployeeLoginUseCase,
     ) { }
 
     async login(req: Request, res: Response): Promise<void> {
             const { email, password } = loginSchema.parse(req.body);
-            const response = await this.userLoginUseCase.login(email, password);
+            const response = await this._userLoginUseCase.login(email, password);
             if (response) {
                 if (response.user.status === "inactive") {
                     res.status(HTTP_STATUS_CODES.FORBIDDEN).json({
@@ -38,7 +37,7 @@ export class EmployeeController {
     }
 
     async logout(req: Request, res: Response): Promise<void> {
-            this.userLoginUseCase.logout(res);
+            this._userLoginUseCase.logout(res);
 
             res.status(HTTP_STATUS_CODES.OK).json({
                 success: true,
