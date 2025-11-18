@@ -92,7 +92,7 @@ export class AttendanceController {
     }
     async requestRegularization(req: Request, res: Response): Promise<void> {
         const { attendanceId } = req.params;
-        const requestedBy = (req as CustomRequest).user.id.toString();
+        const requestedBy = (req as CustomRequest).user.id.toString(); 
         const { reason } = req.body;
         const pendingAttendnace = await this._attendanceUseCase.requestRegularization(attendanceId, {requestedBy, reason});
         res.status(HTTP_STATUS_CODES.OK).json({
