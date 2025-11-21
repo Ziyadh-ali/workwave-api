@@ -1,10 +1,11 @@
 import { IMessageModel } from "../../adapters/database/models/MessageModel";
+import { MessageRequestDTO } from "../dtos/RequestDTOs/MessageDTO";
 import { IMessage } from "../models/IMessage.enities";
 import { IBaseRepository } from "./IBase.repository";
 
 
 export interface IMessageRepository extends IBaseRepository<IMessageModel> {
-  createMessage(data: IMessage): Promise<IMessage>;
+  createMessage(data: MessageRequestDTO): Promise<IMessage>;
 
   getMessagesByRoomId(roomId: string): Promise<IMessage[]>;
 

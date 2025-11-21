@@ -1,7 +1,9 @@
 import { inject, injectable } from "tsyringe";
 import { IMessageRepository } from "../entities/repositoryInterfaces/IMessage.respository";
-import { IMessage } from "../entities/models/IMessage.enities";
 import { IMessageUseCase } from "../entities/useCaseInterface/IMessageUseCase";
+import { MessageResponseDTO } from "../entities/dtos/ResponseDTOs/MessageDTO";
+import { MessageRequestDTO } from "../entities/dtos/RequestDTOs/MessageDTO";
+import { MessageMapper } from './../entities/mapping/MessageMapper';
 
 @injectable()
 export class MessageUseCase implements IMessageUseCase {
@@ -9,19 +11,21 @@ export class MessageUseCase implements IMessageUseCase {
     @inject("IMessageRepository") private _messageRepository: IMessageRepository,
   ) { }
 
-  async createMessage(data: IMessage): Promise<IMessage> {
+  async createMessage(data: MessageRequestDTO): Promise<MessageResponseDTO> {
     const savedMessage = await this._messageRepository.createMessage(data)
-    return savedMessage;
+    return MessageMapper.toResponseDTO(savedMessage);
   }
 
-  async getPrivateMessages(user1: string, user2: string): Promise<IMessage[]> {
-    return await this._messageRepository.getPrivateMessages(user1, user2);
+  async getPrivateMessages(user1: string, user2: string): Promise<MessageResponseDTO[]> {
+    const messages = await this._messageRepository.getPrivateMessages(user1, user2);
+    return messages.map(MessageMapper.toResponseDTO);
   }
 
-  async getGroupMessages(roomId: string): Promise<IMessage[]> {
-    return await this._messageRepository.getMessagesByRoomId(roomId);
+  async getGroupMessages(roomId: string): Promise<MessageResponseDTO[]> {
+    const messages = await this._messageRepository.getMessagesByRoomId(roomId);
+    return messages.map(MessageMapper.toResponseDTO);
   }
-  async createMessageWithMedia(data: IMessage): Promise<IMessage> {
+  async createMessageWithMedia(data: MessageRequestDTO): Promise<MessageResponseDTO> {
 
     const savedMessage = await this._messageRepository.createMessage({
       content: data.content,
@@ -31,6 +35,10 @@ export class MessageUseCase implements IMessageUseCase {
       media: data.media
     });
 
-    return savedMessage;
+    return MessageMapper.toResponseDTO(savedMessage);
+  }
+
+  markAsRead(messageId: string, userId: string): Promise<void> {
+    return this._messageRepository.markAsRead(messageId, userId);
   }
 };

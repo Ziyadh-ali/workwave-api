@@ -1,11 +1,14 @@
-import { IMessage } from "../models/IMessage.enities";
+import { MessageRequestDTO } from "../dtos/RequestDTOs/MessageDTO";
+import { MessageResponseDTO } from "../dtos/ResponseDTOs/MessageDTO";
 
 export interface IMessageUseCase {
-    createMessage(data: IMessage): Promise<IMessage>;
+    createMessage(data: MessageRequestDTO): Promise<MessageResponseDTO>;
 
-    getPrivateMessages(user1: string, user2: string): Promise<IMessage[]>;
+    getPrivateMessages(user1: string, user2: string): Promise<MessageResponseDTO[]>;
 
-    getGroupMessages(roomId: string): Promise<IMessage[]>;
+    getGroupMessages(roomId: string): Promise<MessageResponseDTO[]>;
 
-    createMessageWithMedia(data: Partial<IMessage>): Promise<IMessage>
+    createMessageWithMedia(data: MessageRequestDTO): Promise<MessageResponseDTO>;
+
+    markAsRead(messageId: string, userId: string): Promise<void>
 }

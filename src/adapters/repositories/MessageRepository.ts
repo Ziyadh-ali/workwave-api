@@ -3,21 +3,23 @@ import { IMessageRepository } from "../../entities/repositoryInterfaces/IMessage
 import { injectable } from "tsyringe";
 import { IMessageModel, MessageModel } from "../database/models/MessageModel";
 import { BaseRepository } from "./BaseRepository";
+import { MessageRequestDTO } from "../../entities/dtos/RequestDTOs/MessageDTO";
 
 @injectable()
 export class MessageRepository extends BaseRepository<IMessageModel> implements IMessageRepository {
     constructor() {
         super(MessageModel)
     }
-    async createMessage(data: IMessage): Promise<IMessage> {
+    async createMessage(data: MessageRequestDTO): Promise<IMessage> {
+        console.log("Creating message with data:", data);
         const message = await MessageModel.create({
             content: data.content,
             sender: data.sender,
             recipient: data.recipient || null,
             roomId: data.roomId || null,
-            media : data.media,
+            media: data.media,
         });
-        return message
+        return message.populate("sender", "fullName email profilePic");
     }
 
     async getMessagesByRoomId(roomId: string): Promise<IMessage[]> {

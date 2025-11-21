@@ -1,6 +1,5 @@
 import { RegularizationRequestDTO, UpdateAttendanceRequestDTO } from "../dtos/RequestDTOs/AttendanceDTO";
 import { AttendanceResponseDTO } from "../dtos/ResponseDTOs/AttendanceDTO";
-import { Attendance } from "../models/Attendance.entities";
 
 export interface IAttendanceUseCase {
     checkIn(employeeId: string): Promise<void>;

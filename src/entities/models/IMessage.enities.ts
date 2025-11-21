@@ -3,7 +3,7 @@ import { ObjectId } from "mongoose";
 export interface IMessage {
     _id?: string | ObjectId;
     content: string;
-    sender: ObjectId | string | {_id : string , fullName : string , email : string , profilePic : string};
+    sender: {_id : string , fullName : string , email : string , profilePic : string};
     roomId?: ObjectId | string;
     recipient?: ObjectId | string;
     media?: {

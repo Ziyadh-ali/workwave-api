@@ -1,9 +1,9 @@
 import { injectable } from "tsyringe";
-import { IFaqRepository } from "../../entities/repositoryInterfaces/IFaq.respository";
 import { IFaqs } from "../../entities/models/IFaqs";
 import { FaqModel } from "../database/models/FaqModel";
 import { BaseRepository } from "./BaseRepository";
 import { IFaqModel } from '../database/models/FaqModel';
+import { IFaqRepository } from "../../entities/repositoryInterfaces/IFaq.respository";
 
 @injectable()
 export class FaqRepository extends BaseRepository<IFaqModel> implements IFaqRepository {

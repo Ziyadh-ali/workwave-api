@@ -1,7 +1,6 @@
 import { Server as IOServer, Socket } from 'socket.io';
 import { inject, injectable } from 'tsyringe';
 import { IMessage } from '../../entities/models/IMessage.enities';
-import { IMessageRepository } from '../../entities/repositoryInterfaces/IMessage.respository';
 import { IEmployeeRepository } from '../../entities/repositoryInterfaces/employee/EmployeeRepository';
 import { IGroupRepository } from '../../entities/repositoryInterfaces/IGroup.repository';
 import { INotificationRepository } from '../../entities/repositoryInterfaces/INotification.repository';
@@ -9,6 +8,8 @@ import { INotification } from '../../entities/models/INotification';
 import { CustomError } from '../../shared/errors/CustomError';
 import { HTTP_STATUS_CODES } from '../../shared/constants';
 import { IGroup } from '../../entities/models/IGroup.entities';
+import { IMessageUseCase } from '../../entities/useCaseInterface/IMessageUseCase';
+import { MessageResponseDTO } from '../../entities/dtos/ResponseDTOs/MessageDTO';
 
 interface UserSocketMap {
     [userId: string]: string;
@@ -25,7 +26,7 @@ export class SocketManager {
     private _roomUsersMap: RoomUsersMap = {};
 
     constructor(
-        @inject('IMessageRepository') private _messageRepository: IMessageRepository,
+        @inject('IMessageUseCase') private _messageUseCase: IMessageUseCase,
         @inject('IEmployeeRepository') private _employeeRepository: IEmployeeRepository,
         @inject('IGroupRepository') private _groupRepository: IGroupRepository,
         @inject('INotificationRepository') private _notificationRepository: INotificationRepository,
@@ -37,7 +38,7 @@ export class SocketManager {
     }
 
     private setupSocketEvents(): void {
-        if (!this._io) throw new CustomError('Socket.IO server not initialized' , HTTP_STATUS_CODES.BAD_REQUEST);
+        if (!this._io) throw new CustomError('Socket.IO server not initialized', HTTP_STATUS_CODES.BAD_REQUEST);
 
         this._io.on('connection', (socket: Socket) => {
             console.log(`User connected: ${socket.id}`);
@@ -70,14 +71,19 @@ export class SocketManager {
             // Private message
             socket.on('privateMessage', async (message: IMessage) => {
                 try {
-                    const savedMessage = await this._messageRepository.createMessage(message);
+                    const savedMessage = await this._messageUseCase.createMessage({
+                        sender: message.sender._id as string,
+                        recipient: message.recipient as string,
+                        content: message.content,
+                        media: message.media || undefined,
+                    });
 
                     socket.emit('newPrivateMessage', savedMessage);
-                    const sender = await this._employeeRepository.findById(savedMessage.sender.toString())
+                    const sender = await this._employeeRepository.findById(savedMessage.sender._id.toString())
 
                     await this.sendNotification({
                         recipient: message.recipient as string,
-                        sender: message.sender as string,
+                        sender: message.sender._id.toString(),
                         type: 'message',
                         content: `You have a new message from ${sender?.fullName}`,
                         metadata: {
@@ -100,7 +106,12 @@ export class SocketManager {
                     if (!message.roomId) {
                         throw new Error('Room ID is required for room messages');
                     }
-                    const savedMessage = await this._messageRepository.createMessage(message);
+                    const savedMessage = await this._messageUseCase.createMessage({
+                        sender: message.sender._id as string,
+                        recipient: message.recipient as string,
+                        content: message.content,
+                        media: message.media || undefined,
+                    });
 
                     this._io!.to(message.roomId as string).emit('newRoomMessage', savedMessage);
 
@@ -113,7 +124,7 @@ export class SocketManager {
                         for (const recipient of recipients) {
                             await this.sendNotification({
                                 recipient,
-                                sender: message.sender as string,
+                                sender: message.sender._id.toString(),
                                 type: 'message',
                                 content: `New message in ${groupDetails.name}`,
                                 metadata: {
@@ -132,7 +143,7 @@ export class SocketManager {
             // Mark message as read
             socket.on('markAsRead', async (messageId: string, userId: string) => {
                 try {
-                    await this._messageRepository.markAsRead(messageId, userId);
+                    await this._messageUseCase.markAsRead(messageId, userId);
                     socket.emit('messageRead', messageId);
                 } catch (error) {
                     console.error('Error marking message as read:', error);
@@ -270,9 +281,10 @@ export class SocketManager {
                 }
             });
 
-            socket.on('fetchPrivateMessages', async ({ user1, user2 }: { user1: string; user2: string }, callback: (messages: IMessage[]) => void) => {
+            socket.on('fetchPrivateMessages', async ({ user1, user2 }: { user1: string; user2: string }, callback: (messages: MessageResponseDTO[]) => void) => {
                 try {
-                    const messages = await this._messageRepository.getPrivateMessages(user1, user2);
+                    const messages = await this._messageUseCase.getPrivateMessages(user1, user2);
+                    console.log('Fetched private messages:', messages);
                     callback(messages);
                 } catch (error) {
                     console.error('Error fetching private messages:', error);
@@ -280,9 +292,10 @@ export class SocketManager {
                 }
             });
 
-            socket.on('fetchRoomMessages', async (roomId: string, callback: (messages: IMessage[]) => void) => {
+            socket.on('fetchRoomMessages', async (roomId: string, callback: (messages: MessageResponseDTO[]) => void) => {
                 try {
-                    const messages = await this._messageRepository.getMessagesByRoomId(roomId);
+                    const messages = await this._messageUseCase.getGroupMessages(roomId);
+                    console.log('Fetched room messages:', messages);
                     callback(messages);
                 } catch (error) {
                     console.error('Error fetching room messages:', error);

@@ -14,7 +14,6 @@ async function startApp() {
 
     initializeCronJobs(); 
 
-    console.log("RUNNING BUILD VERSION: Employee Edit v5");
 }
 
 startApp();

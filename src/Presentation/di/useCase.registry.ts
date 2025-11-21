@@ -132,6 +132,9 @@ export class UseCaseRegistry {
         container.register<IMonthlySummaryUseCase>("IMonthlySummaryUseCase", {
             useClass: MonthlySummaryUseCase,
         });
+        container.register<IMessageUseCase>("IMessageUseCase", {
+            useClass: MessageUseCase,
+        });
 
         container.register<IPayrollUseCase>("IPayrollUseCase", {
             useClass: PayrollUseCase,

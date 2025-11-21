@@ -1,12 +1,13 @@
 import { injectable, inject } from "tsyringe";
 import { IAdminRepository } from "../../entities/repositoryInterfaces/admin/AdminRepository";
-import { Admin } from "../../entities/models/adminEntities/AdminEnitity";
-import { AdminLoginResponse } from "../../entities/adminInterface/AdminLoginInterface";
 import { IAdminAuthUseCase } from "../../entities/useCaseInterface/IAdaminAuthUseCase";
 import { HTTP_STATUS_CODES, MESSAGES } from "../../shared/constants";
 import { IJwtService } from "../../entities/services/JwtInterface";
 import { IBcrypt } from "../../Presentation/security/bcrypt.interface";
 import { CustomError } from "../../shared/errors/CustomError";
+import { AdminLoginResponseDTO, AdminResponseDTO } from "../../entities/dtos/ResponseDTOs/AdminDTO";
+import { AdminMapper } from "../../entities/mapping/AdminMapper";
+import { AdminRequestDTO } from "../../entities/dtos/RequestDTOs/AdminDTO";
 
 @injectable()
 export class AdminAuthUseCase implements IAdminAuthUseCase {
@@ -14,9 +15,9 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
     @inject("IAdminRepository") private _adminRepository: IAdminRepository,
     @inject("IBcrypt") private _passwordBcrypt: IBcrypt,
     @inject("IJwtService") private _jwtService: IJwtService
-  ) {}
+  ) { }
 
-  async createAdmin(email: string, password: string): Promise<Admin> {
+  async createAdmin(email: string, password: string): Promise<AdminResponseDTO> {
     const existingAdmin = await this._adminRepository.findByEmail(email);
     if (existingAdmin) {
       throw new CustomError(
@@ -27,19 +28,19 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
 
     const hashedPassword = await this._passwordBcrypt.hash(password);
 
-    const admin: Admin = {
+    const admin: AdminRequestDTO = {
       email,
       password: hashedPassword,
       role: "admin",
     };
-    await this._adminRepository.save(admin);
-    return admin;
+    const adminDetails = await this._adminRepository.save(admin);
+    return AdminMapper.ResponseMapper(adminDetails);
   }
 
   async login(
     email: string,
     password: string
-  ): Promise<AdminLoginResponse | null> {
+  ): Promise<AdminLoginResponseDTO | null> {
     const admin = await this._adminRepository.findByEmail(email);
     if (!admin) {
       throw new CustomError("Admin not found", HTTP_STATUS_CODES.BAD_REQUEST);
@@ -74,7 +75,7 @@ export class AdminAuthUseCase implements IAdminAuthUseCase {
       refreshToken,
       accessToken,
       admin: {
-        _id: admin._id || "",
+        _id: admin._id.toString() || "",
         name: admin.name,
         email: admin.email,
         role: admin.role,

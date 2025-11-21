@@ -1,5 +1,4 @@
 import { MonthlyAttendanceSummaryResponseDTO, MonthlyAttendanceSummaryWithEmployeeResponseDTO } from "../dtos/ResponseDTOs/MonthlySummaryDTO";
-import { IMonthlyAttendanceSummary } from "../models/IMonthlyAttendanceSummary";
 
 export interface IMonthlySummaryUseCase {
     generateSummary(

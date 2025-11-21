@@ -12,7 +12,7 @@ export class LeaveRequestMapper {
       reason: dto.reason,
       duration: dto.duration,
       assignedManager: dto.assignedManager,
-      userRole: dto.userRole,
+      userRole: dto.employeeRole,
       status: "Pending",
     };
   }
